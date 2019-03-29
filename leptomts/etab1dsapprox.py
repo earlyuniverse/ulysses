@@ -50,9 +50,11 @@ class EtaB_1DS_Approx(leptocalc.LeptoCalc):
 
         return np.real(nb)
 
+    # TODO should we move the operator into the base class???
     def __call__(self, x):
         """
         Operator that returns etaB.
+
 
         x --- parameter dictionary
         """
