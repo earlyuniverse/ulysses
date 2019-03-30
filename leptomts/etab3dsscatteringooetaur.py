@@ -74,21 +74,29 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
     return RHStemp
 
 class EtaB_3DS_Scattering_OOEtauR(leptocalc.LeptoCalc):
+
     def RHS(self, y0, zzz, ETA, C, K, W):
         N1, N2, N3, Ntt, Nmm, Nee, Ntm, Nte, Nme, Ntr = y0
         (eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me) = ETA
         k1term,k2term,k3term = K
-        d1      = np.real(self.DS(k1term, zzz))
-        w1      = self.j(zzz)*np.real(self.W1(k1term, zzz))
-        d2      = np.real(self.D2(k2term, zzz))
-        w2      = np.real(self.W2(k2term, zzz))
-        d3      = np.real(self.D3(k3term, zzz))
-        w3      = np.real(self.W3(k3term, zzz))
-        n1eq    = self.N1Eq(zzz)
-        n2eq    = self.N2Eq(zzz)
-        n3eq    = self.N3Eq(zzz)
+        # Turns out, the Bessel functions are expensive, so let's just
+        # evaluate them for every new zzz
+        if zzz != self._currx or zzz == self.xmin:
 
-        return fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me, C, W, d1,d2,d3,w1,w2,w3,n1eq,n2eq,n3eq)
+            self._d1      = np.real(self.DS(k1term, zzz))
+            self._w1      = self.j(zzz)*np.real(self.W1(k1term, zzz))
+            self._d2      = np.real(self.D2(k2term, zzz))
+            self._w2      = np.real(self.W2(k2term, zzz))
+            self._d3      = np.real(self.D3(k3term, zzz))
+            self._w3      = np.real(self.W3(k3term, zzz))
+            self._n1eq    = self.N1Eq(zzz)
+            self._n2eq    = self.N2Eq(zzz)
+            self._n3eq    = self.N3Eq(zzz)
+            self._currx=zzz
+            # print("{}/{} --- {} - {} - {}".format(zzz, self._currx, self._w1, self._w2, self._w3))
+
+        return fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me, C, W,
+                self._d1,self._d2,self._d3,self._w1,self._w2,self._w3,self._n1eq,self._n2eq,self._n3eq)
 
     @property
     def EtaB(self):
@@ -150,12 +158,13 @@ if __name__ == "__main__":
             'M3'     :11
             }
     ETA = EtaB_3DS_Scattering_OOEtauR()
-    # for _ in range(100):
-        # ETA(pars)
 
-    print(ETA(pars))
+    # print(ETA(pars))
+    for _ in range(100):
+        ETA(pars)
 
-    import leptomts
-    L=leptomts.LeptoCalc(nds=4)
-    L.setParams(pars)
-    print("Previous code gives etab = ",np.real(L.EtaB))
+
+    # import leptomts
+    # L=leptomts.LeptoCalc(nds=4)
+    # L.setParams(pars)
+    # print("Previous code gives etab = ",np.real(L.EtaB))
