@@ -1,8 +1,8 @@
-import leptocalc
+import leptomts
 import numpy as np
 from odeintw import odeintw
 
-class EtaB_2DS_Approx(leptocalc.LeptoCalc):
+class EtaB_2DS_Approx(leptomts.LeptoCalc):
     def RHS(self, y0, z, ETA, C, K):
         N1, N2, Ntt, Nmm, Nee = y0
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA

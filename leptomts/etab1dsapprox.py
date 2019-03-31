@@ -1,32 +1,37 @@
-import leptocalc
+import leptomts
 import numpy as np
 from odeintw import odeintw
 
-class EtaB_1DS_Approx(leptocalc.LeptoCalc):
+
+from numba import jit
+@jit
+def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee,c1t,c1m,c1e):
+    N1      = y0[0]
+    Ntt     = y0[1]
+    Nmm     = y0[2]
+    Nee     = y0[3]
+    c1tc    = np.conjugate(c1t)
+    c1mc    = np.conjugate(c1m)
+    c1ec    = np.conjugate(c1e)
+    rhs1 =      -d*(N1-n1eq)
+
+    rhs2 = epstt*d*(N1-n1eq)-0.5*w1*(2*c1t*c1tc*Ntt)
+    rhs3 = epsmm*d*(N1-n1eq)-0.5*w1*(2*c1m*c1mc*Nmm)
+    rhs4 = epsee*d*(N1-n1eq)-0.5*w1*(2*c1e*c1ec*Nee)
+
+    return [rhs1, rhs2, rhs3, rhs4]
+
+class EtaB_1DS_Approx(leptomts.LeptoCalc):
 
     def RHS(self, y0,z,epstt,epsmm,epsee,c1t,c1m,c1e,k):
-        N1      = y0[0]
-        Ntt     = y0[1]
-        Nmm     = y0[2]
-        Nee     = y0[3]
 
-        d    = np.real(self.D1(k,z))
-        w1   = np.real(self.W1(k,z))
-        n1eq = self.N1Eq(z)
+        if z != self._currx or z == self.xmin:
+            self._d       = np.real(self.D1(k,z))
+            self._w1      = np.real(self.W1(k,z))
+            self._n1eq    = self.N1Eq(z)
+            self._currx=z
 
-        c1tc    = np.conjugate(c1t)
-        c1mc    = np.conjugate(c1m)
-        c1ec    = np.conjugate(c1e)
-
-
-        #define the different RHSs for each equation
-        rhs1 =      -d*(N1-n1eq)
-
-        rhs2 = epstt*d*(N1-n1eq)-0.5*w1*(2*c1t*c1tc*Ntt)
-        rhs3 = epsmm*d*(N1-n1eq)-0.5*w1*(2*c1m*c1mc*Nmm)
-        rhs4 = epsee*d*(N1-n1eq)-0.5*w1*(2*c1e*c1ec*Nee)
-
-        return [rhs1, rhs2, rhs3, rhs4]
+        return fast_RHS(y0, self._d, self._w1, self._n1eq, epstt,epsmm,epsee,c1t,c1m,c1e)
 
     @property
     def EtaB(self):
@@ -49,33 +54,3 @@ class EtaB_1DS_Approx(leptocalc.LeptoCalc):
         nb      = self.sphalfact*(ys[-1,1]+ys[-1,2]+ys[-1,3])
 
         return np.real(nb)
-
-
-
-if __name__ == "__main__":
-    pars = {
-            'delta'  :270,
-            'a'      :0,
-            'b'      :0,
-            'theta23':48.7,
-            'theta12':33.63,
-            'theta13': 8.52,
-            'x1'    :45,
-            'y1'    :45,
-            'x2'    :45,
-            'y2'    :45,
-            'x3'    :45,
-            'y3'    :45,
-            'ordering':0,
-            'm1'     :-0.60206,
-            'M1'     :8,
-            'M2'     :9,
-            'M3'     :11
-            }
-    ETA = EtaB_1DS_Approx()
-    print(ETA(pars))
-
-    import leptomts
-    L=leptomts.LeptoCalc(approx=True)
-    L.setParams(pars)
-    print("Previous code gives etab = ",np.real(L.EtaB))

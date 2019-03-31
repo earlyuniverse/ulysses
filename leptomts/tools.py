@@ -59,7 +59,7 @@ def selectLepto(model, approx=False):
         return leptomts.EtaB_3DS_Scattering() if not approx  else None
     elif model=="3dsscatteringooetaur":
         return leptomts.EtaB_3DS_Scattering_OOEtauR() if not approx  else None
-    elif model=="3dsblanchettr":
+    elif model=="3dsblanchett":
         return leptomts.EtaB_3DS_Blanchett() if not approx  else None
     else:
         raise Exception("Specified model '{}' unknown".format(model))

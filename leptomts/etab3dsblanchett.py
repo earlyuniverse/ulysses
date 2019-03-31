@@ -5,10 +5,9 @@ from odeintw import odeintw
 from numba import jit
 @jit
 def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me, C, W, d1,d2,d3,w1,w2,w3,n1eq,n2eq,n3eq):
-    N1, N2, N3, Ntt, Nmm, Nee, Ntm, Nte, Nme, Ntr = y0
+    N1, N2, N3, Ntt, Nmm, Nee, Ntm, Nte, Nme, Ntr, ptm, pte, pme = y0
     c1t,c1m,c1e,c2t,c2m,c2e,c3t,c3m,c3e = C
-    widtht,widthm = W
-
+    widtht,widthm,widthRt = W
     c1tc    = np.conjugate(c1t)
     c1mc    = np.conjugate(c1m)
     c1ec    = np.conjugate(c1e)
@@ -47,7 +46,7 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
       +        (w1 * c1e * c1mc + w2 * c2e * c2mc + w3 * c3e * c3mc) * Nte
       +        (w1 * c1m * c1mc + w2 * c2m * c2mc + w3 * c3m * c3mc) * Ntm
       +        (w1 * c1mc * c1t + w2 * c2mc * c2t + w3 * c3mc * c3t) * Ntt
-      +        (w1 * c1t * c1tc + w2 * c2t * c2tc + w3 * c3t * c3tc + 2 * widtht + 2 * widthm) * Ntm
+      +        (w1 * c1t * c1tc + w2 * c2t * c2tc + w3 * c3t * c3tc + 2 * widtht + 2 * widthm) * Ntm + 1j*widthRt*ptm
       +        (w1 * c1t * c1ec + w2 * c2t * c2ec + w3 * c3t * c3ec) * np.conjugate(Nme)))
 
     rhs8    = (eps1te * d1 * (N1-n1eq) + eps2te * d2 * (N2-n2eq) + eps3te * d3 * (N3-n3eq)
@@ -56,7 +55,7 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
       +        (w1 * c1m * c1ec + w2 * c2m * c2ec + w3 * c3m * c3ec) * Ntm
       +        (w1 * c1t * c1ec + w2 * c2t * c2ec + w3 * c3t * c3ec) * Ntt
       +        (w1 * c1t * c1mc + w2 * c2t * c2mc + w3 * c3t * c3mc) * Nme
-      +        (w1 * c1t * c1tc + w2 * c2t * c2tc + w3 * c3t * c3tc + 2 * widtht) * Nte))
+      +        (w1 * c1t * c1tc + w2 * c2t * c2tc + w3 * c3t * c3tc + 2 * widtht) * Nte)) + 1j*widthRt*pte
 
     rhs9    = (eps1me * d1 * (N1-n1eq) + eps2me * d2 * (N2-n2eq) + eps3me * d3 * (N3-n3eq)
       - 0.5 * ((w1 * c1m * c1ec + w2 * c2m * c2ec + w3 * c3m * c3ec) * Nee
@@ -64,20 +63,21 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
       +        (w1 * c1m * c1ec + w2 * c2m * c2ec + w3 * c3m * c3ec) * Nmm
       +        (w1 * c1t * c1ec + w2 * c2t * c2ec + w3 * c3t * c3ec) * np.conjugate(Ntm)
       +        (w1 * c1m * c1mc + w2 * c2m * c2mc + w3 * c3m * c3mc) * Nme
-      +        (w1 * c1m * c1tc + w2 * c2m * c2tc + w3 * c3m * c3tc) * Nte))
+      +        (w1 * c1m * c1tc + w2 * c2m * c2tc + w3 * c3m * c3tc) * Nte)) + 1j*widthRt*pme
 
     rhs10   = 2 * widtht * (Ntt - 2 * Ntr)
+    rhs11   = -1j*widthRt*Ntm
+    rhs12   = -1j*widthRt*Nte
+    rhs13   = -1j*widthRt*Nme
 
-    RHStemp = [rhs1, rhs2, rhs3, rhs4, rhs5, rhs6, rhs7, rhs8, rhs9, rhs10]
+    RHStemp = [rhs1, rhs2, rhs3, rhs4, rhs5, rhs6, rhs7, rhs8, rhs9, rhs10, rhs11, rhs12, rhs13]
     return RHStemp
 
-class EtaB_3DS_Scattering_OOEtauR(leptomts.LeptoCalc):
-
+class EtaB_3DS_Blanchett(leptomts.LeptoCalc):
     def RHS(self, y0, zzz, ETA, C, K, W):
-        (eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me) = ETA
+        (eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee, eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me) = ETA
         k1term,k2term,k3term = K
-        # Turns out, the Bessel functions are expensive, so let's just
-        # evaluate them for every new zzz
+
         if zzz != self._currx or zzz == self.xmin:
 
             self._d1      = np.real(self.DS(k1term, zzz))
@@ -90,10 +90,10 @@ class EtaB_3DS_Scattering_OOEtauR(leptomts.LeptoCalc):
             self._n2eq    = self.N2Eq(zzz)
             self._n3eq    = self.N3Eq(zzz)
             self._currx=zzz
-            # print("{}/{} --- {} - {} - {}".format(zzz, self._currx, self._w1, self._w2, self._w3))
 
         return fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me, C, W,
                 self._d1,self._d2,self._d3,self._w1,self._w2,self._w3,self._n1eq,self._n2eq,self._n3eq)
+
 
     @property
     def EtaB(self):
@@ -124,12 +124,12 @@ class EtaB_3DS_Scattering_OOEtauR(leptomts.LeptoCalc):
                 self.c3a(2), self.c3a(1), self.c3a(0)]
 
         _K      = [np.real(self.k1), np.real(self.k2), np.real(self.k3)]
-        _W      = [ 485e-10*self.MP/self.M1, 1.7e-10*self.MP/self.M1]
+        _W      = [ 485e-10*self.MP/self.M1, 1.7e-10*self.MP/self.M1, 970e-10*self.MP/self.M1]
 
-        y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
+        y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         zcrit   = 1e100
         ys, _   = odeintw(self.RHS, y0, self.xs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
         nb      = np.real(self.sphalfact*(ys[-1,3]+ys[-1,4]+ys[-1,5]))
 
-        return np.real(nb)
+        return nb

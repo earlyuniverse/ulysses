@@ -19,7 +19,7 @@ def my_kn2(x):
 
 
 
-class LeptoCalc(object):
+class LeptoOld(object):
     def __init__(self, debug=False, nds=1, approx=False, xmin=1e-1, xmax=100, xsteps=1000, controlplots=False, plotprefix=""):
         """
         Set global constants here.
