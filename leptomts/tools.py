@@ -1,20 +1,5 @@
-# # Solver for Boltzmann equation with one decaying sterile, three flavours and CI parametrisation
-
-################################################################################################################## 
-# Input the parameters delta,a,b,theta12,theta23,theta13,x1,y1,x2,y2,x3,y3,ordering,m1,M1,M2,M3 into etaB where: #
-# 														 #
-# PMNS = (delta, a, b - PMNS phases, theta12, theta23, theta13 - mixing angles)					 #
-# 														 #
-# xys = x1,y1,x2,y2,x3,y3 - angles in orthogonal R matrix							 #
-# 														 #
-# lightMs = ordering - 1 normal ordering, 0 inverted ordering, m1 - free mass parameter in the light mass matrix #
-# 														 #
-# heavyMs = M1, M2, M3 - heavy mass parameters (masses are 10^Mi)						 #
-# 														 #
-# Output of etaB is the asymmetry and True or False for the Yukawa perturbativity test.				 #
-##################################################################################################################
-
 import cmath
+import leptomts
 
 def readConfig(fname):
     from collections import OrderedDict
@@ -47,3 +32,34 @@ def readConfig(fname):
                 print ("Warning, not understood instruction:", l)
                 continue
         return ranges, fixed
+
+def selectLepto(model, approx=False):
+    import leptomts
+    from leptomts.etab1ds                  import EtaB_1DS
+    from leptomts.etab2ds                  import EtaB_2DS
+    from leptomts.etab3ds                  import EtaB_3DS
+    from leptomts.etab1dsapprox            import EtaB_1DS_Approx
+    from leptomts.etab2dsapprox            import EtaB_2DS_Approx
+    from leptomts.etab1dszerowidth         import EtaB_1DS_ZeroWidth
+    from leptomts.etab2dsresonant          import EtaB_2DS_Resonant
+    from leptomts.etab3dsscattering        import EtaB_3DS_Scattering
+    from leptomts.etab3dsscatteringooetaur import EtaB_3DS_Scattering_OOEtauR
+    from leptomts.etab3dsblanchett         import EtaB_3DS_Blanchett
+    if model=="1ds":
+        return leptomts.EtaB_1DS() if not approx else leptomts.EtaB_1DS_Approx()
+    elif model=="2ds":
+        return leptomts.EtaB_2DS() if not approx else leptomts.EtaB_2DS_Approx()
+    elif model=="3ds":
+        return leptomts.EtaB_3DS() if not approx else None
+    elif model=="1dszerowidth":
+        return leptomts.EtaB_1DS_ZeroWidth() if not approx  else None
+    elif model=="2dsresonant":
+        return leptomts.EtaB_2DS_Resonant() if not approx  else None
+    elif model=="3dsscattering":
+        return leptomts.EtaB_3DS_Scattering() if not approx  else None
+    elif model=="3dsscatteringooetaur":
+        return leptomts.EtaB_3DS_Scattering_OOEtauR() if not approx  else None
+    elif model=="3dsblanchettr":
+        return leptomts.EtaB_3DS_Blanchett() if not approx  else None
+    else:
+        raise Exception("Specified model '{}' unknown".format(model))
