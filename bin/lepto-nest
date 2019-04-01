@@ -30,7 +30,7 @@ op.add_option("--mn-no-importance",dest="NOIMPSAMP",   default=False, action='st
 opts, args = op.parse_args()
 
 # TODO improve on keywords
-MODELS=["1ds", "2ds", "3ds", "3dsscatteringooetaur", "1dsscatteringooetaur", "3dsooetaur", "2dsresonant", "1dszerowidth"]
+MODELS=["1ds", "2ds", "3ds", "3dsscatteringooetaur", "1dsscatteringooetaur", "3dsooetaur", "2dsresonant", "1dszerowidth", "3dsblanchett"]
 
 if opts.MODEL not in MODELS:
     print("Specified model '{}' unknown, please choose from {}".format(opts.MODEL, MODELS))
