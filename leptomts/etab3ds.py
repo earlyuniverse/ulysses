@@ -132,33 +132,3 @@ class EtaB_3DS(leptomts.LeptoCalc):
         nb      = np.real(self.sphalfact*(ys[-1,3]+ys[-1,4]+ys[-1,5]))
 
         return np.real(nb)
-
-
-if __name__ == "__main__":
-    pars = {
-            'delta'  :270,
-            'a'      :0,
-            'b'      :0,
-            'theta23':48.7,
-            'theta12':33.63,
-            'theta13': 8.52,
-            'x1'    :45,
-            'y1'    :45,
-            'x2'    :45,
-            'y2'    :45,
-            'x3'    :45,
-            'y3'    :45,
-            'ordering':0,
-            'm1'     :-0.60206,
-            'M1'     :8,
-            'M2'     :9,
-            'M3'     :11
-            }
-    ETA = EtaB_3DS()
-    for _ in range(50):
-        ETA(pars)
-
-    # import leptomts
-    # L=leptomts.LeptoCalc(nds=3)
-    # L.setParams(pars)
-    # print("Previous code gives etab = ",np.real(L.EtaB))
