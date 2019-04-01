@@ -2,39 +2,45 @@ import leptomts
 import numpy as np
 from odeintw import odeintw
 
+from numba import jit
+
+# @jit
+def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,d1,d2,w1,w2,n1eq,n2eq,C):
+    N1, N2, Ntt, Nmm, Nee = y0
+    c1t,c1m,c1e,c2t,c2m,c2e = C
+    c1tc    = np.conjugate(c1t)
+    c1mc    = np.conjugate(c1m)
+    c1ec    = np.conjugate(c1e)
+
+    c2tc    = np.conjugate(c2t)
+    c2mc    = np.conjugate(c2m)
+    c2ec    = np.conjugate(c2e)
+
+    #define the different RHSs for each equation
+    rhs1    =      -d1*(N1-n1eq)
+    rhs2    =      -d2*(N2-n2eq)
+    rhs3    = eps1tt*d1*(N1-n1eq)+eps2tt*d2*(N2-n2eq)-0.5*w1*(2*c1t*c1tc*Ntt) -0.5*w2*(2*c2t*c2tc*Ntt)
+    rhs4    = eps1mm*d1*(N1-n1eq)+eps2mm*d2*(N2-n2eq)-0.5*w1*(2*c1m*c1mc*Nmm) -0.5*w2*(2*c2m*c2mc*Nmm)
+    rhs5    = eps1ee*d1*(N1-n1eq)+eps2ee*d2*(N2-n2eq)-0.5*w1*(2*c1e*c1ec*Nee) -0.5*w2*(2*c2e*c2ec*Nee)
+
+    RHStemp = [rhs1, rhs2, rhs3, rhs4, rhs5]
+    return RHStemp
+
 class EtaB_2DS_Approx(leptomts.LeptoCalc):
     def RHS(self, y0, z, ETA, C, K):
-        N1, N2, Ntt, Nmm, Nee = y0
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA
-        c1t,c1m,c1e,c2t,c2m,c2e = C
         k1term,k2term = K
 
-        d1      = np.real(self.D1(k1term, z))
-        w1      = np.real(self.W1(k1term, z))
-        d2      = np.real(self.D2(k2term, z))
-        w2      = np.real(self.W2(k2term, z))
-        n1eq    = self.N1Eq(z)
-        n2eq    = self.N2Eq(z)
+        # if z != self._currx or z == self.xmin:
+        self._d1      = np.real(self.D1(k1term, z))
+        self._w1      = np.real(self.W1(k1term, z))
+        self._d2      = np.real(self.D2(k2term, z))
+        self._w2      = np.real(self.W2(k2term, z))
+        self._n1eq    = self.N1Eq(z)
+        self._n2eq    = self.N2Eq(z)
+        self._currx=z
 
-        c1tc    = np.conjugate(c1t)
-        c1mc    = np.conjugate(c1m)
-        c1ec    = np.conjugate(c1e)
-
-        c2tc    = np.conjugate(c2t)
-        c2mc    = np.conjugate(c2m)
-        c2ec    = np.conjugate(c2e)
-
-        #define the different RHSs for each equation
-        rhs1    =      -d1*(N1-n1eq)
-        rhs2    =      -d2*(N2-n2eq)
-        rhs3    = eps1tt*d1*(N1-n1eq)+eps2tt*d2*(N2-n2eq)-0.5*w1*(2*c1t*c1tc*Ntt) -0.5*w2*(2*c2t*c2tc*Ntt)
-
-        rhs4    = eps1mm*d1*(N1-n1eq)+eps2mm*d2*(N2-n2eq)-0.5*w1*(2*c1m*c1mc*Nmm) -0.5*w2*(2*c2m*c2mc*Nmm)
-
-        rhs5    = eps1ee*d1*(N1-n1eq)+eps2ee*d2*(N2-n2eq)-0.5*w1*(2*c1e*c1ec*Nee) -0.5*w2*(2*c2e*c2ec*Nee)
-
-        RHStemp = [rhs1, rhs2, rhs3, rhs4, rhs5]
-        return RHStemp
+        return fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,self._d1,self._d2,self._w1,self._w2,self._n1eq,self._n2eq, C)
 
 
 
@@ -86,31 +92,3 @@ class EtaB_2DS_Approx(leptomts.LeptoCalc):
         nb      = self.sphalfact*(ys[-1,2]+ys[-1,3]+ys[-1,4])
 
         return np.real(nb)
-
-if __name__ == "__main__":
-    pars = {
-            'delta'  :270,
-            'a'      :0,
-            'b'      :0,
-            'theta23':48.7,
-            'theta12':33.63,
-            'theta13': 8.52,
-            'x1'    :45,
-            'y1'    :45,
-            'x2'    :45,
-            'y2'    :45,
-            'x3'    :45,
-            'y3'    :45,
-            'ordering':0,
-            'm1'     :-0.60206,
-            'M1'     :8,
-            'M2'     :9,
-            'M3'     :11
-            }
-    ETA = EtaB_2DS_Approx()
-    print(ETA(pars))
-
-    import leptomts
-    L=leptomts.LeptoCalc(nds=2,approx=True)
-    L.setParams(pars)
-    print("Previous code gives etab = ",np.real(L.EtaB))
