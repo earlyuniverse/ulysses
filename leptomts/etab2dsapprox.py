@@ -4,7 +4,7 @@ from odeintw import odeintw
 
 from numba import jit
 
-# @jit
+@jit
 def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,d1,d2,w1,w2,n1eq,n2eq,C):
     N1, N2, Ntt, Nmm, Nee = y0
     c1t,c1m,c1e,c2t,c2m,c2e = C
@@ -31,14 +31,14 @@ class EtaB_2DS_Approx(leptomts.LeptoCalc):
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA
         k1term,k2term = K
 
-        # if z != self._currx or z == self.xmin:
-        self._d1      = np.real(self.D1(k1term, z))
-        self._w1      = np.real(self.W1(k1term, z))
-        self._d2      = np.real(self.D2(k2term, z))
-        self._w2      = np.real(self.W2(k2term, z))
-        self._n1eq    = self.N1Eq(z)
-        self._n2eq    = self.N2Eq(z)
-        self._currx=z
+        if z != self._currx or z == self.xmin:
+            self._d1      = np.real(self.D1(k1term, z))
+            self._w1      = np.real(self.W1(k1term, z))
+            self._d2      = np.real(self.D2(k2term, z))
+            self._w2      = np.real(self.W2(k2term, z))
+            self._n1eq    = self.N1Eq(z)
+            self._n2eq    = self.N2Eq(z)
+            self._currx=z
 
         return fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,self._d1,self._d2,self._w1,self._w2,self._n1eq,self._n2eq, C)
 
