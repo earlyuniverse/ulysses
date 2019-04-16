@@ -1,0 +1,60 @@
+#!/usr/bin/env python
+
+
+def plotEvolution(data, f_out):
+    import pylab
+    pylab.plot(data[:,0], abs(data[:,1]), label="$N_{\\tau\\tau}$")
+    pylab.plot(data[:,0], abs(data[:,2]), label="$N_{\mu\mu}$")
+    pylab.plot(data[:,0], abs(data[:,3]), label="$N_{ee}$")
+    pylab.legend()
+    pylab.xlabel("$z$")
+    pylab.yscale("log")
+    pylab.ylabel("$\left|N_{xx} \\right|$")
+    pylab.savefig(f_out)
+
+
+import optparse, os, sys
+op = optparse.OptionParser(usage=__doc__)
+op.add_option("-o", "--output",    dest="OUTPUT",      default="plot.pdf", type=str, help="Output file name for evolution plots (default: %default)")
+op.add_option("-v", "--debug",     dest="DEBUG",       default=False, action="store_true", help="Turn on some debug messages")
+op.add_option("-q", "--quiet",     dest="QUIET",       default=False, action="store_true", help="Turn off messages")
+op.add_option("-m", "--model",     dest="MODEL",       default="3ds", help="Selection of of model")
+op.add_option("--ordering",        dest="ORDERING",    default=0, type=int,                help="The mass ordering (0 or 1, default: %default)")
+opts, args = op.parse_args()
+
+# TODO improve on keywords
+MODELS=["1ds", "2ds", "3ds", "3dsscatteringooetaur", "1dsscatteringooetaur", "3dsooetaur", "2dsresonant", "1dszerowidth", "3dsblanchett"]
+
+if opts.MODEL not in MODELS:
+    print("Specified model '{}' unknown, please choose from {}".format(opts.MODEL, MODELS))
+    sys.exit(1)
+
+if len(args)==0:
+    print("No parameter space configuration given, exiting.")
+    sys.exit(1)
+
+import leptomts
+
+LEPTO = leptomts.selectLepto(opts.MODEL, False)
+if LEPTO is None:
+    print("Combination of approx ({}) and model ({}) not implemented, exiting".format(False, opts.MODEL))
+    sys.exit(1)
+
+
+_, FIX = leptomts.readConfig(args[0])
+
+
+# Sanity check for ordering
+if opts.ORDERING not in [0,1]:
+    print( "Error, ordering has to be either 0 or 1, exiting")
+    sys.exit(1)
+
+FIX["ordering"]=opts.ORDERING
+
+etaB, pd = LEPTO(FIX)
+
+plotEvolution(pd, opts.OUTPUT)
+# from IPython import embed
+# embed()
+print("etaB: {}".format(etaB))
+

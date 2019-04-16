@@ -44,7 +44,7 @@ class EtaB_1DS_Approx(leptomts.LeptoCalc):
         c1m   =                 self.c1a(1)
         c1e   =                 self.c1a(0)
 
-        xs      = np.linspace(self.xmin, self.xmax, self.xsteps)
+        xs      = np.linspace(self.xmin, self.xmax, self.xsteps) # TODO is this not already set?
         k       = np.real(self.k1)
         y0      = np.array([0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
@@ -53,4 +53,8 @@ class EtaB_1DS_Approx(leptomts.LeptoCalc):
         ys      = odeintw(self.RHS, y0, self.xs, args = tuple(params))
         nb      = self.sphalfact*(ys[-1,1]+ys[-1,2]+ys[-1,3])
 
-        return np.real(nb)
+        pd = np.empty((self.xsteps, 4))
+        pd[:,      0] = self.xs
+        pd[:,[1,2,3]] = np.real(ys[:, [1,2,3]])
+
+        return np.real(nb), pd

@@ -91,4 +91,8 @@ class EtaB_2DS_Approx(leptomts.LeptoCalc):
         ys      = odeintw(self.RHS, y0, self.xs, args = tuple([_ETA, _C, _K]))
         nb      = self.sphalfact*(ys[-1,2]+ys[-1,3]+ys[-1,4])
 
-        return np.real(nb)
+        pd = np.empty((self.xsteps, 4))
+        pd[:,      0] = self.xs
+        pd[:,[1,2,3]] = np.real(ys[:, [2,3,4]])
+
+        return np.real(nb), pd
