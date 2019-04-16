@@ -17,8 +17,7 @@ def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e):
     c1mc    = np.conjugate(c1m)
     c1ec    = np.conjugate(c1e)
 
-    #widtht  = 485e-10*self.MP/self.M1
-    #widthm  = 1.7e-10*self.MP/self.M1
+# thermal widths are set to zero such that we are in the "one-flavoured regime"
     widtht = 0.0
     widthm = 0.0
 
