@@ -73,6 +73,12 @@ class LeptoCalc(object):
         self.setParams(x)
         return self.EtaB
 
+    def __str__(self):
+        return self.__doc__
+
+    # def __repr__(self):
+        # return self.__docstring
+
     def setXMin(self, x):
         self._xmin=x
         self.setXS()
@@ -110,6 +116,7 @@ class LeptoCalc(object):
         pd = np.empty((self.xsteps, 4))
         pd[:,      0] = self.xs
         pd[:,[1,2,3]] = self.ys
+        return pd
 
     def setParams(self, pdict):
         """

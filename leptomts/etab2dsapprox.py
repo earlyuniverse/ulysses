@@ -27,6 +27,11 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
     return RHStemp
 
 class EtaB_2DS_Approx(leptomts.LeptoCalc):
+    """
+    Boltzmann  equation (BE) zero thermal width (implies one-flavoured regime (1F)) with two decaying sterile no flavour correlations
+    """
+
+
     def RHS(self, y0, z, ETA, C, K):
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA
         k1term,k2term = K

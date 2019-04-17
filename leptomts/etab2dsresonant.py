@@ -24,6 +24,10 @@ def fast_RHS(y0, epstt,epsmm,epsee,C,d1,w1,n1eq):
     return RHStemp
 
 class EtaB_2DS_Resonant(leptomts.LeptoCalc):
+    """
+    resonant leptogenesis with 2 steriles c.f. Riotto equations
+    """
+
     def RHS(self, y0, zzz, ETA, C, K):
         k1term,k2term = K
         epstt,epsmm,epsee = ETA

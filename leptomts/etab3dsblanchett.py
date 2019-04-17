@@ -74,6 +74,11 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
     return RHStemp
 
 class EtaB_3DS_Blanchett(leptomts.LeptoCalc):
+    """
+    density matrix equation (DME) finite thermal width  with three decaying steriles. Most "realistic" for our purposes.
+    with scatterings of right-handed taus c.f S. Blanchet's thesis Chapter 4
+    """
+
     def RHS(self, y0, zzz, ETA, C, K, W):
         (eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee, eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me) = ETA
         k1term,k2term,k3term = K

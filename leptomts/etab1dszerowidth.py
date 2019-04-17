@@ -28,6 +28,9 @@ def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e, w
 
 
 class EtaB_1DS_ZeroWidth(LeptoCalc):
+    """
+    This is the same as eta1ds.py and should be removed
+    """
 
     def RHS(self, y0,z,epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e,k):
 

@@ -70,6 +70,9 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
 
 
 class EtaB_3DS(leptomts.LeptoCalc):
+    """
+     density matrix equation (DME) finite thermal width  with three decaying steriles. Most "realistic" for our purposes.
+    """
 
     def RHS(self, y0, zzz, ETA, C, K, W):
         N1, N2, N3, Ntt, Nmm, Nee, Ntm, Nte, Nme = y0

@@ -22,6 +22,7 @@ def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee,c1t,c1m,c1e):
     return [rhs1, rhs2, rhs3, rhs4]
 
 class EtaB_1DS_Approx(leptomts.LeptoCalc):
+    """density matrix equation (DME) zero thermal width (implies one-flavoured regime (1F)) with one decaying sterile."""
 
     def RHS(self, y0,z,epstt,epsmm,epsee,c1t,c1m,c1e,k):
 
