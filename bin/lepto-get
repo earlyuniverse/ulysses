@@ -58,9 +58,9 @@ etaB = LEPTO(FIX)
 print("etaB: {}".format(etaB))
 if opts.OUTPUT is not None:
     if opts.OUTPUT.endswith(".txt"):
-        np.savetxt(opts.OUTPUT, LEPT.evolData)
+        np.savetxt(opts.OUTPUT, LEPTO.evolData)
     elif opts.OUTPUT.endswith(".csv"):
-        np.savetxt(opts.OUTPUT, LEPT.evolData, delimiter=",")
+        np.savetxt(opts.OUTPUT, LEPTO.evolData, delimiter=",")
     else:
         plotEvolution(LEPTO.evolData, opts.OUTPUT)
     if opts.DEBUG:
