@@ -58,6 +58,7 @@ class LeptoCalc(object):
         self._currx = self.xmin
 
         self.xs=None
+        self.ys=None
         self.setXS()
         self.sphalfact = 0.01
 
@@ -97,6 +98,18 @@ class LeptoCalc(object):
 
     @property
     def xsteps(self): return self._xsteps
+
+    @property
+    def evolData(self):
+        """
+        Return a 4-D array of the evolution data.
+        The first column is the evolution variable
+        The second column corresponds to Ntautau, the
+        third to Nmumu and the last columnd to Nee
+        """
+        pd = np.empty((self.xsteps, 4))
+        pd[:,      0] = self.xs
+        pd[:,[1,2,3]] = self.ys
 
     def setParams(self, pdict):
         """
