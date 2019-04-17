@@ -128,12 +128,9 @@ class EtaB_3DS_Scattering_OOEtauR(leptomts.LeptoCalc):
 
         y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
-        zcrit   = 1e100
         ys, _   = odeintw(self.RHS, y0, self.xs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
         nb      = np.real(self.sphalfact*(ys[-1,3]+ys[-1,4]+ys[-1,5]))
 
-        pd = np.empty((self.xsteps, 4))
-        pd[:,      0] = self.xs
-        pd[:,[1,2,3]] = np.real(ys[:, [3,4,5]])
+        self.ys = np.real(ys[:, [3,4,5]])
 
-        return np.real(nb), pd
+        return np.real(nb)

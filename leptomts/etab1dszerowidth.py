@@ -68,8 +68,6 @@ class EtaB_1DS_ZeroWidth(LeptoCalc):
         ys, _      = odeintw(self.RHS, y0, self.xs, args = tuple(params), full_output=True)
         nb      = self.sphalfact*(ys[-1,1]+ys[-1,2]+ys[-1,3])
 
-        pd = np.empty((self.xsteps, 4))
-        pd[:,      0] = self.xs
-        pd[:,[1,2,3]] = np.real(ys[:, [1,2,3]])
+        self.ys  = np.real(ys[:, [1,2,3]])
 
-        return np.real(nb), pd
+        return np.real(nb)
