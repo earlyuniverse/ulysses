@@ -15,7 +15,7 @@ setup(
     'numba',
     'pymultinest'
   ],
-  scripts=[],
+  scripts=['bin/lepto-get'],
   extras_require = {
   },
   entry_points = {
