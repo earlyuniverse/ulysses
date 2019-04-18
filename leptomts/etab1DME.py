@@ -1,3 +1,4 @@
+# non-resonant leptogenesis with one decaying sterile neutrino using the density matrix equations. Equations from 1112.4528
 import leptomts
 import numpy as np
 from odeintw import odeintw
@@ -18,8 +19,8 @@ def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e):
     c1ec    = np.conjugate(c1e)
 
 # thermal widths are set to zero such that we are in the "one-flavoured regime"
-    widtht = 0.0
-    widthm = 0.0
+    widtht = 485e-10*self.MP/self.M1
+    widthm = 1.7e-10*self.MP/self.M1
 
     #define the different RHSs for each equation
     rhs1 =      -d*(N1-n1eq)
@@ -33,7 +34,7 @@ def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e):
 
     return [rhs1, rhs2, rhs3, rhs4, rhs5, rhs6, rhs7]
 
-class EtaB_1DS(leptomts.LeptoCalc):
+class EtaB_1DME(leptomts.LeptoCalc):
     """
     density matrix equation (DME) zero thermal width (implies one-flavoured regime (1F)) with one decaying sterile.
     """

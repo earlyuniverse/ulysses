@@ -1,3 +1,4 @@
+# resonant leptogenesis with two  sterile neutrinos. Equations from 0705.2183
 import leptomts
 import numpy as np
 from odeintw import odeintw
@@ -23,10 +24,8 @@ def fast_RHS(y0, epstt,epsmm,epsee,C,d1,w1,n1eq):
     RHStemp = [rhs1, rhs2, rhs3, rhs4]
     return RHStemp
 
-class EtaB_2DS_Resonant(leptomts.LeptoCalc):
-    """
-    resonant leptogenesis with 2 steriles c.f. Riotto equations
-    """
+class EtaB_2Resonant(leptomts.LeptoCalc):
+   
 
     def RHS(self, y0, zzz, ETA, C, K):
         k1term,k2term = K
@@ -57,7 +56,7 @@ class EtaB_2DS_Resonant(leptomts.LeptoCalc):
         y0      = np.array([0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         _ETA = [
-                self.epsilonaaRES(2),
+                self.f(2),
                 self.epsilonaaRES(1),
                 self.epsilonaaRES(0)
             ]

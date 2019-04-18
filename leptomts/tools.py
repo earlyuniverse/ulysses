@@ -35,17 +35,16 @@ def readConfig(fname):
 
 def selectLepto(model):
     import leptomts
-    from leptomts.etab1ds                  import EtaB_1DS
-    from leptomts.etab2ds                  import EtaB_2DS
-    from leptomts.etab3ds                  import EtaB_3DS
-    from leptomts.etab1dsapprox            import EtaB_1DS_Approx
-    from leptomts.etab2dsapprox            import EtaB_2DS_Approx
-    from leptomts.etab1dszerowidth         import EtaB_1DS_ZeroWidth
-    from leptomts.etab2dsresonant          import EtaB_2DS_Resonant
+    from leptomts.etab1DME                 import EtaB_1DME
+    from leptomts.etab2DME                 import EtaB_2DME
+    from leptomts.etab3DME                 import EtaB_3DME
+    from leptomts.etab1BE                  import EtaB_1BE
+    from leptomts.etab2BE                  import EtaB_2BE
+    from leptomts.etab2resonant            import EtaB_2Resonant
     from leptomts.etab3dsscattering        import EtaB_3DS_Scattering
     from leptomts.etab3dsscatteringooetaur import EtaB_3DS_Scattering_OOEtauR
     from leptomts.etab3dsblanchett         import EtaB_3DS_Blanchett
-    if   model=="1ds":                  return leptomts.EtaB_1DS()
+    if   model=="1DME":                  return leptomts.EtaB_1DME()
     elif model=="1dsapprox":            return leptomts.EtaB_1DS_Approx()
     elif model=="2ds":                  return leptomts.EtaB_2DS()
     elif model=="2dsapprox":            return leptomts.EtaB_2DS_Approx()

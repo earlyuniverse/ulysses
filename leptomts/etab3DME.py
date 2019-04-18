@@ -1,3 +1,4 @@
+# non-resonant leptogenesis with three decaying sterile neutrino using the density matrix equations. Equations from 1112.4528
 import leptomts
 import numpy as np
 from odeintw import odeintw
@@ -69,7 +70,7 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
     return RHStemp
 
 
-class EtaB_3DS(leptomts.LeptoCalc):
+class EtaB_3DME(leptomts.LeptoCalc):
     """
      density matrix equation (DME) finite thermal width  with three decaying steriles. Most "realistic" for our purposes.
     """

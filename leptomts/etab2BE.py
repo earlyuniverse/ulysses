@@ -1,3 +1,4 @@
+# non-resonant leptogenesis with two decaying sterile neutrino using the Boltzmann equations. Note these kinetic equations do not include off diagonal flavour oscillations. Equations from 1112.4528
 import leptomts
 import numpy as np
 from odeintw import odeintw
@@ -26,11 +27,8 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
     RHStemp = [rhs1, rhs2, rhs3, rhs4, rhs5]
     return RHStemp
 
-class EtaB_2DS_Approx(leptomts.LeptoCalc):
-    """
-    Boltzmann  equation (BE) zero thermal width (implies one-flavoured regime (1F)) with two decaying sterile no flavour correlations
-    """
-
+class EtaB_2BE(leptomts.LeptoCalc):
+  
 
     def RHS(self, y0, z, ETA, C, K):
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA
