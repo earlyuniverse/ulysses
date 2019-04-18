@@ -22,24 +22,13 @@ op.add_option("-m", "--model",     dest="MODEL",       default="1ds", help="Sele
 op.add_option("--ordering",        dest="ORDERING",    default=0, type=int,                help="The mass ordering (0 or 1, default: %default)")
 opts, args = op.parse_args()
 
-# TODO improve on keywords
-MODELS=["1DME", "2ds", "1dsapprox", "2dsapprox","3ds", "3dsscatteringooetaur", "1dsscatteringooetaur", "3dsooetaur", "2dsresonant", "1dszerowidth", "3dsblanchett"]
-
-if opts.MODEL not in MODELS:
-    print("Specified model '{}' unknown, please choose from {}".format(opts.MODEL, MODELS))
-    sys.exit(1)
 
 if len(args)==0:
     print("No parameter space configuration given, exiting.")
     sys.exit(1)
 
 import leptomts
-
 LEPTO = leptomts.selectLepto(opts.MODEL)
-if LEPTO is None:
-    print("Combination of approx ({}) and model ({}) not implemented, exiting".format(False, opts.MODEL))
-    sys.exit(1)
-
 
 if opts.DEBUG:
     print(LEPTO)
@@ -55,8 +44,8 @@ if opts.ORDERING not in [0,1]:
 FIX["ordering"]=opts.ORDERING
 
 
-
-etaB = LEPTO(FIX)
+for _ in range(100):
+    etaB = LEPTO(FIX)
 print("{}{}\n{}{}\n{}{}".format(
     "eta_b".ljust(      14), etaB,
     "Y_b".ljust(        14), etaB/7.03969,
