@@ -33,7 +33,7 @@ def readConfig(fname):
                 continue
         return ranges, fixed
 
-def selectLepto(model, approx=False):
+def selectLepto(model):
     import leptomts
     from leptomts.etab1ds                  import EtaB_1DS
     from leptomts.etab2ds                  import EtaB_2DS
@@ -45,21 +45,15 @@ def selectLepto(model, approx=False):
     from leptomts.etab3dsscattering        import EtaB_3DS_Scattering
     from leptomts.etab3dsscatteringooetaur import EtaB_3DS_Scattering_OOEtauR
     from leptomts.etab3dsblanchett         import EtaB_3DS_Blanchett
-    if model=="1ds":
-        return leptomts.EtaB_1DS() if not approx else leptomts.EtaB_1DS_Approx()
-    elif model=="2ds":
-        return leptomts.EtaB_2DS() if not approx else leptomts.EtaB_2DS_Approx()
-    elif model=="3ds":
-        return leptomts.EtaB_3DS() if not approx else None
-    elif model=="1dszerowidth":
-        return leptomts.EtaB_1DS_ZeroWidth() if not approx  else None
-    elif model=="2dsresonant":
-        return leptomts.EtaB_2DS_Resonant() if not approx  else None
-    elif model=="3dsscattering":
-        return leptomts.EtaB_3DS_Scattering() if not approx  else None
-    elif model=="3dsscatteringooetaur":
-        return leptomts.EtaB_3DS_Scattering_OOEtauR() if not approx  else None
-    elif model=="3dsblanchett":
-        return leptomts.EtaB_3DS_Blanchett() if not approx  else None
+    if   model=="1ds":                  return leptomts.EtaB_1DS()
+    elif model=="1dsapprox":            return leptomts.EtaB_1DS_Approx()
+    elif model=="2ds":                  return leptomts.EtaB_2DS()
+    elif model=="2dsapprox":            return leptomts.EtaB_2DS_Approx()
+    elif model=="3ds":                  return leptomts.EtaB_3DS()
+    elif model=="1dszerowidth":         return leptomts.EtaB_1DS_ZeroWidth()
+    elif model=="2dsresonant":          return leptomts.EtaB_2DS_Resonant()
+    elif model=="3dsscattering":        return leptomts.EtaB_3DS_Scattering()
+    elif model=="3dsscatteringooetaur": return leptomts.EtaB_3DS_Scattering_OOEtauR()
+    elif model=="3dsblanchett":         return leptomts.EtaB_3DS_Blanchett()
     else:
         raise Exception("Specified model '{}' unknown".format(model))

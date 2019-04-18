@@ -68,6 +68,9 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
     return RHStemp
 
 class EtaB_3DS_Scattering(leptomts.LeptoCalc):
+    """
+    TODO add docstring -- is this different from 3DS?
+    """
 
     def RHS(self, y0, zzz, ETA, C, K, W):
         (eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee, eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me) = ETA
@@ -124,8 +127,6 @@ class EtaB_3DS_Scattering(leptomts.LeptoCalc):
         ys, _   = odeintw(self.RHS, y0, self.xs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
         nb      = np.real(self.sphalfact*(ys[-1,3]+ys[-1,4]+ys[-1,5]))
 
-        pd = np.empty((self.xsteps, 4))
-        pd[:,      0] = self.xs
-        pd[:,[1,2,3]] = np.real(ys[:, [3,4,5]])
+        self.ys = np.real(ys[:, [3,4,5]])
 
-        return np.real(nb), pd
+        return np.real(nb)
