@@ -38,11 +38,11 @@ class EtaB_1DME(leptomts.LeptoCalc):
 
     def RHS(self, y0,z,epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e,k):
 
-        if z != self._currx or z == self.xmin:
+        if z != self._currz or z == self.zmin:
             self._d       = np.real(self.D1(k,z))
             self._w1      = np.real(self.W1(k,z))
             self._n1eq    = self.N1Eq(z)
-            self._currx=z
+            self._currz=z
 
         # thermal widths are set to zero such that we are in the "one-flavoured regime"
         widtht = 485e-10*self.MP/self.M1
@@ -64,13 +64,12 @@ class EtaB_1DME(leptomts.LeptoCalc):
         c1m   =                 self.c1a(1)
         c1e   =                 self.c1a(0)
 
-        xs      = np.linspace(self.xmin, self.xmax, self.xsteps)
         k       = np.real(self.k1)
         y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         params  = np.array([epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e,k], dtype=np.complex128)
 
-        ys, _      = odeintw(self.RHS, y0, self.xs, args = tuple(params), full_output=True)
+        ys, _      = odeintw(self.RHS, y0, self.zs, args = tuple(params), full_output=True)
         nb      = self.sphalfact*(ys[-1,1]+ys[-1,2]+ys[-1,3])
 
         self.ys  = np.real(ys[:, [1,2,3]])
