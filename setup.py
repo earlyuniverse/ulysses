@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
   name = 'leptomts',
-  version = '0.1.0',
+  version = '0.2.0',
   description = 'leptMTS',
   url = 'https://github.com/iamholger/leptomts',
   author = 'Kris Moffat, Jessica Turner, Holger Schulz',
@@ -15,7 +15,7 @@ setup(
     'numba',
     'pymultinest'
   ],
-  scripts=['bin/lepto-get'],
+  scripts=['bin/lepto-get', 'bin/lepto-scan'],
   extras_require = {
   },
   entry_points = {
