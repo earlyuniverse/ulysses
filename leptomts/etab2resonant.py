@@ -25,17 +25,19 @@ def fast_RHS(y0, epstt,epsmm,epsee,C,d1,w1,n1eq):
     return RHStemp
 
 class EtaB_2Resonant(leptomts.LeptoCalc):
-   
+    """
+    TODO add docstring
+    """
 
     def RHS(self, y0, zzz, ETA, C, K):
         k1term,k2term = K
         epstt,epsmm,epsee = ETA
 
-        if zzz != self._currx or zzz == self.xmin:
+        if zzz != self._currz or zzz == self.zmin:
             self._d1            = np.real(self.D1(k1term, zzz))
             self._w1            = np.real(self.W1(k1term, zzz))
             self._n1eq          = self.N1Eq(zzz)
-            self._currx=zzz
+            self._currz=zzz
         # print("{}/{} --- {} - {} - {}".format(zzz, self._currx, self._d1, self._w1, self._n1eq))
 
         return fast_RHS(y0,epstt,epsmm,epsee, C,self._d1,self._w1,self._n1eq)
@@ -56,14 +58,14 @@ class EtaB_2Resonant(leptomts.LeptoCalc):
         y0      = np.array([0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         _ETA = [
-                self.f(2),
+                self.f(2), # YIKES what is this?
                 self.epsilonaaRES(1),
                 self.epsilonaaRES(0)
             ]
         _C = [  self.c1a(2), self.c1a(1), self.c1a(0)]
         _K = [np.real(self.k1), np.real(self.k2)]
 
-        ys      = odeintw(self.RHS, y0, self.xs, args = tuple([_ETA, _C, _K]))
+        ys      = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C, _K]))
         nb      = self.sphalfact*(ys[-1,1]+ys[-1,2]+ys[-1,3])
 
         self.ys = np.real(ys[:, [1,2,3]])
