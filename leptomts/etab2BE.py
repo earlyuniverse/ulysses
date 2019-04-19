@@ -28,20 +28,22 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
     return RHStemp
 
 class EtaB_2BE(leptomts.LeptoCalc):
-  
+    """
+    TODO add docstring
+    """
 
     def RHS(self, y0, z, ETA, C, K):
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA
         k1term,k2term = K
 
-        if z != self._currx or z == self.xmin:
+        if z != self._currz or z == self.zmin:
             self._d1      = np.real(self.D1(k1term, z))
             self._w1      = np.real(self.W1(k1term, z))
             self._d2      = np.real(self.D2(k2term, z))
             self._w2      = np.real(self.W2(k2term, z))
             self._n1eq    = self.N1Eq(z)
             self._n2eq    = self.N2Eq(z)
-            self._currx=z
+            self._currz=z
 
         return fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,self._d1,self._d2,self._w1,self._w2,self._n1eq,self._n2eq, C)
 
@@ -68,11 +70,9 @@ class EtaB_2BE(leptomts.LeptoCalc):
             np.real(self.hterm(0,1))
             ]
 
-        # xs      = np.linspace(self.xmin, self.xmax, self.xsteps)
         _K      = [np.real(self.k1), np.real(self.k2)]
         y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
-        # KKK
         _ETA = [
             np.real(self.epsilon1ab(2,2)),
             np.real(self.epsilon1ab(1,1)),
@@ -91,7 +91,7 @@ class EtaB_2BE(leptomts.LeptoCalc):
                 self.c2a(2), self.c2a(1), self.c2a(0)]
         _K = [np.real(self.k1), np.real(self.k2)]
 
-        ys      = odeintw(self.RHS, y0, self.xs, args = tuple([_ETA, _C, _K]))
+        ys      = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C, _K]))
         nb      = self.sphalfact*(ys[-1,2]+ys[-1,3]+ys[-1,4])
 
         self.ys = np.real(ys[:, [2,3,4]])
