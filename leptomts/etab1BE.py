@@ -23,14 +23,17 @@ def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee,c1t,c1m,c1e):
     return [rhs1, rhs2, rhs3, rhs4]
 
 class EtaB_1BE(leptomts.LeptoCalc):
-   
+    """
+    TODO add docstring
+    """
+
     def RHS(self, y0,z,epstt,epsmm,epsee,c1t,c1m,c1e,k):
 
-        if z != self._currx or z == self.xmin:
+        if z != self._currz or z == self.zmin:
             self._d       = np.real(self.D1(k,z))
             self._w1      = np.real(self.W1(k,z))
             self._n1eq    = self.N1Eq(z)
-            self._currx=z
+            self._currz=z
 
         return fast_RHS(y0, self._d, self._w1, self._n1eq, epstt,epsmm,epsee,c1t,c1m,c1e)
 
@@ -45,13 +48,12 @@ class EtaB_1BE(leptomts.LeptoCalc):
         c1m   =                 self.c1a(1)
         c1e   =                 self.c1a(0)
 
-        xs      = np.linspace(self.xmin, self.xmax, self.xsteps) # TODO is this not already set?
         k       = np.real(self.k1)
         y0      = np.array([0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         params  = np.array([epstt,epsmm,epsee,c1t,c1m,c1e,k], dtype=np.complex128)
 
-        ys      = odeintw(self.RHS, y0, self.xs, args = tuple(params))
+        ys      = odeintw(self.RHS, y0, self.zs, args = tuple(params))
         nb      = self.sphalfact*(ys[-1,1]+ys[-1,2]+ys[-1,3])
 
         self.ys  = np.real(ys[:, [1,2,3]])
