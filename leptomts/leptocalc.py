@@ -35,7 +35,7 @@ def my_kn2(x):
 
 # This is the base class
 class LeptoCalc(object):
-    def __init__(self, debug=False, xmin=1e-1, xmax=100, xsteps=1000):
+    def __init__(self, *args, **kwargs):
         """
         Set global constants here.
         """
@@ -49,18 +49,24 @@ class LeptoCalc(object):
         self.MP = 1.22e+19
         #neutrino cosmological mass in GeV
         self.mstar = 1.0e-12
-        self.debug=debug
-
+        # Flags
+        self.debug   = kwargs["debug"]  if kwargs.get("debug")  is not None else False
         # Parameters of the solver
-        self._xmin = xmin
-        self._xmax = xmax
-        self._xsteps=xsteps
-        self._currx = self.xmin
+        self._zmin   = kwargs["zmin"]   if kwargs.get("zmin")   is not None else 0.1
+        self._zmax   = kwargs["zmax"]   if kwargs.get("zmax")   is not None else 1000
+        self._zsteps = kwargs["zsteps"] if kwargs.get("zsteps") is not None else 1000
+        self._currz = self.zmin
 
-        self.xs=None
+        # Model switches
+        self.ordering = kwargs["ordering"] if kwargs.get("ordering") is not None else 0
+        self.loop = kwargs["loop"] if kwargs.get("loop") is not None else False
+
+
+
+        self.zs=None
         self.ys=None
-        self.setXS()
-        self.sphalfact = 0.01
+        self.setZS()
+        self.sphalfact = 0.01 #TODO --- check if used
 
     def __call__(self, x):
         """
@@ -74,36 +80,40 @@ class LeptoCalc(object):
         return self.EtaB
 
     def __str__(self):
-        return self.__doc__
+        s=self.__doc__
+        s+= "\nNormal ordering\n" if self.ordering==0 else "\nInverted ordering\n"
+        s+= "Loop-corrected Yukawa\n" if self.loop else "Tree-level Yukawa\n"
+        s+="Integration in [{}, {}] in {} steps\n".format(self._zmin, self._zmax, self._zsteps)
+        return s
 
     # def __repr__(self):
         # return self.__docstring
 
-    def setXMin(self, x):
-        self._xmin=x
-        self.setXS()
+    def setZMin(self, x):
+        self._zmin=x
+        self.setZS()
 
-    def setXMax(self, x):
-        self._xmax=x
-        self.setXS()
+    def setZMax(self, x):
+        self._zmax=x
+        self.setZS()
 
-    def setXSteps(self, x):
-        self._xsteps=x
-        self.setXS()
+    def setZSteps(self, x):
+        self._zsteps=x
+        self.setZS()
 
-    def setXS(self):
-        self.xs = np.geomspace(self.xmin, self.xmax, self.xsteps)
+    def setZS(self):
+        self.zs = np.geomspace(self.zmin, self.zmax, self.zsteps)
         if self.debug:
-            print("Integration range:",self.xs.min(),self.xs.max())
+            print("Integration range:",self.zs.min(),self.zs.max())
 
     @property
-    def xmin(self): return self._xmin
+    def zmin(self): return self._zmin
 
     @property
-    def xmax(self): return self._xmax
+    def zmax(self): return self._zmax
 
     @property
-    def xsteps(self): return self._xsteps
+    def zsteps(self): return self._zsteps
 
     @property
     def evolData(self):
@@ -113,8 +123,8 @@ class LeptoCalc(object):
         The second column corresponds to Ntautau, the
         third to Nmumu and the last columnd to Nee
         """
-        pd = np.empty((self.xsteps, 4))
-        pd[:,      0] = self.xs
+        pd = np.empty((self.zsteps, 4))
+        pd[:,      0] = self.zs
         pd[:,[1,2,3]] = self.ys
         return pd
 
@@ -123,22 +133,21 @@ class LeptoCalc(object):
         This set the model parameters. pdict is expected to be a dictionary
         """
         self.delta    = pdict['delta']/180*np.pi
-        self.a        = pdict['a']/180*np.pi
-        self.b        = pdict['b']/180*np.pi
-        self.theta12  = pdict['theta12']/180*np.pi
-        self.theta23  = pdict['theta23']/180*np.pi
-        self.theta13  = pdict['theta13']/180*np.pi
+        self.a        = pdict['a21']/180*np.pi
+        self.b        = pdict['a31']/180*np.pi
+        self.theta12  = pdict['t12']/180*np.pi
+        self.theta23  = pdict['t23']/180*np.pi
+        self.theta13  = pdict['t13']/180*np.pi
         self.x1       = pdict['x1']/180*np.pi
         self.y1       = pdict['y1']/180*np.pi
         self.x2       = pdict['x2']/180*np.pi
         self.y2       = pdict['y2']/180*np.pi
         self.x3       = pdict['x3']/180*np.pi
         self.y3       = pdict['y3']/180*np.pi
-        self.m1       = 10**pdict['m1'] * 1e-9 # NOTE input is in log10(m1) in eV --- we convert here to the real value in GeV
+        self.m1       = 10**pdict['m'] * 1e-9 # NOTE input is in log10(m1) in eV --- we convert here to the real value in GeV
         self.M1       = 10**pdict['M1']  #
         self.M2       = 10**pdict['M2']  #
         self.M3       = 10**pdict['M3']  #
-        self.ordering = pdict['ordering']
 
     # Some general calculators purely based on input parameters
     @property
@@ -224,11 +233,11 @@ class LeptoCalc(object):
     def fMR(self):
         """
         This returns the sqrt of the inverse of what is called f(mR) or so
-	Equation (3) --- the inverse
+        Equation (3) --- the inverse
         Note: the prefactor differs from the paper due to the fact that in
         this code we use v=174 (i.e.sqrt(2)*vev(higgs))
 
-	"""
+        """
         return np.sqrt(linalg.inv(self.fMRcore))
 
     @property
@@ -262,6 +271,7 @@ class LeptoCalc(object):
         rZ2 = (x/self.MZ)**2
         return x*(np.log(rH2)/(rH2-1) + 3*np.log(rZ2)/(rZ2-1) )
 
+    # TODO check logic here after change of h_loop
     @property
     def isTreeDominant(self):
         min_tree = abs(self.h_tree).min()
@@ -269,6 +279,7 @@ class LeptoCalc(object):
         print("Want (Loop, tree)", max_loop, "to be <", min_tree)
         return max_loop < .1 * min_tree
 
+    # TODO check logic here after change of h_loop
     @property
     def isLoopDominant(self):
         max_tree = abs(self.h_tree).max()
@@ -304,9 +315,20 @@ class LeptoCalc(object):
         """
         return 1./(16*np.pi**2)*(np.max(np.abs(self.h))**2)*self.m_loop
 
+    # @property
+    # def h_loop(self):
+        # return self.h +  self.h_tree
+
+    @property
+    def h(self):
+        return self.h_loop if self.loop else self.h_tree
+
     @property
     def h_loop(self):
-        return self.h +  self.h_tree
+        """
+        Yukawa matrix (LOOP + Tree)
+        """
+        return (1./self.v)*(self.U @ self.SqrtDm @ np.transpose(self.R) @ self.fMR)
 
     @property
     def h_tree(self):
@@ -335,19 +357,6 @@ class LeptoCalc(object):
             print("measure:", meas)
 
         return meas
-
-
-    @property
-    def h(self):
-        """
-        Yukawa matrix (LOOP + Tree)
-        """
-        #return (1./self.v)*(self.U @ self.SqrtDm @ np.transpose(self.R) @ self.SqrtDM)
-        #return (i1./self.v)*(self.U @ self.SqrtDm @ np.transpose(self.R) @ self.fMR)
-        #import cmath
-        #j=complex(0,1)
-        return (1./self.v)*(self.U @ self.SqrtDm @ np.transpose(self.R) @ self.fMR)
-        #return j*(1./self.v)*(self.U.conjugate() @ self.SqrtDm @ np.transpose(self.R) @ self.fMR)
 
     ##########################################
     #Define functions for Boltzmann equations#
