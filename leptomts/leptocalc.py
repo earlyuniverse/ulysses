@@ -80,7 +80,7 @@ class LeptoCalc(object):
         return self.EtaB
 
     def __str__(self):
-        s=self.__doc__
+        s="Model:\n{}".format(self.__doc__)
         s+= "\nNormal ordering\n" if self.ordering==0 else "\nInverted ordering\n"
         s+= "Loop-corrected Yukawa\n" if self.loop else "Tree-level Yukawa\n"
         s+="Integration in [{}, {}] in {} steps\n".format(self._zmin, self._zmax, self._zsteps)
