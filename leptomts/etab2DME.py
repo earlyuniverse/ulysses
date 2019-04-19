@@ -72,14 +72,14 @@ class EtaB_2DME(leptomts.LeptoCalc):
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA
         k1term,k2term = K
 
-        if zzz != self._currx or zzz == self.xmin:
+        if zzz != self._currz or zzz == self.zmin:
             self._d1      = np.real(self.DS(k1term, zzz))
             self._w1      = self.j(zzz)*np.real(self.W1(k1term, zzz))
             self._d2      = np.real(self.D2(k2term, zzz))
             self._w2      = np.real(self.W2(k2term, zzz))
             self._n1eq    = self.N1Eq(zzz)
             self._n2eq    = self.N2Eq(zzz)
-            self._currx=zzz
+            self._currz=zzz
 
         return fast_RHS(y0, eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me, C,self._d1,self._d2,self._w1,self._w2,self._n1eq,self._n2eq,W)
 
@@ -108,7 +108,7 @@ class EtaB_2DME(leptomts.LeptoCalc):
 
         y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
-        ys, _      = odeintw(self.RHS, y0, self.xs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
+        ys, _      = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
         nb      = np.real(self.sphalfact*(ys[-1,2]+ys[-1,3]+ys[-1,4]))
 
         self.ys = np.real(ys[:, [2,3,4]])

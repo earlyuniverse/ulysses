@@ -83,7 +83,7 @@ class EtaB_3DME(leptomts.LeptoCalc):
         widtht,widthm = W
         # Turns out, the Bessel functions are expensive, so let's just
         # evaluate them for every new zzz
-        if zzz != self._currx or zzz == self.xmin:
+        if zzz != self._currz or zzz == self.zmin:
             self._d1      = np.real(self.D1(k1term, zzz))
             self._w1      = np.real(self.W1(k1term, zzz))
             self._d2      = np.real(self.D2(k2term, zzz))
@@ -93,7 +93,7 @@ class EtaB_3DME(leptomts.LeptoCalc):
             self._n1eq    = self.N1Eq(zzz)
             self._n2eq    = self.N2Eq(zzz)
             self._n3eq    = self.N3Eq(zzz)
-            self._currx=zzz
+            self._currz=zzz
 
         return fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me, C, W,
                 self._d1,self._d2,self._d3,self._w1,self._w2,self._w3,self._n1eq,self._n2eq,self._n3eq)
@@ -131,7 +131,7 @@ class EtaB_3DME(leptomts.LeptoCalc):
 
         y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
-        ys, _   = odeintw(self.RHS, y0, self.xs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
+        ys, _   = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
         nb      = np.real(self.sphalfact*(ys[-1,3]+ys[-1,4]+ys[-1,5]))
 
         self.ys = np.real(ys[:, [3,4,5]])
