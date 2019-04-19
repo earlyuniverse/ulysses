@@ -33,25 +33,16 @@ def readConfig(fname):
                 continue
         return ranges, fixed
 
-def selectLepto(model):
+def selectLepto(model, **kwargs):
+    avail = ["1DME", "2DME", "3DME", "1BE", "2BE", "2resonant", "3DMEsct", "3DMErhtau"]
     import leptomts
-    from leptomts.etab1DME                 import EtaB_1DME
-    from leptomts.etab2DME                 import EtaB_2DME
-    from leptomts.etab3DME                 import EtaB_3DME
-    from leptomts.etab1BE                  import EtaB_1BE
-    from leptomts.etab2BE                  import EtaB_2BE
-    from leptomts.etab2resonant            import EtaB_2Resonant
-    from leptomts.etab3dsscattering        import EtaB_3DS_Scattering
-    from leptomts.etab3dsscatteringooetaur import EtaB_3DS_Scattering_OOEtauR
-    from leptomts.etab3dsblanchett         import EtaB_3DS_Blanchett
-    if   model=="1DME":                    return leptomts.EtaB_1DME()
-    elif model=="2DME":                    return leptomts.EtaB_2DME()
-    elif model=="3DME":                    return leptomts.EtaB_3DME()
-    elif model=="1BE":                     return leptomts.EtaB_1BE()
-    elif model=="2BE":                     return leptomts.EtaB_2BE()
-    elif model=="2resonant":               return leptomts.EtaB_2Resonant()
-    elif model=="3dsscattering":           return leptomts.EtaB_3DS_Scattering()
-    elif model=="3dsscatteringooetaur":    return leptomts.EtaB_3DS_Scattering_OOEtauR()
-    elif model=="3dsblanchett":            return leptomts.EtaB_3DS_Blanchett()
+    if   model=="1DME":                    return leptomts.EtaB_1DME(**kwargs)
+    elif model=="2DME":                    return leptomts.EtaB_2DME(**kwargs)
+    elif model=="3DME":                    return leptomts.EtaB_3DME(**kwargs)
+    elif model=="1BE":                     return leptomts.EtaB_1BE(**kwargs)
+    elif model=="2BE":                     return leptomts.EtaB_2BE(**kwargs)
+    elif model=="2resonant":               return leptomts.EtaB_2Resonant(**kwargs)
+    elif model=="3DMEsct":                 return leptomts.EtaB_3DME_Scattering(**kwargs)
+    elif model=="3DMErhtau":               return leptomts.EtaB_3DS_Scattering_RHtaur(**kwargs)
     else:
-        raise Exception("Specified model '{}' unknown".format(model))
+        raise Exception("Specified model '{}' unknown.\n Select from: {}".format(model, avail))
