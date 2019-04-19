@@ -44,15 +44,14 @@ def selectLepto(model):
     from leptomts.etab3dsscattering        import EtaB_3DS_Scattering
     from leptomts.etab3dsscatteringooetaur import EtaB_3DS_Scattering_OOEtauR
     from leptomts.etab3dsblanchett         import EtaB_3DS_Blanchett
-    if   model=="1DME":                  return leptomts.EtaB_1DME()
-    elif model=="1dsapprox":            return leptomts.EtaB_1DS_Approx()
-    elif model=="2ds":                  return leptomts.EtaB_2DS()
-    elif model=="2dsapprox":            return leptomts.EtaB_2DS_Approx()
-    elif model=="3ds":                  return leptomts.EtaB_3DS()
-    elif model=="1dszerowidth":         return leptomts.EtaB_1DS_ZeroWidth()
-    elif model=="2dsresonant":          return leptomts.EtaB_2DS_Resonant()
-    elif model=="3dsscattering":        return leptomts.EtaB_3DS_Scattering()
-    elif model=="3dsscatteringooetaur": return leptomts.EtaB_3DS_Scattering_OOEtauR()
-    elif model=="3dsblanchett":         return leptomts.EtaB_3DS_Blanchett()
+    if   model=="1DME":                    return leptomts.EtaB_1DME()
+    elif model=="2DME":                    return leptomts.EtaB_2DME()
+    elif model=="3DME":                    return leptomts.EtaB_3DME()
+    elif model=="1BE":                     return leptomts.EtaB_1BE()
+    elif model=="2BE":                     return leptomts.EtaB_2BE()
+    elif model=="2resonant":               return leptomts.EtaB_2Resonant()
+    elif model=="3dsscattering":           return leptomts.EtaB_3DS_Scattering()
+    elif model=="3dsscatteringooetaur":    return leptomts.EtaB_3DS_Scattering_OOEtauR()
+    elif model=="3dsblanchett":            return leptomts.EtaB_3DS_Blanchett()
     else:
         raise Exception("Specified model '{}' unknown".format(model))

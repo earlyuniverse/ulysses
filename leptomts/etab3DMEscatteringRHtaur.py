@@ -1,3 +1,5 @@
+# non-resonant leptogenesis with three decaying sterile neutrino using the density matrix equations. Equations from 1112.4528 including the scattering term from 0401240 and affect of right-handed tau participation in kinetic equations.
+
 import leptomts
 import numpy as np
 from odeintw import odeintw
@@ -5,9 +7,10 @@ from odeintw import odeintw
 from numba import jit
 @jit
 def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me, C, W, d1,d2,d3,w1,w2,w3,n1eq,n2eq,n3eq):
-    N1, N2, N3, Ntt, Nmm, Nee, Ntm, Nte, Nme = y0
+    N1, N2, N3, Ntt, Nmm, Nee, Ntm, Nte, Nme, Ntr = y0
     c1t,c1m,c1e,c2t,c2m,c2e,c3t,c3m,c3e = C
     widtht,widthm = W
+
     c1tc    = np.conjugate(c1t)
     c1mc    = np.conjugate(c1m)
     c1ec    = np.conjugate(c1e)
@@ -28,7 +31,8 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
     rhs4    = (eps1tt * d1 * (N1-n1eq) + eps2tt * d2 * (N2-n2eq) + eps3tt * d3 * (N3-n3eq)
       - 0.5 * w1 * (2 * c1t * c1tc * Ntt + c1m * c1tc * Ntm + c1e * c1tc * Nte + np.conjugate(c1m * c1tc * Ntm + c1e * c1tc * Nte))
       - 0.5 * w2 * (2 * c2t * c2tc * Ntt + c2m * c2tc * Ntm + c2e * c2tc * Nte + np.conjugate(c2m * c2tc * Ntm + c2e * c2tc * Nte))
-      - 0.5 * w3 * (2 * c3t * c3tc * Ntt + c3m * c3tc * Ntm + c3e * c3tc * Nte + np.conjugate(c3m * c3tc * Ntm + c3e * c3tc * Nte)))
+      - 0.5 * w3 * (2 * c3t * c3tc * Ntt + c3m * c3tc * Ntm + c3e * c3tc * Nte + np.conjugate(c3m * c3tc * Ntm + c3e * c3tc * Nte))
+              - 2 * widtht * Ntt + 4 * widtht * Ntr)
 
     rhs5    = (eps1mm * d1 * (N1-n1eq) + eps2mm * d2 * (N2-n2eq) + eps3mm * d3 * (N3-n3eq)
       - 0.5 * w1 * (2 * c1m * c1mc * Nmm + c1m * c1tc * Ntm + c1e * c1mc * Nme + np.conjugate(c1m * c1tc * Ntm + c1e * c1mc * Nme))
@@ -64,17 +68,21 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
       +        (w1 * c1m * c1mc + w2 * c2m * c2mc + w3 * c3m * c3mc) * Nme
       +        (w1 * c1m * c1tc + w2 * c2m * c2tc + w3 * c3m * c3tc) * Nte))
 
-    RHStemp = [rhs1, rhs2, rhs3, rhs4, rhs5, rhs6, rhs7, rhs8, rhs9]
+    rhs10   = 2 * widtht * (Ntt - 2 * Ntr)
+
+    RHStemp = [rhs1, rhs2, rhs3, rhs4, rhs5, rhs6, rhs7, rhs8, rhs9, rhs10]
     return RHStemp
 
-class EtaB_3DS_Scattering(leptomts.LeptoCalc):
+class EtaB_3DS_Scattering_OOEtauR(leptomts.LeptoCalc):
     """
-    TODO add docstring -- is this different from 3DS?
+    TODO add docstring
     """
 
     def RHS(self, y0, zzz, ETA, C, K, W):
-        (eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee, eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me) = ETA
+        (eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me) = ETA
         k1term,k2term,k3term = K
+        # Turns out, the Bessel functions are expensive, so let's just
+        # evaluate them for every new zzz
         if zzz != self._currx or zzz == self.xmin:
 
             self._d1      = np.real(self.DS(k1term, zzz))
@@ -87,6 +95,7 @@ class EtaB_3DS_Scattering(leptomts.LeptoCalc):
             self._n2eq    = self.N2Eq(zzz)
             self._n3eq    = self.N3Eq(zzz)
             self._currx=zzz
+            # print("{}/{} --- {} - {} - {}".format(zzz, self._currx, self._w1, self._w2, self._w3))
 
         return fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me, C, W,
                 self._d1,self._d2,self._d3,self._w1,self._w2,self._w3,self._n1eq,self._n2eq,self._n3eq)
@@ -122,7 +131,7 @@ class EtaB_3DS_Scattering(leptomts.LeptoCalc):
         _K      = [np.real(self.k1), np.real(self.k2), np.real(self.k3)]
         _W      = [ 485e-10*self.MP/self.M1, 1.7e-10*self.MP/self.M1]
 
-        y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
+        y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         ys, _   = odeintw(self.RHS, y0, self.xs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
         nb      = np.real(self.sphalfact*(ys[-1,3]+ys[-1,4]+ys[-1,5]))
