@@ -9,7 +9,9 @@ def plotEvolution(data, f_out):
     pylab.legend()
     pylab.xlabel("$z$")
     pylab.yscale("log")
+    pylab.xscale("log")
     pylab.ylabel("$\left|N_{xx} \\right|$")
+    pylab.tight_layout()
     pylab.savefig(f_out)
 
 
@@ -19,6 +21,7 @@ op.add_option("-o", "--output",    dest="OUTPUT",      default=None, type=str, h
 op.add_option("-v", "--debug",     dest="DEBUG",       default=False, action="store_true", help="Turn on some debug messages")
 op.add_option("-q", "--quiet",     dest="QUIET",       default=False, action="store_true", help="Turn off messages")
 op.add_option("-m", "--model",     dest="MODEL",       default="1ds", help="Selection of of model")
+op.add_option("--zrange",          dest="ZRANGE",      default="0.1,30,1000", help="Selection of of model")
 op.add_option("--ordering",        dest="ORDERING",    default=0, type=int,                help="The mass ordering (0 or 1, default: %default)")
 opts, args = op.parse_args()
 
@@ -29,6 +32,13 @@ if len(args)==0:
 
 import leptomts
 LEPTO = leptomts.selectLepto(opts.MODEL)
+
+zmin, zmax, zsteps = opts.ZRANGE.split(",")
+# TODO some cheks
+LEPTO.setXMin(float(zmin))
+LEPTO.setXMax(float(zmax))
+LEPTO.setXSteps(int(zsteps))
+
 
 if opts.DEBUG:
     print(LEPTO)
