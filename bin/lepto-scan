@@ -29,16 +29,10 @@ t23    49.58  # [deg]
 
 def plotEtaB(data, f_out, pname):
     import pylab
-    pos=data[data[:,1]>0]
-    neg=data[data[:,1]<0]
 
-    pylab.plot(pos[:,0], abs(pos[:,1]), label="$\eta_B >0$")
-    if neg.shape[0]>0:
-        pylab.plot(neg[:,0], abs(neg[:,1]), label="$\eta_B <0$")
-    pylab.legend()
+    pylab.plot(data[:,0], 1e10*data[:,1])
     pylab.xlabel(pname)
-    pylab.yscale("log")
-    pylab.ylabel("$|\eta_B|$")
+    pylab.ylabel("$\eta_B\cdot 10^{10}$")
     pylab.tight_layout()
     pylab.savefig(f_out)
 
@@ -53,7 +47,7 @@ if __name__=="__main__":
     op.add_option("-v", "--debug",     dest="DEBUG",       default=False, action="store_true", help="Turn on some debug messages")
     op.add_option("-m", "--model",     dest="MODEL",       default="1DME", help="Selection of of model (default: %default)")
     op.add_option("-n", "--n-scan",    dest="NSCAN",       default=30, type=int, help="Number of point to scan (default: %default)")
-    op.add_option("--zrange",          dest="ZRANGE",      default="0.1,30,1000", help="Ranges and steps of the evolution variable (default: %default)")
+    op.add_option("--zrange",          dest="ZRANGE",      default="0.1,100,1000", help="Ranges and steps of the evolution variable (default: %default)")
     op.add_option("--ordering",        dest="ORDERING",    default=0, type=int,                help="The mass ordering (0 or 1, default: %default)")
     op.add_option("--loop",            dest="LOOP",        default=False, action='store_true', help="Use loop-corrected Yukawa (default: %default)")
     opts, args = op.parse_args()
