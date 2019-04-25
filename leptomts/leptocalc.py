@@ -908,10 +908,6 @@ class LeptoCalc(object):
 
         return nb
 
-
-
-
-
     @property
     def getEtaB_1DS_DM_scattering_OOEtauR(self):
 
@@ -992,7 +988,6 @@ class LeptoCalc(object):
         xs      = np.linspace(self.xmin, self.xmax, self.xsteps)
         k       = np.real(self.k1)
         y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
-
         params  = np.array([epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e,k], dtype=np.complex128)
 
         ys, _      = odeintw(self.RHS_1DS_DM_ZeroWidthm, y0, self.xs, args = tuple(params), full_output=True)
@@ -1000,29 +995,25 @@ class LeptoCalc(object):
 
         return nb
 
-
-
-      #####   HERE we insert the code for resonant leptogenesis #######
-      #CP asymmetry parameter for flavoured resonant leptogenesis from 0705.2183 averaged for large       #washout
+   #####   HERE we insert the code for resonant leptogenesis #######
+      #CP asymmetry parameter for flavoured resonant leptogenesis from 0705.218averaged for large  washout
     def epsilonaaRES(self,a):
         l         = self.h
         ldag      = np.conjugate(np.transpose(l))
         lcon      = np.conjugate(l)
         M         = self.DM
         lsquare   = np.dot(ldag,l)
-        gamma1  = (lsquare[0,0]/(8*np.pi))*M[0,0]
-        gamma2  = (lsquare[1,1]/(8*np.pi))*M[1,1]
-        DeltaM  = M[1,1]-M[0,0]
-
-        sum1  = np.imag(ldag[0,a]*ldag[0,0]*l[0,1]*l[a,1])
-        sum2  = np.imag(ldag[0,a]*ldag[0,1]*l[1,1]*l[a,1])
-        sum3  = np.imag(ldag[0,a]*ldag[0,2]*l[2,1]*l[a,1])
-
-        epsbar1  = (sum1+sum2+sum3)/(lsquare[0,0]*lsquare[1,1])
-        epsbar2  = (DeltaM/gamma2)/(1+(DeltaM/gamma2)**2)
-        epsbar  = - epsbar1 * epsbar2
-
+        gamma1    = (lsquare[0,0]/(8*np.pi))*M[0,0]
+        gamma2    = (lsquare[1,1]/(8*np.pi))*M[1,1]
+        DeltaM    = M[1,1]-M[0,0]
+        sum1      = np.imag(ldag[0,a]*l[a,1]*lsquare[0,1])+np.imag(ldag[0,a]*l[a,1]*lsquare[1,0])
+                                                                   
+        epsbar1   = sum1/(lsquare[0,0]*lsquare[1,1])
+        fmix      =  -2*(DeltaM/gamma2)/(1+(2*DeltaM/gamma2)**2)
+        fosc      = -0.5*(DeltaM/gamma2)/(1+(DeltaM/gamma2)**2)
+        epsbar    = -0.5*epsbar1 * (fmix+fosc)
         return epsbar
+
 
 
     @property
