@@ -15,11 +15,11 @@ def fast_RHS(y0, epstt,epsmm,epsee,C,d1,w1,n1eq):
     #define the different RHSs for each equation
     rhs1           =      -d1*(N1-n1eq)
     rhs2           = (  2 * epstt * d1 * (N1-n1eq)
-                                 -  2 * w1 * (2 * c1t * c1tc * Ntt))
+                                 -  2 * w1 * (  c1t * c1tc * Ntt))
     rhs3           = (  2 * epsmm * d1 * (N1-n1eq)
-                                 -  2 * w1 * (2 * c1m * c1mc * Nmm))
+                                 -  2 * w1 * (  c1m * c1mc * Nmm))
     rhs4           = (  2 * epsee * d1 * (N1-n1eq)
-                                 -  2 * w1 * (2 * c1e * c1ec * Nee))
+                                 -  2 * w1 * (  c1e * c1ec * Nee))
 
     RHStemp = [rhs1, rhs2, rhs3, rhs4]
     return RHStemp
