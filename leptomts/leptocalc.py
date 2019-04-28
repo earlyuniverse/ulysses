@@ -1011,7 +1011,8 @@ class LeptoCalc(object):
         epsbar1   = sum1/(lsquare[0,0]*lsquare[1,1])
         fmix      =  -2*(DeltaM/gamma2)/(1+(2*DeltaM/gamma2)**2)
         fosc      = -0.5*(DeltaM/gamma2)/(1+(DeltaM/gamma2)**2)
-        epsbar    = -0.5*epsbar1 * (fmix+fosc)
+        epsbar    = -0.5*epsbar1 * (fosc + fmix)
+        
         return epsbar
 
 
