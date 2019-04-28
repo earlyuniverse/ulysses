@@ -58,7 +58,7 @@ class EtaB_2Resonant(leptomts.LeptoCalc):
         y0      = np.array([0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         _ETA = [
-                self.f(2), # YIKES what is this?
+                self.epsilonaaRES(2),
                 self.epsilonaaRES(1),
                 self.epsilonaaRES(0)
             ]
