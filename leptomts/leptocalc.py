@@ -191,6 +191,7 @@ class LeptoCalc(object):
         Matrix square root of light masses.
         Everything is in GeV.
         """
+        # TODO make these masses configurable
         msplit2_solar       =  7.40e-5*1e-18 # 2017
         msplit2_athm_normal = 2.515e-3*1e-18 # Values
         msplit2_athm_invert = 2.483e-3*1e-18 # from nu-fit 3.1
@@ -719,40 +720,31 @@ class LeptoCalc(object):
         return epstot
 
     @property
-    def eps100(self):
-        return self.epsilon1ab(0,0)
+    def eps100(self): return self.epsilon1ab(0,0)
 
     @property
-    def eps111(self):
-        return self.epsilon1ab(1,1)
+    def eps111(self): return self.epsilon1ab(1,1)
 
     @property
-    def eps122(self):
-        return self.epsilon1ab(2,2)
+    def eps122(self): return self.epsilon1ab(2,2)
 
     @property
-    def eps200(self):
-        return self.epsilon2ab(0,0)
+    def eps200(self): return self.epsilon2ab(0,0)
 
     @property
-    def eps211(self):
-        return self.epsilon2ab(1,1)
+    def eps211(self): return self.epsilon2ab(1,1)
 
     @property
-    def eps222(self):
-        return self.epsilon2ab(2,2)
+    def eps222(self): return self.epsilon2ab(2,2)
 
     @property
-    def eps300(self):
-        return self.epsilon3ab(0,0)
+    def eps300(self): return self.epsilon3ab(0,0)
 
     @property
-    def eps311(self):
-        return self.epsilon3ab(1,1)
+    def eps311(self): return self.epsilon3ab(1,1)
 
     @property
-    def eps322(self):
-        return self.epsilon3ab(2,2)
+    def eps322(self): return self.epsilon3ab(2,2)
 
     def resonance(self, z):
         """
@@ -886,60 +878,6 @@ class LeptoCalc(object):
                 break
         return ZTEST[num-10]
 
-    def Control(self):
-        k1, k2 = [np.real(self.k1), np.real(self.k2)]
-
-        XXX=self.xs
-
-        D1      = [np.real(self.D1(k1, x)) for x in XXX]
-        W1      = [np.real(self.W1(k1, x)) for x in XXX]
-        D2      = [np.real(self.D2(k2, x)) for x in XXX]
-        W2      = [np.real(self.W2(k2, x)) for x in XXX]
-        N1eq    = [np.real(self.N1Eq(x))   for x in XXX]
-        N2eq    = [np.real(self.N2Eq(x))   for x in XXX]
-
-        import pylab
-        pylab.clf()
-        pylab.plot(XXX, D1, label="D1")
-        pylab.plot(XXX, D2, label="D2")
-        pylab.plot(XXX, W1, label="W1")
-        pylab.plot(XXX, W2, label="W2")
-        pylab.plot(XXX, N1eq, label="N1eq")
-        pylab.plot(XXX, N2eq, label="N2eq")
-        pylab.legend()
-        pylab.xscale("log")
-        pylab.yscale("log")
-        pylab.xlim((self.xmin,self.xmax))
-        pylab.savefig(self.plotprefix+"control.pdf")
-
-
 
 if __name__ == "__main__":
     pass
-    # start_time = timeit.default_timer()
-
-    # import sys
-    # from leptomts import readConfig
-    # _, pdict = readConfig(sys.argv[1])
-
-    # L=LeptoCalc()
-    # L.setParams(pdict)
-    # print("Eta_B full =",np.real(L.EtaB))
-    # L=LeptoCalc(approx=True)
-    # L.setParams(pdict)
-    # print("Eta_B appx =",np.real(L.EtaB))
-    # L=LeptoCalc(nds=2, controlplots=False)#, plotprefix=sys.argv[2])
-    # L.setParams(pdict)
-    # print("Eta_B full 2DS =",np.real(L.EtaB))
-    # L=LeptoCalc(nds=2, approx=True)
-    # L.setParams(pdict)
-    # print("Eta_B appx 2DS =",np.real(L.EtaB))
-    # L=LeptoCalc(nds=3, controlplots=False)
-    # L.setParams(pdict)
-    # print("Eta_B full 3DS =",np.real(L.EtaB))
-    # L=LeptoCalc(nds=5, controlplots=False)
-    # L.setParams(pdict)
-    # print("Eta_B scattering ('nds' =5)",np.real(L.EtaB))
-    # from IPython import embed
-    # embed()
-
