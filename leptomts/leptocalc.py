@@ -40,33 +40,51 @@ class LeptoCalc(object):
         Set global constants here.
         """
         #Higgs vev, mass and Z-mass in GeV
-        self.v = 174.
-        self.MH = 125.
-        self.MZ = 91.1876
+        self.v =  kwargs["vev"]                        if kwargs.get("vev")      is not None else 174.
+        self.MH = kwargs["mhiggs"]                     if kwargs.get("mhiggs")   is not None else 125.
+        self.MZ = kwargs["mz"]                         if kwargs.get("mz")       is not None else 91.1876
         #relativistic degrees of freedom at high temperature
-        self.gstar = 106.75
+        self.gstar = kwargs["gstar"]                   if kwargs.get("gstar")    is not None else 106.75
         #Planck mass in GeV
-        self.MP = 1.22e+19
+        self.MP    = kwargs["mplanck"]                 if kwargs.get("mplanck")  is not None else 1.22e+19
         #neutrino cosmological mass in GeV
-        self.mstar = 1.0e-12
+        self.mstar = kwargs["mstar"]                   if kwargs.get("mstar")    is not None else 1.0e-12
+        # Mass-splittings, all in GeV^2
+        self.msplit2_solar       = kwargs["m2solar"]   if kwargs.get("m2solar")  is not None else 7.400e-5*1e-18 # 2017
+        self.msplit2_athm_normal = kwargs["m2atm"]     if kwargs.get("m2atm")    is not None else 2.515e-3*1e-18 # Values
+        self.msplit2_athm_invert = kwargs["m2atminv"]  if kwargs.get("m2atminv") is not None else 2.483e-3*1e-18 # from nu-fit 3.1
+
         # Flags
-        self.debug   = kwargs["debug"]  if kwargs.get("debug")  is not None else False
+        self.debug   = kwargs["debug"]                 if kwargs.get("debug")    is not None else False
+
         # Parameters of the solver
-        self._zmin   = kwargs["zmin"]   if kwargs.get("zmin")   is not None else 0.1
-        self._zmax   = kwargs["zmax"]   if kwargs.get("zmax")   is not None else 1000
-        self._zsteps = kwargs["zsteps"] if kwargs.get("zsteps") is not None else 1000
+        self._zmin   = kwargs["zmin"]                  if kwargs.get("zmin")     is not None else 0.1
+        self._zmax   = kwargs["zmax"]                  if kwargs.get("zmax")     is not None else 1000
+        self._zsteps = kwargs["zsteps"]                if kwargs.get("zsteps")   is not None else 1000
         self._currz = self.zmin
 
         # Model switches
-        self.ordering = kwargs["ordering"] if kwargs.get("ordering") is not None else 0
-        self.loop = kwargs["loop"] if kwargs.get("loop") is not None else False
-
-
+        self.ordering = kwargs["ordering"]             if kwargs.get("ordering") is not None else 0
+        self.loop     = kwargs["loop"]                 if kwargs.get("loop")     is not None else False
 
         self.zs=None
         self.ys=None
         self.setZS()
         self.sphalfact = 0.01
+
+    @property
+    def constants(self):
+        s=" Global constants:"
+        s+= "\n\t Higgs VEV {} GeV ['vev']".format(self.v)
+        s+= "\n\t Higgs mass {} GeV ['mhiggs']".format(self.MH)
+        s+= "\n\t Z-boson mass {} GeV ['mz']".format(self.MZ)
+        s+= "\n\t Planck mass {} GeV ['mplanck']".format(self.MP)
+        s+= "\n\t Neutrino cosmological mass {} GeV ['mstar']".format(self.mstar)
+        s+= "\n\t Relativistic degrees of freedom at high temperature {} GeV ['gstar']".format(self.gstar)
+        s+= "\n\t Solar mass square splitting {} GeV^2 ['m2solar']".format(self.msplit2_solar)
+        s+= "\n\t Atmospheric mass square splitting, normal ordering {} GeV^2 ['m2atm']".format(self.msplit2_athm_normal)
+        s+= "\n\t Atmospheric mass square splitting, inverted ordering {} GeV^2 ['m2atminv']".format(self.msplit2_athm_invert)
+        return s
 
     def __call__(self, x):
         """
@@ -84,6 +102,7 @@ class LeptoCalc(object):
         s+= "\nNormal ordering\n" if self.ordering==0 else "\nInverted ordering\n"
         s+= "Loop-corrected Yukawa\n" if self.loop else "Tree-level Yukawa\n"
         s+="Integration in [{}, {}] in {} steps\n".format(self._zmin, self._zmax, self._zsteps)
+        if self.debug: s+=self.constants
         return s
 
     def setZMin(self, x):
@@ -191,18 +210,14 @@ class LeptoCalc(object):
         Matrix square root of light masses.
         Everything is in GeV.
         """
-        # TODO make these masses configurable
-        msplit2_solar       =  7.40e-5*1e-18 # 2017
-        msplit2_athm_normal = 2.515e-3*1e-18 # Values
-        msplit2_athm_invert = 2.483e-3*1e-18 # from nu-fit 3.1
 
         if self.ordering==0:
             m11 = np.sqrt(self.m1)
-            m22 = np.sqrt(np.sqrt(msplit2_solar       + self.m1*self.m1))
-            m33 = np.sqrt(np.sqrt(msplit2_athm_normal + self.m1*self.m1))
+            m22 = np.sqrt(np.sqrt(self.msplit2_solar       + self.m1*self.m1))
+            m33 = np.sqrt(np.sqrt(self.msplit2_athm_normal + self.m1*self.m1))
         elif self.ordering==1:
-            m11 = np.sqrt(np.sqrt(msplit2_athm_invert + self.m1*self.m1 - msplit2_solar))
-            m22 = np.sqrt(np.sqrt(msplit2_athm_invert + self.m1*self.m1))
+            m11 = np.sqrt(np.sqrt(self.msplit2_athm_invert + self.m1*self.m1 - self.msplit2_solar))
+            m22 = np.sqrt(np.sqrt(self.msplit2_athm_invert + self.m1*self.m1))
             m33 = np.sqrt(self.m1)
         else:
             raise Exception("ordering %i not implemented"%self.ordering)
@@ -860,4 +875,7 @@ class LeptoCalc(object):
 
 
 if __name__ == "__main__":
-    pass
+    L=LeptoCalc()
+    print(L)
+    L=LeptoCalc(debug=True)
+    print(L)
