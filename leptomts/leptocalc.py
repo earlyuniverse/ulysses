@@ -269,22 +269,6 @@ class LeptoCalc(object):
         rZ2 = (x/self.MZ)**2
         return x*(np.log(rH2)/(rH2-1) + 3*np.log(rZ2)/(rZ2-1) )
 
-    # TODO check logic here after change of h_loop
-    @property
-    def isTreeDominant(self):
-        min_tree = abs(self.h_tree).min()
-        max_loop = abs(self.h_loop).max()
-        print("Want (Loop, tree)", max_loop, "to be <", min_tree)
-        return max_loop < .1 * min_tree
-
-    # TODO check logic here after change of h_loop
-    @property
-    def isLoopDominant(self):
-        max_tree = abs(self.h_tree).max()
-        min_loop = abs(self.h_loop).min()
-        print("Want (Loop, tree)", min_loop, "to be >", max_tree)
-        return min_loop > 10 * max_tree
-
     @property
     def m_tree(self):
         """
@@ -312,10 +296,6 @@ class LeptoCalc(object):
         loop  mass matrix
         """
         return 1./(16*np.pi**2)*(np.max(np.abs(self.h))**2)*self.m_loop
-
-    # @property
-    # def h_loop(self):
-        # return self.h +  self.h_tree
 
     @property
     def h(self):
