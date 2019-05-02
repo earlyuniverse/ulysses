@@ -66,7 +66,7 @@ class LeptoCalc(object):
         self.zs=None
         self.ys=None
         self.setZS()
-        self.sphalfact = 0.01 #TODO --- check if used
+        self.sphalfact = 0.01
 
     def __call__(self, x):
         """
@@ -85,9 +85,6 @@ class LeptoCalc(object):
         s+= "Loop-corrected Yukawa\n" if self.loop else "Tree-level Yukawa\n"
         s+="Integration in [{}, {}] in {} steps\n".format(self._zmin, self._zmax, self._zsteps)
         return s
-
-    # def __repr__(self):
-        # return self.__docstring
 
     def setZMin(self, x):
         self._zmin=x
@@ -338,8 +335,6 @@ class LeptoCalc(object):
         return (1./self.v)*(self.U @ self.SqrtDm @ np.transpose(self.R) @ self.SqrtDM)
 
     def FTmeasure(self, debug=False):
-        # e_loop, v_loop = linalg.eig(self.m_loop)
-        # e_tot,   v_tot = linalg.eig(self.m_tot)
         U_tree, S_tree, V_tree = linalg.svd(self.m_tree)
         U_loop, S_loop, V_loop = linalg.svd(self.m_loop)
         U_tot,  S_tot,  V_tot  = linalg.svd(self.m_tot)
@@ -348,8 +343,6 @@ class LeptoCalc(object):
         meas = sum([abs(x) for x in S_loop])/sum([abs(x) for x in S_tot])
 
         if debug:
-            #print("Eigenvalues loop:", e_loop)
-            #print("Eigenvalues tot:", e_tot)
             print("Total of singular values tree:", np.sum(S_tree))
             print("Total of singular values loop:", np.sum(S_loop))
             print("Total of singular values tot:" , np.sum(S_tot))
@@ -358,16 +351,12 @@ class LeptoCalc(object):
 
         return meas
 
-    ##########################################
-    #Define functions for Boltzmann equations#
-    ##########################################
     @property
     def meff1(self):
         """
         Effective mass 1
         """
         return np.dot(np.conjugate(np.transpose(self.h)),self.h)[0,0]*(self.v**2)/self.M1
-
 
     @property
     def meff2(self,):
@@ -492,7 +481,6 @@ class LeptoCalc(object):
         # RATIO = n1/n3
         return n3
         # return n3 if RATIO < 8e40 and RATIO >1e-5  else 0 # NOTE these are ad-hoc magic values
-
 
     def W1(self, k1, z):
         """
@@ -619,7 +607,6 @@ class LeptoCalc(object):
         third       = 1j*(lsquare[2,0]*l[a,0]*lcon[b,2]-lsquare[0,2]*l[a,2]*lcon[b,0])*(M[0,0]/M[2,2])*self.f1(M[2,2]/M[0,0])
         second      = 1j*(2./3.)*(1/(np.power(M[1,1]/M[0,0],2)-1.))*(l[a,0]*lcon[b,1]*lsquare[0,1]-lcon[b,0]*l[a,1]*lsquare[1,0])
         fourth      = 1j*(2./3.)*(1/(np.power(M[2,2]/M[0,0],2)-1.))*(l[a,0]*lcon[b,2]*lsquare[0,2]-lcon[b,0]*l[a,2]*lsquare[2,0])
-        # print(a,b,prefactor)
         return prefactor*(first+second+third+fourth)
 
     def epsilon1ab(self,a,b):
@@ -869,132 +856,6 @@ class LeptoCalc(object):
         JCPtemp = np.imag(u[0,0]*u[1,1]*np.conj(u[0,1])*np.conj(u[1,0]))
         return JCPtemp
 
-    @property
-    def getEtaB_3DS_DM_OOEtauR(self):
-
-        #Define fixed quantities for BEs
-        _ETA = [
-            np.real(self.epsilon1ab(2,2)),
-            np.real(self.epsilon1ab(1,1)),
-            np.real(self.epsilon1ab(0,0)),
-                    self.epsilon1ab(2,1) ,
-                    self.epsilon1ab(2,0) ,
-                    self.epsilon1ab(1,0) ,
-            np.real(self.epsilon2ab(2,2)),
-            np.real(self.epsilon2ab(1,1)),
-            np.real(self.epsilon2ab(0,0)),
-                    self.epsilon2ab(2,1) ,
-                    self.epsilon2ab(2,0) ,
-                    self.epsilon2ab(1,0) ,
-            np.real(self.epsilon3ab(2,2)),
-            np.real(self.epsilon3ab(1,1)),
-            np.real(self.epsilon3ab(0,0)),
-                    self.epsilon3ab(2,1) ,
-                    self.epsilon3ab(2,0) ,
-                    self.epsilon3ab(1,0)]
-
-        _C =   [self.c1a(2), self.c1a(1), self.c1a(0),
-                self.c2a(2), self.c2a(1), self.c2a(0),
-                self.c3a(2), self.c3a(1), self.c3a(0)]
-
-        _K      = [np.real(self.k1), np.real(self.k2), np.real(self.k3)]
-        _W      = [ 485e-10*self.MP/self.M1, 1.7e-10*self.MP/self.M1]
-
-        y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
-
-        zcrit   = 1e100
-        ys, _   = odeintw(self.RHS_3DS_DM_OOEtauR, y0, self.xs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
-        nb      = np.real(self.sphalfact*(ys[-1,3]+ys[-1,4]+ys[-1,5]))
-
-        return nb
-
-    @property
-    def getEtaB_1DS_DM_scattering_OOEtauR(self):
-
-        #Define fixed quantities for BEs
-        _ETA = [
-            np.real(self.epsilon1ab(2,2)),
-            np.real(self.epsilon1ab(1,1)),
-            np.real(self.epsilon1ab(0,0)),
-                    self.epsilon1ab(2,1) ,
-                    self.epsilon1ab(2,0) ,
-                    self.epsilon1ab(1,0) ,
-            np.real(self.epsilon2ab(2,2)),
-            np.real(self.epsilon2ab(1,1)),
-            np.real(self.epsilon2ab(0,0)),
-                    self.epsilon2ab(2,1) ,
-                    self.epsilon2ab(2,0) ,
-                    self.epsilon2ab(1,0) ,
-            np.real(self.epsilon3ab(2,2)),
-            np.real(self.epsilon3ab(1,1)),
-            np.real(self.epsilon3ab(0,0)),
-                    self.epsilon3ab(2,1) ,
-                    self.epsilon3ab(2,0) ,
-                    self.epsilon3ab(1,0)]
-
-        _C =   [self.c1a(2), self.c1a(1), self.c1a(0),
-                self.c2a(2), self.c2a(1), self.c2a(0),
-                self.c3a(2), self.c3a(1), self.c3a(0)]
-
-        _K      = [np.real(self.k1), np.real(self.k2), np.real(self.k3)]
-        _W      = [ 485e-10*self.MP/self.M1, 1.7e-10*self.MP/self.M1]
-
-        y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
-
-        zcrit   = 1e100
-        ys, _   = odeintw(self.RHS_1DS_DM_scattering_OOEtauR, y0, self.xs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
-        nb      = np.real(self.sphalfact*(ys[-1,1]+ys[-1,2]+ys[-1,3]))
-
-        return nb
-
-    @property
-    def getEtaB_1DS_DM_allQuantities(self):
-        #Define fixed quantities for BEs   
-        epstt = np.real(self.epsilonab(2,2))
-        epsmm = np.real(self.epsilonab(1,1))
-        epsee = np.real(self.epsilonab(0,0))
-        epstm =         self.epsilonab(2,1)
-        epste =         self.epsilonab(2,0)
-        epsme =         self.epsilonab(1,0)
-
-        c1t   =                 self.c1a(2)
-        c1m   =                 self.c1a(1)
-        c1e   =                 self.c1a(0)
-
-        xs    = np.linspace(self.xmin, self.xmax, self.xsteps)
-        k     = np.real(self.k1)
-        y0    = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
-
-        params= np.array([epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e,k], dtype=np.complex128)
-
-        ys, _ = odeintw(self.RHS_1DS_DM, y0, self.xs, args = tuple(params), full_output=True)
-
-        return self.sphalfact*(np.array([ys[-1,1],ys[-1,2],ys[-1,3],ys[-1,4],ys[-1,5],ys[-1,6]]))
-
-    @property
-    def getEtaB_1DS_DM_ZeroWidthm(self):
-        #Define fixed quantities for BEs   
-        epstt = np.real(self.epsilonab(2,2))
-        epsmm = np.real(self.epsilonab(1,1))
-        epsee = np.real(self.epsilonab(0,0))
-        epstm =         self.epsilonab(2,1)
-        epste =         self.epsilonab(2,0)
-        epsme =         self.epsilonab(1,0)
-
-        c1t   =                 self.c1a(2)
-        c1m   =                 self.c1a(1)
-        c1e   =                 self.c1a(0)
-
-        xs      = np.linspace(self.xmin, self.xmax, self.xsteps)
-        k       = np.real(self.k1)
-        y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
-        params  = np.array([epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e,k], dtype=np.complex128)
-
-        ys, _      = odeintw(self.RHS_1DS_DM_ZeroWidthm, y0, self.xs, args = tuple(params), full_output=True)
-        nb      = self.sphalfact*(ys[-1,1]+ys[-1,2]+ys[-1,3])
-
-        return nb
-
    #####   HERE we insert the code for resonant leptogenesis #######
       #CP asymmetry parameter for flavoured resonant leptogenesis from 0705.218averaged for large  washout
     def epsilonaaRES(self,a):
@@ -1007,55 +868,12 @@ class LeptoCalc(object):
         gamma2    = (lsquare[1,1]/(8*np.pi))*M[1,1]
         DeltaM    = M[1,1]-M[0,0]
         sum1      = np.imag(ldag[0,a]*l[a,1]*lsquare[0,1])+np.imag(ldag[0,a]*l[a,1]*lsquare[1,0])
-                                                                   
         epsbar1   = sum1/(lsquare[0,0]*lsquare[1,1])
         fmix      =  -2*(DeltaM/gamma2)/(1+(2*DeltaM/gamma2)**2)
         fosc      = -0.5*(DeltaM/gamma2)/(1+(DeltaM/gamma2)**2)
         epsbar    = -0.5*epsbar1 * (fosc + fmix)
-        
         return epsbar
 
-
-
-    @property
-    def ___EtaB(self):
-        if self.nds==1:
-            if self.approx:
-                return np.real(self.getEtaB_1DS_Approx)
-            else:
-                return np.real(self.getEtaB_1DS_DM)
-        if self.nds==2:
-            if self.approx:
-                return np.real(self.getEtaB_2DS_Approx)
-            else:
-                return np.real(self.getEtaB_2DS_DM)
-        if self.nds==3:
-            if self.approx:
-                return print("We have nocode for 3-flavoured BE")
-            else:
-                return np.real(self.getEtaB_3DS_DM)
-        if self.nds==4:
-             if self.approx:
-                return 0
-             else:
-                return np.real(self.getEtaB_3DS_DM_scattering_OOEtauR)
-        if self.nds==5:
-             if self.approx:
-                return 0
-             else:
-                return np.real(self.getEtaB_1DS_DM_scattering_OOEtauR)
-        if self.nds==6:
-             if self.approx:
-                return 0
-             else:
-                return np.real(self.getEtaB_3DS_DM_OOEtauR)
-        if self.nds==7:
-             if self.approx:
-                return 0
-             else:
-                 return np.real(self.getEtaB_2DS_Resonant)
-#             else:
-#                return np.real(self.getEtaB_1DS_DM_ZeroWidth)
 
     def findZmax(self, zmin=0.1, zmax=100, steps=1000):
         k1, k2 = [np.real(self.k1), np.real(self.k2)]
@@ -1097,30 +915,31 @@ class LeptoCalc(object):
 
 
 if __name__ == "__main__":
-    start_time = timeit.default_timer()
+    pass
+    # start_time = timeit.default_timer()
 
-    import sys
-    from leptomts import readConfig
-    _, pdict = readConfig(sys.argv[1])
+    # import sys
+    # from leptomts import readConfig
+    # _, pdict = readConfig(sys.argv[1])
 
-    L=LeptoCalc()
-    L.setParams(pdict)
-    print("Eta_B full =",np.real(L.EtaB))
-    L=LeptoCalc(approx=True)
-    L.setParams(pdict)
-    print("Eta_B appx =",np.real(L.EtaB))
-    L=LeptoCalc(nds=2, controlplots=False)#, plotprefix=sys.argv[2])
-    L.setParams(pdict)
-    print("Eta_B full 2DS =",np.real(L.EtaB))
-    L=LeptoCalc(nds=2, approx=True)
-    L.setParams(pdict)
-    print("Eta_B appx 2DS =",np.real(L.EtaB))
-    L=LeptoCalc(nds=3, controlplots=False)
-    L.setParams(pdict)
-    print("Eta_B full 3DS =",np.real(L.EtaB))
-    L=LeptoCalc(nds=5, controlplots=False)
-    L.setParams(pdict)
-    print("Eta_B scattering ('nds' =5)",np.real(L.EtaB))
-    from IPython import embed
-    embed()
+    # L=LeptoCalc()
+    # L.setParams(pdict)
+    # print("Eta_B full =",np.real(L.EtaB))
+    # L=LeptoCalc(approx=True)
+    # L.setParams(pdict)
+    # print("Eta_B appx =",np.real(L.EtaB))
+    # L=LeptoCalc(nds=2, controlplots=False)#, plotprefix=sys.argv[2])
+    # L.setParams(pdict)
+    # print("Eta_B full 2DS =",np.real(L.EtaB))
+    # L=LeptoCalc(nds=2, approx=True)
+    # L.setParams(pdict)
+    # print("Eta_B appx 2DS =",np.real(L.EtaB))
+    # L=LeptoCalc(nds=3, controlplots=False)
+    # L.setParams(pdict)
+    # print("Eta_B full 3DS =",np.real(L.EtaB))
+    # L=LeptoCalc(nds=5, controlplots=False)
+    # L.setParams(pdict)
+    # print("Eta_B scattering ('nds' =5)",np.real(L.EtaB))
+    # from IPython import embed
+    # embed()
 
