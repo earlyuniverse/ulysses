@@ -35,7 +35,7 @@ def plotEvolution(data, f_out):
     pylab.xlabel("$z$")
     pylab.yscale("log")
     pylab.xscale("log")
-    pylab.ylabel("$\left|N_{xx} \\right|, eta_B$")
+    pylab.ylabel("$\left|N_{xx} \\right|, \eta_B$")
     pylab.tight_layout()
     pylab.savefig(f_out)
 
