@@ -5,10 +5,10 @@ __doc__="""
 
 %prog -m 1DME --ordering 0 --loop -o evol.pdf  PARAMETERFILE
 
-Example paramter file:
+Example parameter file:
 
 m     -1      # logarithm, in [ev]
-K1    12      # logarithm, in [GeV]
+M1    12      # logarithm, in [GeV]
 M2    12.6    # logarithm, in [GeV]
 M3    13      # logarithm, in [GeV]
 delta 213     # [deg]
@@ -114,6 +114,9 @@ if __name__=="__main__":
 
     # for _ in range(100):
     etaB = LEPTO(FIX)
+    if opts.DEBUG:
+        LEPTO.printParams()
+        print(LEPTO.U)
     print("{}{}\n{}{}\n{}{}".format(
         "eta_b".ljust(      14), etaB,
         "Y_b".ljust(        14), etaB/7.03969,
