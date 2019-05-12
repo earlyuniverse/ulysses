@@ -165,6 +165,21 @@ class LeptoCalc(object):
         self.M2       = 10**pdict['M2']  #
         self.M3       = 10**pdict['M3']  #
 
+
+    def printParams(self):
+        """
+        Print current parameters.
+        """
+        K = ('delta','a21','a31','t12','t23','t13','x1','y1','x2','y2','x3','y3','m','M1','M2','M3')
+        V = (self.delta/np.pi*180, self.a/np.pi*180, self.b/np.pi*180, self.theta12/np.pi*180, self.theta23/np.pi*180, self.theta13/np.pi*180, self.x1/np.pi*180, self.y1/np.pi*180, self.x2/np.pi*180, self.y2/np.pi*180, self.x3/np.pi*180, self.y3/np.pi*180,
+                np.log10(self.m1/1e-9), np.log10(self.M1), np.log10(self.M2), np.log10(self.M3))
+        for k, v in zip(K,V):
+            print(k,v)
+
+
+
+
+
     # Some general calculators purely based on input parameters
     @property
     def R(self):
@@ -182,7 +197,7 @@ class LeptoCalc(object):
 
         R3 = np.array([[ np.cos(self.x3+self.y3*1j), np.sin(self.x3+self.y3*1j), 0.],
                        [-np.sin(self.x3+self.y3*1j), np.cos(self.x3+self.y3*1j), 0.],
-                       [-2., 0., 1.]], dtype=np.complex128)
+                       [0., 0., 1.]], dtype=np.complex128)
 
         return R1 @ R2 @ R3
 
