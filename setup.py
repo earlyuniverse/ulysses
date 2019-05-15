@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
   name = 'leptomts',
-  version = '0.2.0',
+  version = '0.3.0',
   description = 'leptMTS',
   url = 'https://github.com/iamholger/leptomts',
   author = 'Kris Moffat, Jessica Turner, Holger Schulz',
