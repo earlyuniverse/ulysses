@@ -34,15 +34,41 @@ def readConfig(fname):
         return ranges, fixed
 
 def selectLepto(model, **kwargs):
-    avail = ["1DME", "2DME", "3DME", "1BE", "2BE", "2resonant", "3DMEsct", "3DMErhtau"]
     import leptomts
-    if   model=="1DME":                    return leptomts.EtaB_1DME(**kwargs)
-    elif model=="2DME":                    return leptomts.EtaB_2DME(**kwargs)
-    elif model=="3DME":                    return leptomts.EtaB_3DME(**kwargs)
-    elif model=="1BE":                     return leptomts.EtaB_1BE(**kwargs)
-    elif model=="2BE":                     return leptomts.EtaB_2BE(**kwargs)
-    elif model=="2resonant":               return leptomts.EtaB_2Resonant(**kwargs)
-    elif model=="3DMEsct":                 return leptomts.EtaB_3DME_Scattering(**kwargs)
-    elif model=="3DMErhtau":               return leptomts.EtaB_3DS_Scattering_RHtaur(**kwargs)
+    if not ":" in model:
+        avail = ["1DME", "2DME", "3DME", "1BE", "2BE", "2resonant", "3DMEsct", "3DMErhtau"]
+        if   model=="1DME":                    return leptomts.EtaB_1DME(**kwargs)
+        elif model=="2DME":                    return leptomts.EtaB_2DME(**kwargs)
+        elif model=="3DME":                    return leptomts.EtaB_3DME(**kwargs)
+        elif model=="1BE":                     return leptomts.EtaB_1BE(**kwargs)
+        elif model=="2BE":                     return leptomts.EtaB_2BE(**kwargs)
+        elif model=="2resonant":               return leptomts.EtaB_2Resonant(**kwargs)
+        elif model=="3DMEsct":                 return leptomts.EtaB_3DME_Scattering(**kwargs)
+        elif model=="3DMErhtau":               return leptomts.EtaB_3DS_Scattering_RHtaur(**kwargs)
+        else:
+            raise Exception("Specified model '{}' unknown.\n Select from: {}".format(model, avail))
     else:
-        raise Exception("Specified model '{}' unknown.\n Select from: {}".format(model, avail))
+        return loadPlugin(model, **kwargs)
+
+def loadPlugin(model, **kwargs):
+    import leptomts
+    m_file, m_name = model.split(":")
+    import os
+    if not os.path.exists(m_file):
+        raise Exception("Specified module file '{}' does not exist.{}".format(m_file))
+
+    # https://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
+    from importlib.machinery import SourceFileLoader
+
+    foo = SourceFileLoader(m_name, m_file).load_module()
+
+    # https://stackoverflow.com/questions/1796180/how-can-i-get-a-list-of-all-classes-within-current-module-in-python
+    import inspect
+
+    IM = dict(inspect.getmembers(foo, inspect.isclass))
+    if not m_name in IM:
+        raise Exception("Specified class '{}'  not found in module {}".format(m_name, m_file))
+    if not issubclass(IM[m_name], leptomts.LeptoCalc):
+        raise Exception("Specified class '{}'  does not derive from leptoms.LeptoCalc".format(m_name))
+
+    return IM[m_name](**kwargs)
