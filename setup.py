@@ -13,9 +13,9 @@ setup(
     'scipy',
     'odeintw',
     'numba',
-    # 'pymultinest'
+    'pymultinest'
   ],
-  scripts=['bin/uls-get', 'bin/uls-scan', 'bin/uls-nest'],
+  scripts=['bin/uls-calc', 'bin/uls-scan', 'bin/uls-nest'],
   extras_require = {
   },
   entry_points = {

@@ -1,0 +1,267 @@
+#!/usr/bin/env python
+
+import ulysses
+
+
+if __name__=="__main__":
+    import optparse, os, sys
+    op = optparse.OptionParser(usage=__doc__)
+    op.add_option("-o", "--output",    dest="OUTPUT",      default="nestout", type=str, help="Prefix for outputs (default: %default)")
+    op.add_option("-v", "--debug",     dest="DEBUG",       default=False, action="store_true", help="Turn on some debug messages")
+    op.add_option("-q", "--quiet",     dest="QUIET",       default=False, action="store_true", help="Turn off messages")
+    op.add_option("-m", "--model",     dest="MODEL",       default="1DME", help="Selection of of model (default: %default)")
+    op.add_option("--zrange",          dest="ZRANGE",      default="0.1,100,1000", help="Ranges and steps of the evolution variable (default: %default)")
+    op.add_option("--ordering",        dest="ORDERING",    default=0, type=int,                help="The mass ordering (0 or 1, default: %default)")
+    op.add_option("--loop",            dest="LOOP",        default=False, action='store_true', help="Use loop-corrected Yukawa (default: %default)")
+    op.add_option("--seed",            dest="SEED",        default=-1, type=int,              help="Multinest seed (default: %default)")
+    op.add_option("--sigma",           dest="SIGMA",       default=1, type=int,              help="Switch to inflate the error in likelihood (default: %default)")
+    op.add_option("--mn-resume",       dest="RESUME",      default=False, action='store_true', help="Resume on previous run.")
+    op.add_option("--mn-multi-mod",    dest="MULTIMODE",   default=False, action='store_true', help="Set multimodal to true.")
+    op.add_option("--mn-update",       dest="UPDATE",      default=1000, type=int, help="Update inteval (default: %default iterations)")
+    op.add_option("--mn-tol",          dest="TOL",         default=0.5, type=float, help="Evidence tolerance (default: %default)")
+    op.add_option("--mn-eff",          dest="EFF",         default=0.8, type=float, help="Sampling efficiency (default: %default)")
+    op.add_option("--mn-points",       dest="POINTS",      default=400, type=int,              help="Number of live points in PyMultinest (default: %default)")
+    op.add_option("--mn-imax",         dest="ITMAX",       default=0, type=int, help="Max number of iterations PyMultinest, 0 is infinite (default: %default)")
+    op.add_option("--mn-multimodal",   dest="MULTIMODAL",  default=False, action='store_true', help="Run in multimodal mode.")
+    op.add_option("--mn-no-importance",dest="NOIMPSAMP",   default=False, action='store_true', help="Turn off importance sampling.")
+    opts, args = op.parse_args()
+
+
+
+
+    # Sanity check for ordering
+    if opts.ORDERING not in [0,1]:
+        print( "Error, ordering has to be either 0 or 1, exiting")
+        sys.exit(1)
+
+
+    # Read parameter card and very explicit checks on parameter names
+    # TODO also checks on values?
+    import ulysses
+    RNG, FIX = ulysses.readConfig(args[0])
+    if len(FIX) + len(RNG)!=16:
+        print("Error, the number of parameters needs to be 16, user supplied {}, exiting".format(len(FIX)))
+        sys.exit(1)
+
+    pnames = ['m',  'M1', 'M2', 'M3', 'delta', 'a21', 'a31', 'x1', 'x2', 'x3', 'y1', 'y2', 'y3', 't12', 't13', 't23']
+
+
+    for p in FIX.keys():
+        if not p in pnames:
+            print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
+            sys.exit(1)
+
+    for p in RNG.keys():
+        if not p in pnames:
+            print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
+            sys.exit(1)
+
+
+    # Number of dimensions our problem has
+    NP = len(RNG.keys())
+
+    if NP==0:
+        print("No floating parameters specified in {}, exiting.".format(args[0]))
+        sys.exit(1)
+
+    # Disect the zrange string
+    zmin, zmax, zsteps = opts.ZRANGE.split(",")
+    zmin=float(zmin)
+    zmax=float(zmax)
+    zsteps=int(zsteps)
+
+    assert(zmin<zmax)
+    assert(zsteps>0)
+
+
+    LEPTO = ulysses.selectLepto(opts.MODEL,
+            zmin=zmin, zmax=zmax, zsteps=zsteps,
+            ordering=opts.ORDERING,
+            loop=opts.LOOP,
+            debug=opts.DEBUG
+            )
+
+
+    RNG, FIX = ulysses.readConfig(args[0])
+
+
+    # Output directory
+    rank=0
+    try:
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        size = comm.Get_size()
+        rank = comm.Get_rank()
+        if opts.DEBUG:
+            print("[%i]/[%i] reporting for duty"%(rank, size))
+    except Exception as e:
+        print("Problem:", e)
+        pass
+
+    try:
+        os.makedirs(opts.OUTPUT)
+    except:
+        pass
+
+    print("[%i] Writing output to"%rank, opts.OUTPUT)
+    # Paramter names
+    PNAMES = list(RNG.keys())
+
+    # Scaling info
+    PMIN   = [x[0] for x in list(RNG.values())]
+    PMAX   = [x[1] for x in list(RNG.values())]
+    PLEN   = [PMAX[i] - PMIN[i] for i in range(len(PMAX))]
+
+
+
+
+
+    def scaleParam(p, idx):
+        return PMIN[idx] + p * PLEN[idx]
+
+    def myprior(cube, ndim, nparams):
+        for i in range(ndim):
+            cube[i] = scaleParam(cube[i], i)
+
+    def loglike(cube, ndim, nparams):
+        PP=[cube[j] for j in range(ndim)]
+        pdict=FIX.copy()
+        pdict["ordering"]=opts.ORDERING
+
+        for num, p in enumerate(PNAMES):
+            pdict[p]=cube[num]
+
+
+        if opts.DEBUG:
+            print( "Testing point", PP)
+
+        LEPTO.setParams(pdict)
+        pert = LEPTO.isPerturbative
+        if not pert:
+            if opts.DEBUG:
+                print( "Vetoing point", PP)
+            return -1e101
+
+        # if opts.TESTTREEDOM:
+            # meas = LEPTO.FTmeasure()
+            # if meas > 0.2:
+                # if opts.DEBUG:
+                    # print( "Vetoing point because it is not tree dominant")
+                # return -1e101
+            # if opts.DEBUG:
+                # return -1e101
+
+        # if opts.TESTLOOPDOM:
+            # meas = LEPTO.FTmeasure()
+            # if meas > 1.1 or meas < 0.9:
+                # if opts.DEBUG:
+                    # print( "Vetoing point because it is not loop dominant")
+                # return -1e101
+
+        ymodel = LEPTO(pdict)
+        # except:
+            # print( "Something went wrong at", PP, "vetoing")
+            # return -1e101
+
+        if opts.DEBUG:
+            print("response", ymodel)
+
+        ydata = 6.10e-10
+        yerr  = 0.04e-10*opts.SIGMA
+
+
+        loglikelihood = -0.5 * ((ymodel - ydata) / yerr)**2
+        return loglikelihood
+
+    import matplotlib, os, sys
+    matplotlib.use(os.environ.get("MPL_BACKEND", "Agg"))
+
+    # Run MultiNest
+    import pymultinest
+    pymultinest.run(loglike, myprior, NP,
+            importance_nested_sampling = not opts.NOIMPSAMP,
+            verbose = False if opts.QUIET else True,
+            multimodal=opts.MULTIMODAL,
+            resume=opts.RESUME,
+            n_iter_before_update=opts.UPDATE,
+            evidence_tolerance=opts.TOL,
+            sampling_efficiency = opts.EFF,
+            init_MPI=False,
+            n_live_points = opts.POINTS,
+            max_iter=opts.ITMAX,
+            seed=opts.SEED,
+            outputfiles_basename='%s/ULSNEST'%opts.OUTPUT)
+
+    try:
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        size = comm.Get_size()
+        rank = comm.Get_rank()
+        print("Rank:", rank, "Size:", size)
+    #    os.system("cp %s/ULSNEST.txt %s/rescue.%i.txt"%(opts.OUTPUT,opts.OUTPUT,rank))
+    except:
+        pass
+
+    if rank==0:
+        print()
+        print("Now analyzing output from {}/ULSNEST.txt".format(opts.OUTPUT))
+        a = pymultinest.Analyzer(n_params = NP, outputfiles_basename='%s/ULSNEST'%opts.OUTPUT)
+        a.get_data()
+        try:
+            s = a.get_stats()
+        except:
+            print("There was an error accumulating statistics. Try increasing the number of iterations, e.g. --mn-iterations -1")
+            sys.exit(1)
+
+
+        from collections import OrderedDict
+        resraw = a.get_best_fit()["parameters"]
+        PP=OrderedDict.fromkeys(PNAMES)
+        for num, pname in enumerate(PNAMES):
+            PP[pname] = resraw[num]
+        for k in FIX:
+            PP[k] = FIX[k]
+        PP["ordering"]=opts.ORDERING
+
+        LEPTO.setParams(PP)
+        BESTVAL=LEPTO.EtaB
+
+
+        out="# Model: {}".format(opts.MODEL)
+        if opts.LOOP:
+            out+="# with loop correction to neutrino tree-level mass"
+        out+="\n"
+
+        out+="# Best fit value: %e\n"%BESTVAL
+        out+="# Best fit point:\n"
+        for k in PP:
+            if not k in FIX:
+                out+= "%s %.16f\n"%(k,PP[k])
+
+        out+="# Fixed parameters were:\n"
+        for k in FIX:
+            try:
+                out+= "%s %f\n"%(k, FIX[k])
+            except:
+                out+= "%s %f %f i\n"%(k, FIX[k].real, FIX[k].imag)
+        with open("%sconfig.best"%a.outputfiles_basename, "w") as f:
+            f.write(out)
+            f.write("ordering %s"%opts.ORDERING)
+
+        import json
+        # store name of parameters, always useful
+        with open('%sparams.json' % a.outputfiles_basename, 'w') as f:
+                json.dump(PNAMES, f, indent=2)
+        with open('%sparams.info' % a.outputfiles_basename, 'w') as f:
+            for p in PNAMES:
+                f.write("%s\n"%p)
+        # store derived stats
+        with open('%sstats.json' % a.outputfiles_basename, mode='w') as f:
+                json.dump(s, f, indent=2)
+        print()
+        print("-" * 30, 'ANALYSIS', "-" * 30)
+        print("Global Evidence:\n\t%.15e +- %.15e" % ( s['nested sampling global log-evidence'], s['nested sampling global log-evidence error'] ))
+
+        print("Done!")
+        import sys
+        sys.exit(0)
