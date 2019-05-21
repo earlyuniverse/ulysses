@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 setup(
-  name = 'leptomts',
-  version = '0.3.0',
-  description = 'leptMTS',
-  url = 'https://github.com/iamholger/leptomts',
+  name = 'ulysses',
+  version = '1.0',
+  description = 'ULYSSES: Universal LeptogeneSiS Equation Solver',
+  url = 'https://github.com/iamholger/ulysses',
   author = 'Kris Moffat, Jessica Turner, Holger Schulz',
   author_email = 'hschulz@fnal.gov',
   packages = find_packages(),
@@ -13,9 +13,9 @@ setup(
     'scipy',
     'odeintw',
     'numba',
-    'pymultinest'
+    # 'pymultinest'
   ],
-  scripts=['bin/lepto-get', 'bin/lepto-scan'],
+  scripts=['bin/uls-get', 'bin/uls-scan', 'bin/uls-nest'],
   extras_require = {
   },
   entry_points = {
