@@ -55,9 +55,9 @@ class ULSBase(object):
         #neutrino cosmological mass in GeV
         self.mstar = kwargs["mstar"]                   if kwargs.get("mstar")    is not None else 1.0e-12
         # Mass-splittings, all in GeV^2
-        self.msplit2_solar       = kwargs["m2solar"]   if kwargs.get("m2solar")  is not None else 7.400e-5*1e-18 # 2017
-        self.msplit2_athm_normal = kwargs["m2atm"]     if kwargs.get("m2atm")    is not None else 2.515e-3*1e-18 # Values
-        self.msplit2_athm_invert = kwargs["m2atminv"]  if kwargs.get("m2atminv") is not None else 2.483e-3*1e-18 # from nu-fit 3.1
+        self.msplit2_solar       = kwargs["m2solar"]   if kwargs.get("m2solar")  is not None else 7.390e-5*1e-18 # 2018
+        self.msplit2_athm_normal = kwargs["m2atm"]     if kwargs.get("m2atm")    is not None else 2.525e-3*1e-18 # Values
+        self.msplit2_athm_invert = kwargs["m2atminv"]  if kwargs.get("m2atminv") is not None else 2.512e-3*1e-18 # from nu-fit 4.0
 
         # Flags
         self.debug   = kwargs["debug"]                 if kwargs.get("debug")    is not None else False
