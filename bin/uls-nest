@@ -173,9 +173,6 @@ if __name__=="__main__":
         loglikelihood = -0.5 * ((ymodel - ydata) / yerr)**2
         return loglikelihood
 
-    import matplotlib, os, sys
-    matplotlib.use(os.environ.get("MPL_BACKEND", "Agg"))
-
     # Run MultiNest
     import pymultinest
     pymultinest.run(loglike, myprior, NP,
