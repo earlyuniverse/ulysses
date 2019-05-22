@@ -104,7 +104,7 @@ if __name__=="__main__":
     assert(zsteps>0)
 
 
-    LEPTO = ulysses.selectLepto(opts.MODEL,
+    LEPTO = ulysses.selectModel(opts.MODEL,
             zmin=zmin, zmax=zmax, zsteps=zsteps,
             ordering=opts.ORDERING,
             loop=opts.LOOP,

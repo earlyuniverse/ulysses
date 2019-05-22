@@ -33,7 +33,7 @@ def readConfig(fname):
                 continue
         return ranges, fixed
 
-def selectLepto(model, **kwargs):
+def selectModel(model, **kwargs):
     import ulysses
     if not ":" in model:
         avail = ["1DME", "2DME", "3DME", "1BE", "2BE", "2resonant", "3DMEsct", "3DMErhtau"]
