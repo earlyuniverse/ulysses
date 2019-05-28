@@ -50,7 +50,7 @@ if __name__=="__main__":
     op.add_option("-v", "--debug",     dest="DEBUG",       default=False, action="store_true", help="Turn on some debug messages")
     op.add_option("-m", "--model",     dest="MODEL",       default="1DME", help="Selection of of model (default: %default)")
     op.add_option("--zrange",          dest="ZRANGE",      default="0.1,100,1000", help="Ranges and steps of the evolution variable (default: %default)")
-    op.add_option("--ordering",        dest="ORDERING",    default=0, type=int,                help="The mass ordering (0 or 1, default: %default)")
+    op.add_option("--inv",             dest="INVORDERING", default=False, action='store_true', help="Use inverted mass ordering (default: %default)")
     op.add_option("--loop",            dest="LOOP",        default=False, action='store_true', help="Use loop-corrected Yukawa (default: %default)")
     opts, args = op.parse_args()
 
@@ -58,12 +58,6 @@ if __name__=="__main__":
     if len(args)==0:
         print("No parameter space configuration given, exiting.")
         sys.exit(1)
-
-    # Sanity check for ordering
-    if opts.ORDERING not in [0,1]:
-        print( "Error, ordering has to be either 0 or 1, exiting")
-        sys.exit(1)
-
 
     # Read parameter card and very explicit checks on parameter names
     # TODO also checks on values?
@@ -99,20 +93,14 @@ if __name__=="__main__":
 
     LEPTO = ulysses.selectModel(opts.MODEL,
             zmin=zmin, zmax=zmax, zsteps=zsteps,
-            ordering=opts.ORDERING,
+            ordering=int(opts.INVORDERING),
             loop=opts.LOOP,
             debug=opts.DEBUG
             )
 
-
     if opts.DEBUG:
         print(LEPTO)
 
-
-
-
-
-    # for _ in range(100):
     etaB = LEPTO(FIX)
     if opts.DEBUG:
         LEPTO.printParams()

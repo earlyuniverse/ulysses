@@ -48,7 +48,7 @@ if __name__=="__main__":
     op.add_option("-m", "--model",     dest="MODEL",       default="1DME", help="Selection of of model (default: %default)")
     op.add_option("-n", "--n-scan",    dest="NSCAN",       default=30, type=int, help="Number of point to scan (default: %default)")
     op.add_option("--zrange",          dest="ZRANGE",      default="0.1,100,1000", help="Ranges and steps of the evolution variable (default: %default)")
-    op.add_option("--ordering",        dest="ORDERING",    default=0, type=int,                help="The mass ordering (0 or 1, default: %default)")
+    op.add_option("--inv",             dest="INVORDERING", default=False, action='store_true', help="Use inverted mass ordering (default: %default)")
     op.add_option("--loop",            dest="LOOP",        default=False, action='store_true', help="Use loop-corrected Yukawa (default: %default)")
     opts, args = op.parse_args()
 
@@ -60,12 +60,6 @@ if __name__=="__main__":
     # Make sure specified file actually exists
     if not os.path.exists(args[0]):
         print("Specified input file {} does not exist, exiting.".format(args[0]))
-
-
-    # Sanity check for ordering
-    if opts.ORDERING not in [0,1]:
-        print( "Error, ordering has to be either 0 or 1, exiting")
-        sys.exit(1)
 
 
     # Read parameter card and very explicit checks on parameter names
@@ -92,8 +86,6 @@ if __name__=="__main__":
         print("Scan-parameter {} in input file {} not recognised, exiting".format(pscan, args[0]))
 
 
-
-
     # Disect the zrange string
     zmin, zmax, zsteps = opts.ZRANGE.split(",")
     zmin=float(zmin)
@@ -106,7 +98,7 @@ if __name__=="__main__":
 
     LEPTO = ulysses.selectModel(opts.MODEL,
             zmin=zmin, zmax=zmax, zsteps=zsteps,
-            ordering=opts.ORDERING,
+            ordering=int(opts.INVORDERING),
             loop=opts.LOOP,
             debug=opts.DEBUG
             )
