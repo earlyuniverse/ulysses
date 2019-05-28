@@ -34,13 +34,23 @@ def my_kn2(x):
 class ULSBase(object):
     def __init__(self, *args, **kwargs):
         r"""
+        Base class for all EtaB calculators.
+
         Set global constants here.
 
         :Keyword Arguments:
             * *vev* (``float``) --
               Higgs VEV in GeV
-            * *supplement* (``dict``) --
-              Additional content
+            * *mhiggs* (``float``) --
+              Higgs mass in GeV
+            * *mz* (``float``) --
+              Z-boson mass in GeV
+            * *gstar* (``float``) --
+              Relativistic degrees of freedom at high temperature
+            * *mplanck* (``float``) --
+              Planck mass in GeV
+            * *mstar* (``float``) --
+              Neutrino cosmological mass in GeV
 
 
         """
@@ -92,12 +102,14 @@ class ULSBase(object):
         return s
 
     def __call__(self, x):
-        """
-        Operator that returns etaB.
+        r"""
+        Operator that returns EtaB for a given parameter point.
 
-        NOTE --- this will work only with derived classes where EtaB is actually implemented
+        :Arguments:
+            * *x* (``dict``) --
+              parameter dictionary
 
-        x --- parameter dictionary
+        NOTE --- this operator is intended to be used with derived classes where EtaB is implemented
         """
         self.setParams(x)
         return self.EtaB
@@ -138,11 +150,14 @@ class ULSBase(object):
 
     @property
     def evolData(self):
-        """
-        Return a 4-D array of the evolution data.
+        r"""
+
+        :getter: Return a 4-D array of the evolution data.
+
         The first column is the evolution variable
         The second column corresponds to Ntautau, the
         third to Nmumu and the last columnd to Nee
+
         """
         pd = np.empty((self.zsteps, 4))
         pd[:,      0] = self.zs
@@ -180,9 +195,6 @@ class ULSBase(object):
                 np.log10(self.m1/1e-9), np.log10(self.M1), np.log10(self.M2), np.log10(self.M3))
         for k, v in zip(K,V):
             print(k,v)
-
-
-
 
 
     # Some general calculators purely based on input parameters
