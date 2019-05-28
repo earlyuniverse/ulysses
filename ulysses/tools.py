@@ -34,6 +34,16 @@ def readConfig(fname):
         return ranges, fixed
 
 def selectModel(model, **kwargs):
+    r"""
+
+    This function loads and returns an instance of one of the built-in models.
+    The kwargs are passed on to the base class.
+
+        :Arguments:
+            * *model* (``str``) --
+              The model. Must be in ["1DME", "2DME", "3DME", "1BE", "2BE", "2resonant", "3DMEsct", "3DMErhtau"]
+
+    """
     import ulysses
     if not ":" in model:
         avail = ["1DME", "2DME", "3DME", "1BE", "2BE", "2resonant", "3DMEsct", "3DMErhtau"]
@@ -51,6 +61,16 @@ def selectModel(model, **kwargs):
         return loadPlugin(model, **kwargs)
 
 def loadPlugin(model, **kwargs):
+    r"""
+    Plugin loader. This attemts to load and return and instance of
+    the class CLASS in the file FILENAME. Both are given as a single
+    string using : as separator. The kwargs are passed on to the base class.
+
+        :Arguments:
+            * *model* (``str``) --
+              FILENAME:CLASS
+
+    """
     import ulysses
     m_file, m_name = model.split(":")
     import os
