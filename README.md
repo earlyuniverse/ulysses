@@ -5,7 +5,5 @@ models of leptogenesis.
 [Repository](https://github.com/iamholger/ulysses)
 
 [![Documentation Status](https://readthedocs.org/projects/ulysses-universal-leptogenesis-equation-solver/badge/?version=latest)](https://ulysses-universal-leptogenesis-equation-solver.readthedocs.io/en/latest/?badge=latest)
-
 [![PyPI version](https://badge.fury.io/py/ulysses.svg)](https://badge.fury.io/py/ulysses)
 ￼￼
-[![Supported Python versionss](https://img.shields.io/pypi/pyversions/ulysses.svg)](https://pypi.org/project/ulysses/)
