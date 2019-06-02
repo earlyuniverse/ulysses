@@ -4,6 +4,8 @@
 # list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+master_doc = 'index'
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -53,3 +55,5 @@ html_theme = 'alabaster'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+
