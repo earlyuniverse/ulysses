@@ -26,7 +26,7 @@ def fast_RHS(y0, epstt,epsmm,epsee,C,d1,w1,n1eq):
 
 class EtaB_2Resonant(ulysses.ULSBase):
     """
-    TODO add docstring
+    Resonant equations with two steriles and three lepton flavours. See arxiv:0705.2183.
     """
 
     def RHS(self, y0, zzz, ETA, C, K):
@@ -38,7 +38,6 @@ class EtaB_2Resonant(ulysses.ULSBase):
             self._w1            = np.real(self.W1(k1term, zzz))
             self._n1eq          = self.N1Eq(zzz)
             self._currz=zzz
-        # print("{}/{} --- {} - {} - {}".format(zzz, self._currx, self._d1, self._w1, self._n1eq))
 
         return fast_RHS(y0,epstt,epsmm,epsee, C,self._d1,self._w1,self._n1eq)
 

@@ -1,4 +1,4 @@
-# non-resonant leptogenesis with three decaying sterile neutrino using the density matrix equations. Equations from 1112.4528 including the scattering term from 0401240 and affect of right-handed tau participation in kinetic equations.
+# non-resonant leptogenesis with three decaying sterile neutrino using the density matrix equations. Equations from 1112.4528 including the scattering term from 0401240 and effect of right-handed tau participation in kinetic equations.
 
 import ulysses
 import numpy as np
@@ -75,7 +75,9 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
 
 class EtaB_3DS_Scattering_RHtaur(ulysses.ULSBase):
     """
-    TODO add docstring
+    Density matrix equation (DME) with three decaying steriles including
+    scatterings and effect of right-handed tau participation in kinetic equations.
+    See hep-ph/0401240 and arxiv:0807.1408.
     """
 
     def RHS(self, y0, zzz, ETA, C, K, W):

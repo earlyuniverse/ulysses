@@ -70,7 +70,8 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
 
 class EtaB_3DME_Scattering(ulysses.ULSBase):
     """
-    TODO add docstring
+    Density matrix equation (DME) with three decaying steriles including
+    scatterings. See hep-ph/0401240.
     """
 
     def RHS(self, y0, zzz, ETA, C, K, W):

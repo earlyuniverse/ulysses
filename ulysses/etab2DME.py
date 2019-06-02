@@ -65,7 +65,7 @@ def fast_RHS(y0, eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,
 
 class EtaB_2DME(ulysses.ULSBase):
     """
-    density matrix equation (DME) finite thermal width  with two decaying steriles.
+    Density matrix equation (DME) with two decaying steriles. See arxiv:1112.4528.
     """
 
     def RHS(self, y0, zzz, ETA, C, K, W):

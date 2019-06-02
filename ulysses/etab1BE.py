@@ -24,7 +24,9 @@ def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee,c1t,c1m,c1e):
 
 class EtaB_1BE(ulysses.ULSBase):
     """
-    TODO add docstring
+    Boltzmann equation (BE) with one decaying sterile. See arxiv:1112.4528.
+    Note these kinetic equations do not include off diagonal flavour
+    oscillations.
     """
 
     def RHS(self, y0,z,epstt,epsmm,epsee,c1t,c1m,c1e,k):

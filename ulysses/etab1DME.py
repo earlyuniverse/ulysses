@@ -33,7 +33,7 @@ def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e, w
 
 class EtaB_1DME(ulysses.ULSBase):
     """
-    density matrix equation (DME) zero thermal width (implies one-flavoured regime (1F)) with one decaying sterile.
+    Density matrix equation (DME) with one decaying sterile. See arxiv:1112.4528.
     """
 
     def RHS(self, y0,z,epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e,k):
