@@ -221,7 +221,8 @@ class ULSBase(object):
     @property
     def SqrtDM(self):
         """
-        Matrix square root of heavy masses
+        Square root of diagonal heavy mass matrix.
+        TODO: is this np.sqrt(self.DM) ???
         """
         return np.array([[np.sqrt(self.M1), 0., 0.],
                          [0., np.sqrt(self.M2), 0.],
@@ -230,7 +231,7 @@ class ULSBase(object):
     @property
     def DM(self):
         """
-        Heavy mass matrix
+        Diagonal heavy mass matrix.
         """
         return np.array([[self.M1, 0., 0.],
                          [0., self.M2, 0.],
@@ -239,7 +240,7 @@ class ULSBase(object):
     @property
     def SqrtDm(self):
         """
-        Matrix square root of light masses.
+        Square root of diagonal light mass matrix.
         Everything is in GeV.
         """
 
@@ -261,7 +262,7 @@ class ULSBase(object):
     @property
     def U(self):
         """
-        PMNS
+        PMNS matrix using the PDG parametrisation convention.
         """
         s12     = np.sin(self.theta12)
         s23     = np.sin(self.theta23)
@@ -277,16 +278,9 @@ class ULSBase(object):
     @property
     def fMR(self):
         """
-        This returns the sqrt of the inverse of what is called f(mR) or so
-        Equation (3) --- the inverse
-        Note: the prefactor differs from the paper due to the fact that in
-        this code we use v=174 (i.e.sqrt(2)*vev(higgs))
-
+        This function returns the diagonl heavy neutrino mass matrix taking
+        radiative corrections into account. (see h_loop) I.e. equivalent to self.SqrtDM in loop case
         """
-        return np.sqrt(linalg.inv(self.fMRcore))
-
-    @property
-    def fMRcore(self):
         a = 1./self.M1
         b = 1./self.M2
         c = 1./self.M3
@@ -297,10 +291,15 @@ class ULSBase(object):
         f = self.fMLoop(self.M3)
         A = np.diag([a,b,c])
         B = prefactor*np.diag([d,e,f])
-        return A+B
+
+        return np.sqrt(linalg.inv(A+B))
+
 
     @property
-    def helper(self):
+    def fMLoopHelper(self):
+        """
+        Helper function.
+        """
         prefactor = 1./(32*np.pi**2*self.v**2)
         d = self.fMLoop(self.M1)
         e = self.fMLoop(self.M2)
@@ -310,7 +309,7 @@ class ULSBase(object):
 
     def fMLoop(self, x):
         """
-        The loop correction bit in Eq. 3 --- x is M1, M2 or M3
+        The loop function.
         """
         rH2 = (x/self.MH)**2
         rZ2 = (x/self.MZ)**2
@@ -319,84 +318,56 @@ class ULSBase(object):
     @property
     def m_tree(self):
         """
-        Tree-level mass matrix
+        Tree-level mass matrix.
         """
         return self.v**2 * self.h @ np.linalg.inv(self.DM) @ np.transpose(self.h)
 
     @property
-    def m_tot(self):
-        """
-        (Tree + loop)  mass matrix
-        """
-        return self.v**2 * self.h @ self.fMRcore @ np.transpose(self.h)
-
-    @property
     def m_loop(self):
         """
-        loop  mass matrix
+        One-loop-level mass matrix.
         """
-        return -1 * self.v**2 * self.h @ self.helper @ np.transpose(self.h)
-
-    @property
-    def m_2loop(self):
-        """
-        loop  mass matrix
-        """
-        return 1./(16*np.pi**2)*(np.max(np.abs(self.h))**2)*self.m_loop
+        return -1 * self.v**2 * self.h @ self.fMLoopHelper @ np.transpose(self.h)
 
     @property
     def h(self):
+        """
+        YUKAWA matrix.
+        """
         return self.h_loop if self.loop else self.h_tree
 
     @property
     def h_loop(self):
         """
-        Yukawa matrix (LOOP + Tree)
+        Yukawa matrix (LOOP + Tree).
         """
         return (1./self.v)*(self.U @ self.SqrtDm @ np.transpose(self.R) @ self.fMR)
 
     @property
     def h_tree(self):
         """
-        Yukawa matrix, tree-level
+        Yukawa matrix, tree-level.
         """
         return (1./self.v)*(self.U @ self.SqrtDm @ np.transpose(self.R) @ self.SqrtDM)
-
-    def FTmeasure(self, debug=False):
-        U_tree, S_tree, V_tree = linalg.svd(self.m_tree)
-        U_loop, S_loop, V_loop = linalg.svd(self.m_loop)
-        U_tot,  S_tot,  V_tot  = linalg.svd(self.m_tot)
-        U_2loop,S_2loop,V_2loop= linalg.svd(self.m_2loop)
-
-        meas = sum([abs(x) for x in S_loop])/sum([abs(x) for x in S_tot])
-
-        if debug:
-            print("Total of singular values tree:", np.sum(S_tree))
-            print("Total of singular values loop:", np.sum(S_loop))
-            print("Total of singular values tot:" , np.sum(S_tot))
-            print("Total of singular values 2loop:" , np.sum(S_2loop))
-            print("measure:", meas)
-
-        return meas
 
     @property
     def meff1(self):
         """
-        Effective mass 1
+        Effective mass 1 used for decay ans washout.
         """
         return np.dot(np.conjugate(np.transpose(self.h)),self.h)[0,0]*(self.v**2)/self.M1
 
     @property
     def meff2(self,):
         """
-        Effective mass 2
+        Effective mass 2 used for decay ans washout.
         """
         return np.dot(np.conjugate(np.transpose(self.h)),self.h)[1,1]*(self.v**2)/self.M2
 
     @property
     def meff3(self,):
         """
-        Effective mass 3
+        Effective mass 3 used for decay and washout.
         """
         return np.dot(np.conjugate(np.transpose(self.h)),self.h)[2,2]*(self.v**2)/self.M3
 
@@ -427,9 +398,9 @@ class ULSBase(object):
         """
         return  k1*z*my_kn1( z)/my_kn2( z)
 
-    def j(self, z):
+    def scat(self, z):
         """
-        Function that multiplies washouts to incorporate scatterings
+        Function that multiplies washouts to incorporate scatterings.
         """
         M         = self.DM
         prefactor = 0.1*(1+15/(8*z))
@@ -446,16 +417,9 @@ class ULSBase(object):
         DStemp    = 0.1*k1*(1+t*(z**2)*np.log(1+8.77298/(t*z)))
         return DStemp
 
-    def KNR(self, x):
-        """
-        Test function to see the numerical stability behaviour of the ratio
-        of two modified Bessel functions.
-        """
-        return my_kn1(x)/my_kn2(x)
-
     def D2(self, k,z):
         """
-        Decay term for Boltzmann equation
+        Decay term for Boltzmann equation with two decaying steriles.
         """
         r =self.M2/self.M1
         a = r*r
@@ -466,7 +430,7 @@ class ULSBase(object):
 
     def D3(self, k,z):
         """
-        Decay term for Boltzmann equation
+        Decay term for Boltzmann equation with three decaying steriles.
         """
         r =self.M3/self.M1
         a = r*r
@@ -477,79 +441,54 @@ class ULSBase(object):
 
     def N1Eq(self, z):
         """
-        Equilibrium N1 number density
+        Equilibrium number density with one decaying sterile.
         """
         n1 = 3./8.*(z**2)*my_kn2(z)
         return n1
 
     def N2Eq(self, z):
         """
-        Equilibrium N2 number density
-        For numerical reasons, cut off the return value if there are more than 5 orders of
-        magnitude between N1Eq and N2Eq.
+        Equilibrium number density with two decaying steriles.
         """
         r = self.M2/self.M1
-        # n1 = self.N1Eq(z)
         n2 = 3./8.*np.power(r*z,2)*my_kn2(r*z)
-
-        # RATIO = n1/n2
         return n2
-        # return n2 if RATIO < 8e40 and RATIO >1e-5  else 0 # NOTE these are ad-hoc magic values
 
     def N3Eq(self, z):
         """
-        Equilibrium N2 number density
-        For numerical reasons, cut off the return value if there are more than 5 orders of
-        magnitude between N1Eq and N3Eq.
+        Equilibrium number density with three decaying steriles.
         """
         r = self.M3/self.M1
-        # n1 = self.N1Eq(z)
         n3 = 3./8.*np.power(r*z,2)*my_kn2(r*z)
-
-        # RATIO = n1/n3
         return n3
-        # return n3 if RATIO < 8e40 and RATIO >1e-5  else 0 # NOTE these are ad-hoc magic values
 
     def W1(self, k1, z):
         """
-        Washout parameter 1
+        Washout parameter with one decaying sterile.
         """
         w1 = 1./4*(z**3)*k1*my_kn1(z)
         return w1
 
     def W2(self, k, z):
         """
-        Washout parameter 2
+        Washout parameter with two decaying steriles.
         """
-        w1=self.W1(k,z)
         r = self.M2/self.M1
         w2 = k*r/4*np.power(r*z,3) * my_kn1(r*z)
         return w2
-        # RATIO = w1/w2
-        # return w2 if RATIO < 8e4 and RATIO >1e-5  else 0 # NOTE these are ad-hoc magic values
-
-    def W2p(self, k, z):
-        """
-        Washout parameter 2 --- derivative w.r.t. r*z
-        """
-        # w1=self.W1(k,z)
-        r = self.M2/self.M1
-        w2p = k*r/4 *(3* np.power(r*z,2)*my_kn1(r*z) + np.power(r*z,3)*kvp(1,r*z))
-        return w2p
-        # RATIO = w1/w2
-        # return w2 if RATIO < 8e4 and RATIO >1e-5  else 0 # NOTE these are ad-hoc magic values
 
     def W3(self, k, z):
         """
-        Washout parameter 3
+        Washout parameter with three decaying steriles.
         """
-        r = self.M2/self.M1
+        r = self.M3/self.M1
         w3 = k*r/4*np.power(r*z,3) * my_kn1(r*z)
         return w3
 
     def hterm(self, a, b):
         """
-        Probability coefficient
+        Projection probability projecting onto certain directions
+        of flavour space indicated by the indices a and b.
 
         a ... [0,1,2]
               0 = e
@@ -572,21 +511,21 @@ class ULSBase(object):
 
     def c2a(self, a):
         """
-        Probability coefficient for 1 a
+        Probability coefficient for 2 a
         """
         norm          = np.sqrt(1./((np.dot(np.conjugate(np.transpose(self.h)), self.h))[1,1]))
         return norm*(self.h[a,1])
 
     def c3a(self, a):
         """
-        Probability coefficient for 1 a
+        Probability coefficient for 3 a
         """
         norm          = np.sqrt(1./((np.dot(np.conjugate(np.transpose(self.h)), self.h))[2,2]))
         return norm*(self.h[a,2])
 
     def f1(self, x):
         """
-        f1(x) appears in the expression for epsilon but is numerically unstable so approx. with pw definition
+        Loop function in epsilon.
         """
         r2=np.power(x,2)
 
@@ -596,13 +535,14 @@ class ULSBase(object):
 
     def f2(self, x):
         """
-        f2(x) appears in the expression for epsilon
+        Loop function in epsilon.
         """
         return (2./3.)*(1/(np.power(x,2)-1.))
 
     def epsilon(self, i, j, k, m):
         """
-        CP asymmetry parameter
+        CP asymmetry parameter.
+        i,j,k,m denote indices in the heavy neutrino mass matrix.
         """
         l         = self.h
         ldag      = np.conjugate(np.transpose(l))
@@ -619,25 +559,10 @@ class ULSBase(object):
         fourth      = np.imag(lsquare[k,i]*l[m,k]*lcon[m,i])*(2./3.)*(1/(np.power(M[k,k]/M[i,i],2)-1.))
         return prefactor*(first+second+third+fourth)
 
-    def epsilonab(self, a, b):
-        """
-        CP asymmetry parameter. a and b are NOT the model parameters of the same name
-        """
-        l         = self.h
-        ldag      = np.conjugate(np.transpose(l))
-        lcon      = np.conjugate(l)
-        M         = self.DM
-        lsquare   = np.dot(ldag,l)
-
-        #define terms of epsilon: prefactor and first term (first), second term (second) etc.
-        prefactor   = (3/(32*np.pi))*(1/(lsquare[0,0]))
-        first       = 1j*(lsquare[1,0]*l[a,0]*lcon[b,1]-lsquare[0,1]*l[a,1]*lcon[b,0]) * (M[0,0]/M[1,1])*self.f1(M[1,1]/M[0,0])
-        third       = 1j*(lsquare[2,0]*l[a,0]*lcon[b,2]-lsquare[0,2]*l[a,2]*lcon[b,0])*(M[0,0]/M[2,2])*self.f1(M[2,2]/M[0,0])
-        second      = 1j*(2./3.)*(1/(np.power(M[1,1]/M[0,0],2)-1.))*(l[a,0]*lcon[b,1]*lsquare[0,1]-lcon[b,0]*l[a,1]*lsquare[1,0])
-        fourth      = 1j*(2./3.)*(1/(np.power(M[2,2]/M[0,0],2)-1.))*(l[a,0]*lcon[b,2]*lsquare[0,2]-lcon[b,0]*l[a,2]*lsquare[2,0])
-        return prefactor*(first+second+third+fourth)
-
     def epsilon1ab(self,a,b):
+        """
+        Off-diagonal CP asymmetry parameter for decays of N1. a and b denote lepton flavour.
+        """
         l         = self.h
         ldag      = np.conjugate(np.transpose(l))
         lcon      = np.conjugate(l)
@@ -653,8 +578,10 @@ class ULSBase(object):
         epsilon1abtemp = prefactor*(first+second+third+fourth)
         return epsilon1abtemp
 
-    #CP asymmetry parameter
     def epsilon2ab(self,a,b):
+        """
+        Off-diagonal CP asymmetry parameter for decays of N2. a and b denote lepton flavour.
+        """
         l         = self.h
         ldag      = np.conjugate(np.transpose(l))
         lcon      = np.conjugate(l)
@@ -669,9 +596,11 @@ class ULSBase(object):
         fourth      = 1j*(2./3.)*(1/(np.power(M[2,2]/M[1,1],2)-1.))*(l[a,1]*lcon[b,2]*lsquare[1,2]-lcon[b,1]*l[a,2]*lsquare[2,1])
         epsilon2abtemp = prefactor*(first+second+third+fourth)
         return epsilon2abtemp
-        #################################
 
     def epsilon3ab(self,a,b):
+        """
+        Off-diagonal CP asymmetry parameter for decays of N3. a and b denote lepton flavour.
+        """
         l         = self.h
         ldag      = np.conjugate(np.transpose(l))
         lcon      = np.conjugate(l)
@@ -686,65 +615,6 @@ class ULSBase(object):
         fourth      = 1j*(2./3.)*(1/(np.power(M[1,1]/M[2,2],2)-1.))*(l[a,2]*lcon[b,1]*lsquare[2,1]-lcon[b,2]*l[a,1]*lsquare[1,2])
         epsilon3abtemp = prefactor*(first+second+third+fourth)
         return epsilon3abtemp
-
-    @property
-    def isPerturbative(self):
-        """
-        Check perturbativity of Yukawas
-        """
-        return fast_isPerturbative(self.h)
-        y = self.h
-        #limit of perturbativity for y
-        limit = np.power(4*np.pi,0.5)
-        #check if any element of column 1, 2 or 3 is larger than limit
-        col1               = (y[0,0] < limit)*(y[1,0] < limit)*(y[2,0] < limit)
-        col2               = (y[0,1] < limit)*(y[1,1] < limit)*(y[2,1] < limit)
-        col3               = (y[0,2] < limit)*(y[1,2] < limit)*(y[2,2] < limit)
-        return col1*col2*col3
-
-    def loopContTest(self):
-        """
-        Something tree bla loop contribution compare with lightest neutrino mass
-        """
-        lhs=0
-        return lhs < self.m1
-
-    #################################
-    #Check we are not in resonance  #
-    #################################
-
-    @property
-    def eps1(self):
-        epsilon100 = np.real(self.epsilon1ab(0,0))
-        epsilon111 = np.real(self.epsilon1ab(1,1))
-        epsilon122 = np.real(self.epsilon1ab(2,2))
-        epstot  = epsilon100+epsilon111+epsilon122
-        return epstot
-
-    @property
-    def eps1(self):
-        epsilon100 = np.real(self.epsilon1ab(0,0))
-        epsilon111 = np.real(self.epsilon1ab(1,1))
-        epsilon122 = np.real(self.epsilon1ab(2,2))
-        epstot  = epsilon100+epsilon111+epsilon122
-        return epstot
-
-
-    @property
-    def eps2(self):
-        epsilon200 = np.real(self.epsilon2ab(0,0))
-        epsilon211 = np.real(self.epsilon2ab(1,1))
-        epsilon222 = np.real(self.epsilon2ab(2,2))
-        epstot  = epsilon200+epsilon211+epsilon222
-        return epstot
-
-    @property
-    def eps3(self):
-        epsilon300 = np.real(self.epsilon3ab(0,0))
-        epsilon311 = np.real(self.epsilon3ab(1,1))
-        epsilon322 = np.real(self.epsilon3ab(2,2))
-        epstot  = epsilon300+epsilon311+epsilon322
-        return epstot
 
     @property
     def eps100(self): return self.epsilon1ab(0,0)
@@ -773,6 +643,25 @@ class ULSBase(object):
     @property
     def eps322(self): return self.epsilon3ab(2,2)
 
+    def epsilonaaRES(self,a):
+        """
+        CP asymmetry for resonant Leptogenesis.
+        """
+        l         = self.h
+        ldag      = np.conjugate(np.transpose(l))
+        lcon      = np.conjugate(l)
+        M         = self.DM
+        lsquare   = np.dot(ldag,l)
+        gamma1    = (lsquare[0,0]/(8*np.pi))*M[0,0]
+        gamma2    = (lsquare[1,1]/(8*np.pi))*M[1,1]
+        DeltaM    = M[1,1]-M[0,0]
+        sum1      = np.imag(ldag[0,a]*l[a,1]*lsquare[0,1])+np.imag(ldag[0,a]*l[a,1]*lsquare[1,0])
+        epsbar1   = sum1/(lsquare[0,0]*lsquare[1,1])
+        fmix      =  -2*(DeltaM/gamma2)/(1+(2*DeltaM/gamma2)**2)
+        fosc      = -0.5*(DeltaM/gamma2)/(1+(DeltaM/gamma2)**2)
+        epsbar    = -0.5*epsbar1 * (fosc + fmix)
+        return epsbar
+
     def resonance(self, z):
         """
         calculate decay rate Gamma in terms of the total epsilon (epstot)
@@ -789,33 +678,10 @@ class ULSBase(object):
         return Gamma/(M2-M1)
 
     @property
-    def deltaMu2(self):
-        M         = self.DM
-        r         = np.transpose(self.R)
-        rstar     = np.transpose(np.conjugate(r))
-
-        coeff     = (1/self.v**2)*(1/(4*(np.pi**2)))
-
-        deltaMu2  = coeff*(self.SqrtDm @ self.SqrtDm @ r @ M @ M @ M @ rstar)
-
-        return np.trace(deltaMu2)
-
-    @property
-    def HiggsNaturalness(self):
-        l         = self.h
-        ldag      = np.conjugate(np.transpose(l))
-        lcon      = np.conjugate(l)
-        M         = self.DM
-        lsquare   = np.dot(ldag,l)
-
-        coeff     = 2.9*1e7
-
-        paran     = [(M[i,i]*0.05*1e-9)/((self.v**2)*lsquare[i,i]) for i in range(3)]
-        bounds    = [coeff*np.power(paran[i],1./3.) for i in range(3)]
-        return bounds
-
-    @property
     def Gamma1(self):
+        """
+        Decay rate of N1.
+        """
         l         = self.h
         ldag      = np.conjugate(np.transpose(l))
         lcon      = np.conjugate(l)
@@ -826,6 +692,9 @@ class ULSBase(object):
 
     @property
     def Gamma2(self):
+        """
+        Decay rate of N2.
+        """
         l         = self.h
         ldag      = np.conjugate(np.transpose(l))
         lcon      = np.conjugate(l)
@@ -836,6 +705,9 @@ class ULSBase(object):
 
     @property
     def Gamma3(self):
+        """
+        Decay rate of N3.
+        """
         l         = self.h
         ldag      = np.conjugate(np.transpose(l))
         lcon      = np.conjugate(l)
@@ -844,66 +716,20 @@ class ULSBase(object):
 
         return (M[2,2]/(8*np.pi))*lsquare[2,2]
 
-    ################################################
-    # Define functions for CPV plots               #
-    ################################################
     @property
-    def effectiveMass(self):
-        u = self.U
-        if self.ordering == 0:
-            m1   = self.SqrtDm[0,0]**2
-            m2   = self.SqrtDm[1,1]**2
-            m3   = self.SqrtDm[2,2]**2
-            meff = np.abs(m1*u[0,0]**2+m2*u[0,1]**2+m3*u[0,2]**2)
-            return meff
-
-    @property
-    def S1(self):
-        u      = self.U
-        s1temp = np.imag(np.conj(u[2,0])*u[2,1])
-        return s1temp
-
-    @property
-    def S2(self):
-        u      = self.U
-        s2temp = np.imag(np.conj(u[2,1])*u[2,2])
-        return s2temp
-
-    @property
-    def JCP(self):
-        u       = self.U
-        JCPtemp = np.imag(u[0,0]*u[1,1]*np.conj(u[0,1])*np.conj(u[1,0]))
-        return JCPtemp
-
-   #####   HERE we insert the code for resonant leptogenesis #######
-      #CP asymmetry parameter for flavoured resonant leptogenesis from 0705.218averaged for large  washout
-    def epsilonaaRES(self,a):
-        l         = self.h
-        ldag      = np.conjugate(np.transpose(l))
-        lcon      = np.conjugate(l)
-        M         = self.DM
-        lsquare   = np.dot(ldag,l)
-        gamma1    = (lsquare[0,0]/(8*np.pi))*M[0,0]
-        gamma2    = (lsquare[1,1]/(8*np.pi))*M[1,1]
-        DeltaM    = M[1,1]-M[0,0]
-        sum1      = np.imag(ldag[0,a]*l[a,1]*lsquare[0,1])+np.imag(ldag[0,a]*l[a,1]*lsquare[1,0])
-        epsbar1   = sum1/(lsquare[0,0]*lsquare[1,1])
-        fmix      =  -2*(DeltaM/gamma2)/(1+(2*DeltaM/gamma2)**2)
-        fosc      = -0.5*(DeltaM/gamma2)/(1+(DeltaM/gamma2)**2)
-        epsbar    = -0.5*epsbar1 * (fosc + fmix)
-        return epsbar
-
-
-    def findZmax(self, zmin=0.1, zmax=100, steps=1000):
-        k1, k2 = [np.real(self.k1), np.real(self.k2)]
-        ZTEST=np.linspace(zmin, zmax,steps)
-        W2      = [np.real(self.W2( k2, x)) for x in ZTEST]
-        W2p     = [np.real(self.W2p(k2, x)) for x in ZTEST]
-
-        for num, i in enumerate(W2p):
-            if i>0:
-                break
-        return ZTEST[num-10]
+    def isPerturbative(self):
+        """
+        Check for perturbative nature of Yukawas
+        """
+        return fast_isPerturbative(self.h)
+        y = self.h
+        #limit of perturbativity for y
+        limit = np.power(4*np.pi,0.5)
+        #check if any element of column 1, 2 or 3 is larger than limit
+        col1               = (y[0,0] < limit)*(y[1,0] < limit)*(y[2,0] < limit)
+        col2               = (y[0,1] < limit)*(y[1,1] < limit)*(y[2,1] < limit)
+        col3               = (y[0,2] < limit)*(y[1,2] < limit)*(y[2,2] < limit)
+        return col1*col2*col3
 
 
 if __name__ == "__main__":
