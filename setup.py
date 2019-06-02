@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
   name = 'ulysses',
-  version = '0.1',
+  version = '0.2',
   description = 'ULYSSES: Universal LeptogeneSiS Equation Solver',
   url = 'https://github.com/iamholger/ulysses',
   author = 'Kris Moffat, Jessica Turner, Holger Schulz',
@@ -15,6 +15,7 @@ setup(
     'matplotlib',
     'pymultinest'
   ],
+  python_requires='>3.5.2',
   scripts=['bin/uls-calc', 'bin/uls-scan', 'bin/uls-nest'],
   extras_require = {
   },
