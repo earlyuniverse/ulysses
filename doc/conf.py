@@ -22,7 +22,7 @@ copyright = '2019, Kris Moffat, Holger Schulz, Jessica Turner'
 author = 'Kris Moffat, Holger Schulz, Jessica Turner'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = '0.2'
 
 
 # -- General configuration ---------------------------------------------------
