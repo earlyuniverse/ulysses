@@ -53,12 +53,12 @@ class EtaB_1DME(ulysses.ULSBase):
     @property
     def EtaB(self):
         #Define fixed quantities for BEs
-        epstt = np.real(self.epsilonab(2,2))
-        epsmm = np.real(self.epsilonab(1,1))
-        epsee = np.real(self.epsilonab(0,0))
-        epstm =         self.epsilonab(2,1)
-        epste =         self.epsilonab(2,0)
-        epsme =         self.epsilonab(1,0)
+        epstt = np.real(self.epsilon1ab(2,2))
+        epsmm = np.real(self.epsilon1ab(1,1))
+        epsee = np.real(self.epsilon1ab(0,0))
+        epstm =         self.epsilon1ab(2,1)
+        epste =         self.epsilon1ab(2,0)
+        epsme =         self.epsilon1ab(1,0)
 
         c1t   =                 self.c1a(2)
         c1m   =                 self.c1a(1)
