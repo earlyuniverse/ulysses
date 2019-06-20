@@ -1,5 +1,5 @@
 .. ulysses documentation master file, created by
-   sphinx-quickstart on Fri May 17 16:40:52 2019.
+   sphinx-quickstart on Wed Jun 19 21:44:27 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -18,10 +18,6 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-Documentation for the Code
-**************************
-
 
 ULSBase
 =========
