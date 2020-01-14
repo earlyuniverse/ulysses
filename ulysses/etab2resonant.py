@@ -5,23 +5,29 @@ from odeintw import odeintw
 from numba import jit
 
 @jit
-def fast_RHS(y0, epstt,epsmm,epsee,C,d1,w1,n1eq):
-    N1, Ntt, Nmm, Nee = y0
-    c1t,c1m,c1e = C
+def fast_RHS(y0, eps2tt,eps2mm,eps2ee,eps1tt,eps1mm,eps1ee,C,d1,d2,w1,w2,n1eq,n2eq):
+    N1, N2, Ntt, Nmm, Nee = y0
+    c1t,c1m,c1e,c2t,c2m,c2e = C
     c1tc          = np.conjugate(c1t)
     c1mc          = np.conjugate(c1m)
     c1ec          = np.conjugate(c1e)
+    c2tc          = np.conjugate(c2t)
+    c2mc          = np.conjugate(c2m)
+    c2ec          = np.conjugate(c2e)
 
     #define the different RHSs for each equation
     rhs1           =      -d1*(N1-n1eq)
-    rhs2           = (  2 * epstt * d1 * (N1-n1eq)
-                                 -  2 * w1 * (  c1t * c1tc * Ntt))
-    rhs3           = (  2 * epsmm * d1 * (N1-n1eq)
-                                 -  2 * w1 * (  c1m * c1mc * Nmm))
-    rhs4           = (  2 * epsee * d1 * (N1-n1eq)
-                                 -  2 * w1 * (  c1e * c1ec * Nee))
 
-    RHStemp = [rhs1, rhs2, rhs3, rhs4]
+    rhs2           =      -d2*(N2-n2eq)
+
+    rhs3           = (  eps1tt * d1 * (N1-n1eq) + eps2tt * d2 * (N2-n2eq)
+                                -  w1 * (  c1t * c1tc * Ntt) - w2 * (  c2t * c2tc * Ntt))
+    rhs4           = (  eps1mm * d1 * (N1-n1eq) + eps2mm * d2 * (N2-n2eq)
+                                 - w1 * (  c1m * c1mc * Nmm) - w2 * (  c2m * c2mc * Nmm))
+    rhs5           = (  eps1ee * d1 * (N1-n1eq) + eps2ee * d2 * (N2-n2eq)
+                                 - w1 * (  c1e * c1ec * Nee) - w2 * (  c2e * c2ec * Nee))
+
+    RHStemp = [rhs1, rhs2, rhs3, rhs4, rhs5]
     return RHStemp
 
 class EtaB_2Resonant(ulysses.ULSBase):
@@ -31,15 +37,18 @@ class EtaB_2Resonant(ulysses.ULSBase):
 
     def RHS(self, y0, zzz, ETA, C, K):
         k1term,k2term = K
-        epstt,epsmm,epsee = ETA
+        eps2tt,eps2mm,eps2ee,eps1tt,eps1mm,eps1ee = ETA
 
         if zzz != self._currz or zzz == self.zmin:
             self._d1            = np.real(self.D1(k1term, zzz))
+            self._d2            = np.real(self.D2(k2term, zzz))
             self._w1            = np.real(self.W1(k1term, zzz))
+            self._w2            = np.real(self.W2(k2term, zzz))
             self._n1eq          = self.N1Eq(zzz)
+            self._n2eq          = self.N2Eq(zzz)
             self._currz=zzz
 
-        return fast_RHS(y0,epstt,epsmm,epsee, C,self._d1,self._w1,self._n1eq)
+        return fast_RHS(y0, eps2tt, eps2mm, eps2ee, eps1tt, eps1mm, eps1ee, C,self._d1,self._d2,self._w1,self._w2,self._n1eq,self._n2eq)
 
     @property
     def EtaB(self):
@@ -54,19 +63,22 @@ class EtaB_2Resonant(ulysses.ULSBase):
             ]
 
         _K      = [np.real(self.k1), np.real(self.k2)]
-        y0      = np.array([0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
+        y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         _ETA = [
-                self.epsilonaaRES(2),
-                self.epsilonaaRES(1),
-                self.epsilonaaRES(0)
+                self.epsiloniaaRES(2,1,0),
+                self.epsiloniaaRES(1,1,0),
+                self.epsiloniaaRES(0,1,0),
+                self.epsiloniaaRES(2,0,1),
+                self.epsiloniaaRES(1,0,1),
+                self.epsiloniaaRES(0,0,1)
             ]
-        _C = [  self.c1a(2), self.c1a(1), self.c1a(0)]
+        _C = [  self.c1a(2), self.c1a(1), self.c1a(0), self.c2a(2), self.c2a(1), self.c2a(0)]
         _K = [np.real(self.k1), np.real(self.k2)]
 
-        ys      = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C, _K]))
-        nb      = self.sphalfact*(ys[-1,1]+ys[-1,2]+ys[-1,3])
+        ys      = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C, _K]), atol=1e-10)
+        nb      = self.sphalfact*(ys[-1,2]+ys[-1,3]+ys[-1,4])
 
-        self.ys = np.real(ys[:, [1,2,3]])
+        self.ys = np.real(ys[:, [2,3,4]])
 
         return np.real(nb)
