@@ -13,8 +13,8 @@ if __name__=="__main__":
     op.add_option("--zrange",          dest="ZRANGE",      default="0.1,100,1000", help="Ranges and steps of the evolution variable (default: %default)")
     op.add_option("--inv",             dest="INVORDERING", default=False, action='store_true', help="Use inverted mass ordering (default: %default)")
     op.add_option("--loop",            dest="LOOP",        default=False, action='store_true', help="Use loop-corrected Yukawa (default: %default)")
-    op.add_option("--seed",            dest="SEED",        default=-1, type=int,              help="Multinest seed (default: %default)")
     op.add_option("--sigma",           dest="SIGMA",       default=1, type=int,              help="Switch to inflate the error in likelihood (default: %default)")
+    op.add_option("--mn-seed",         dest="SEED",        default=-1, type=int,              help="Multinest seed (default: %default)")
     op.add_option("--mn-resume",       dest="RESUME",      default=False, action='store_true', help="Resume on previous run.")
     op.add_option("--mn-multi-mod",    dest="MULTIMODE",   default=False, action='store_true', help="Set multimodal to true.")
     op.add_option("--mn-update",       dest="UPDATE",      default=1000, type=int, help="Update inteval (default: %default iterations)")
@@ -121,6 +121,8 @@ if __name__=="__main__":
         ymodel = LEPTO(pdict)
 
         if opts.DEBUG: print("response", ymodel)
+        import sys
+        sys.stdout.flush()
 
         ydata = 6.10e-10
         yerr  = 0.04e-10*opts.SIGMA
