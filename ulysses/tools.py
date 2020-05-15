@@ -33,6 +33,15 @@ def readConfig(fname):
                 continue
         return ranges, fixed
 
+
+def getBuiltInModels():
+    """
+    Return as dict of short name a and class.
+    """
+    classes    = [cls                for cls in ulysses.ULSBase.__subclasses__()]
+    shortnames = [cls.shortname(cls) for cls in ulysses.ULSBase.__subclasses__()]
+    return {n : c for n, c in zip(shortnames, classes) if n!=""}
+
 def selectModel(model, **kwargs):
     r"""
 
@@ -44,21 +53,15 @@ def selectModel(model, **kwargs):
               The model. Must be in ["1DME", "2DME", "3DME", "1BE", "2BE", "2resonant", "3DMEsct", "3DMErhtau"]
 
     """
+
+    builtin = getBuiltInModels()
+
     import ulysses
     if not ":" in model:
-        avail = ["1DME", "2DME", "3DME", "1BE1F", "1BE2F", "1BE3F", "2BE3F", "2resonant", "3DMEsct", "3DMErhtau"]
-        if   model=="1DME":                    return ulysses.EtaB_1DME(**kwargs)
-        elif model=="2DME":                    return ulysses.EtaB_2DME(**kwargs)
-        elif model=="3DME":                    return ulysses.EtaB_3DME(**kwargs)
-        elif model=="1BE1F":                   return ulysses.EtaB_1BE1F(**kwargs)
-        elif model=="1BE2F":                   return ulysses.EtaB_1BE2F(**kwargs)
-        elif model=="1BE3F":                   return ulysses.EtaB_1BE3F(**kwargs)
-        elif model=="2BE3F":                   return ulysses.EtaB_2BE3F(**kwargs)
-        elif model=="2resonant":               return ulysses.EtaB_2Resonant(**kwargs)
-        elif model=="3DMEsct":                 return ulysses.EtaB_3DME_Scattering(**kwargs)
-        elif model=="3DMErhtau":               return ulysses.EtaB_3DS_Scattering_RHtaur(**kwargs)
+        if model in builtin:
+            return builtin[model](**kwargs)
         else:
-            raise Exception("Specified model '{}' unknown.\n Select from: {}".format(model, avail))
+            raise Exception("Specified model '{}' unknown.\n Select from: {}".format(model, sorted([k for k in builtin.keys()])))
     else:
         return loadPlugin(model, **kwargs)
 
