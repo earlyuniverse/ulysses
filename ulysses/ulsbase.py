@@ -87,6 +87,11 @@ class ULSBase(object):
         self.setZS()
         self.sphalfact = kwargs["sphalfact"] if kwargs.get("sphalfact") is not None else 0.01
 
+
+
+    def shortname(self):
+        return ""
+
     @property
     def constants(self):
         s=" Global constants:"

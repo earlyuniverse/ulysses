@@ -32,6 +32,8 @@ class EtaB_1BE2F(ulysses.ULSBase):
     Density matrix equation (DME) with one decaying sterile. See arxiv:1112.4528.
     """
 
+    def shortname(self): return "1BE2F"
+
     def RHS(self, y0,z,epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e,k):
 
         if z != self._currz or z == self.zmin:

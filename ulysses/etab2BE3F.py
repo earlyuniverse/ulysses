@@ -34,6 +34,8 @@ class EtaB_2BE3F(ulysses.ULSBase):
     oscillations.
     """
 
+    def shortname(self): return "2BE3F"
+
     def RHS(self, y0, z, ETA, C, K):
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA
         k1term,k2term = K

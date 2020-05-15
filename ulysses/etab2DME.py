@@ -68,6 +68,8 @@ class EtaB_2DME(ulysses.ULSBase):
     Density matrix equation (DME) with two decaying steriles. See arxiv:1112.4528.
     """
 
+    def shortname(self): return "2DME"
+
     def RHS(self, y0, zzz, ETA, C, K, W):
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA
         k1term,k2term = K

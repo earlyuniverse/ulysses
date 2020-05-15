@@ -80,6 +80,8 @@ class EtaB_3DS_Scattering_RHtaur(ulysses.ULSBase):
     See hep-ph/0401240 and arxiv:0807.1408.
     """
 
+    def shortname(self): return "3DMErhtau"
+
     def RHS(self, y0, zzz, ETA, C, K, W):
         (eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me) = ETA
         k1term,k2term,k3term = K

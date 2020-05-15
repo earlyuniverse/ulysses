@@ -35,6 +35,8 @@ class EtaB_2Resonant(ulysses.ULSBase):
     Resonant equations with two steriles and three lepton flavours. See arxiv:0705.2183.
     """
 
+    def shortname(self): return "2resonant"
+
     def RHS(self, y0, zzz, ETA, C, K):
         k1term,k2term = K
         eps2tt,eps2mm,eps2ee,eps1tt,eps1mm,eps1ee = ETA

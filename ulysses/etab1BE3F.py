@@ -29,6 +29,8 @@ class EtaB_1BE3F(ulysses.ULSBase):
     oscillations.
     """
 
+    def shortname(self): return "1BE3F"
+
     def RHS(self, y0,z,epstt,epsmm,epsee,c1t,c1m,c1e,k):
 
         if z != self._currz or z == self.zmin:
