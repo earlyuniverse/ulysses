@@ -16,7 +16,7 @@ def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee):
 
     return [rhs1, rhs2]
 
-class EtaB_1BE(ulysses.ULSBase):
+class EtaB_1BE1F(ulysses.ULSBase):
     """
     Boltzmann equation (BE) with one decaying sterile. See arxiv:1112.4528 Eqns. 4 and 5.
     """

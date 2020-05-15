@@ -5,8 +5,10 @@ from ulysses.ulsbase import ULSBase
 from ulysses.etab1DME                 import EtaB_1DME
 from ulysses.etab2DME                 import EtaB_2DME
 from ulysses.etab3DME                 import EtaB_3DME
-from ulysses.etab1BE                  import EtaB_1BE
-from ulysses.etab2BE                  import EtaB_2BE
+from ulysses.etab1BE1F                import EtaB_1BE1F
+from ulysses.etab1BE2F                import EtaB_1BE2F
+from ulysses.etab1BE3F                import EtaB_1BE3F
+from ulysses.etab2BE3F                import EtaB_2BE3F
 from ulysses.etab3DMEscattering       import EtaB_3DME_Scattering
 from ulysses.etab3DMEscatteringRHtaur import EtaB_3DS_Scattering_RHtaur
 
