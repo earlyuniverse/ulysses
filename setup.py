@@ -13,7 +13,8 @@ setup(
     'scipy',
     'numba',
     'matplotlib',
-    'pymultinest'
+    'pymultinest',
+    'mpi4py'
   ],
   python_requires='>3.5.2',
   scripts=['bin/uls-calc', 'bin/uls-scan', 'bin/uls-nest'],
