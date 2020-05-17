@@ -61,7 +61,7 @@ def selectModel(model, **kwargs):
         if model in builtin:
              return builtin[model](**kwargs)
         else:
-            raise Exception("Specified model '{}' unknown.\n Select from: {}".format(model, avail))
+            raise Exception("Specified model '{}' unknown.\n Select from: {}".format(model, sorted([k for k in builtin.keys()]) ))
     else:
         return loadPlugin(model, **kwargs)
 
