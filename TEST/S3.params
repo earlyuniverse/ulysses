@@ -1,20 +1,16 @@
-# This is S3, the best fit point from
-# the paper which should give etaB=6.1e-10
-# for 1DME in normal ordering:
-# python3 bin/lepto-get TEST/S3.params -m 1DME --loop --ordering 0
-delta 31.713030
-a21 130.953483
-a31 649.655874
-x1 -72.335979
-y1 170.549206
-x2 86.969063
-y2 2.223559
-x3 -1.862141
-y3 178.312158
-m -0.942835
+delta 300.713030
+a21 180.953483
+a31 270.
+x1 -75.335979
+y1 181.0
+x2 120.969063
+y2 180.
+x3 130.862141
+y3 180.
+m -0.9
 t12 33.630000
 t23 46.633046
 t13 8.520000
-M1 6.500000
-M2 7.200000
-M3 7.900000
+M1 12.00000
+M2 12.03000
+M3 12.06000
