@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import numpy as np
+import ulysses as uls
+
+__doc__="""
+
+%prog
+
+"""
+
+
+if __name__=="__main__":
+
+    import optparse, os, sys
+    op = optparse.OptionParser(usage=__doc__)
+    opts, args = op.parse_args()
+
+    builtin = uls.tools.getBuiltInModels()
+
+    s="ULYSSES currently contains these {} models:\n\n".format(len(builtin))
+
+    for k, v in builtin.items():
+        s+= "{}\t\t{}\n".format(k, v.__doc__)
+
+    print(s)
