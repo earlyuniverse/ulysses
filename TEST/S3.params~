@@ -1,0 +1,19 @@
+# the paper which should give etaB=6.1e-10
+# for 1DME in normal ordering:
+# python3 bin/lepto-get TEST/S3.params -m 1DME --loop --ordering 0
+delta 270.0
+a21 30.0
+a31 50.0
+x1 72.335979
+y1 10
+x2 86.969063
+y2 10.267197839
+x3 -1.862141
+y3 10.97773
+m -0.923
+t12 33.630000
+t23 46.633046
+t13 8.520000
+M1 11.0
+M2 12.500000
+M3 12.000000

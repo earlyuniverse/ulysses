@@ -116,7 +116,7 @@ class LeptoOld(object):
 
         return R1 @ R2 @ R3
 
-    @property
+    
     def SqrtDM(self):
         """
         Matrix square root of heavy masses
@@ -124,15 +124,6 @@ class LeptoOld(object):
         return np.array([[np.sqrt(self.M1), 0., 0.],
                          [0., np.sqrt(self.M2), 0.],
                          [0., 0., np.sqrt(self.M3)]], dtype=np.complex128)
-
-    @property
-    def DM(self):
-        """
-        Heavy mass matrix
-        """
-        return np.array([[self.M1, 0., 0.],
-                         [0., self.M2, 0.],
-                         [0., 0., self.M3]], dtype=np.complex128)
 
     @property
     def SqrtDm(self):
