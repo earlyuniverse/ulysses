@@ -22,6 +22,8 @@ class EtaB_2BE1F(ulysses.ULSBase):
     Boltzmann equation (BE) with one decaying sterile. See arxiv:1112.4528 Eqns. 4 and 5.
     """
 
+    def shortname(self): return "2BE1F"
+
     def RHS(self, y0, z, ETA, K):
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA
         k1term,k2term = K
