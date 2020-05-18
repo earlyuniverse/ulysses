@@ -14,6 +14,7 @@ from ulysses.etab3DMEscattering       import EtaB_3DME_Scattering
 from ulysses.etab3DMEscatteringRHtaur import EtaB_3DS_Scattering_RHtaur
 
 from ulysses.etab2resonant            import EtaB_2Resonant # Buggy
+from ulysses.etab2resonantspectators  import EtaB_2ResonantSpectator
 
 testpars = {
         'delta' :270,

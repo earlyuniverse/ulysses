@@ -1,4 +1,4 @@
-# resonant leptogenesis with two  sterile neutrinos. Equations from 0705.2183
+# resonant leptogenesis with two sterile neutrinos. Equations from 0705.2183
 import ulysses
 import numpy as np
 from odeintw import odeintw
@@ -17,14 +17,13 @@ def fast_RHS(y0, eps2tt,eps2mm,eps2ee,eps1tt,eps1mm,eps1ee,C,d1,d2,w1,w2,n1eq,n2
 
 
     #Very low temperature spectator process factors from https://arxiv.org/pdf/hep-ph/0601084.pdf
-    CPhie, CPhimu, CPhitau    = 8./79., 8./79., 8./79.
+    CPhie, CPhimu, CPhitau    = 16./79., 16./79., 16./79.
 
-    #Check signs
-    Clee, Clemu, Cletau       = 211./711., -16./711., -16./711.
+    Clee, Clemu, Cletau       = 442./711., -32./711., -32./711.
 
-    Clmue, Clmumu, Clmutau    = -16./711., 211./711., -16./711.
+    Clmue, Clmumu, Clmutau    = -32./711., 442./711., -32./711.
 
-    Cltaue, Cltaumu, Cltautau = -16./711., -16./711., 211./711.
+    Cltaue, Cltaumu, Cltautau = -32./711., -32./711., 442./711.
 
     #define the different RHSs for each equation
     rhs1           =      -d1*(N1-n1eq)
@@ -48,8 +47,10 @@ def fast_RHS(y0, eps2tt,eps2mm,eps2ee,eps1tt,eps1mm,eps1ee,C,d1,d2,w1,w2,n1eq,n2
 
 class EtaB_2ResonantSpectator(ulysses.ULSBase):
     """
-    Resonant equations with two steriles and three lepton flavours. See arxiv:0705.2183.
+    Resonant equations with two steriles and three lepton flavours. See arXiv:hep-ph/0601084.
     """
+
+    def shortname(self): return "2resonantspectator"
 
     def RHS(self, y0, zzz, ETA, C, K):
         k1term,k2term = K
