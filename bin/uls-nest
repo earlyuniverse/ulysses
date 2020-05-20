@@ -26,33 +26,6 @@ if __name__=="__main__":
     op.add_option("--mn-no-importance",dest="NOIMPSAMP",   default=False, action='store_true', help="Turn off importance sampling.")
     opts, args = op.parse_args()
 
-
-    # Read parameter card and very explicit checks on parameter names
-    # TODO also checks on values?
-    RNG, FIX = uls.readConfig(args[0])
-    if len(FIX) + len(RNG)!=16:
-        print("Error, the number of parameters needs to be 16, user supplied {}, exiting".format(len(FIX)))
-        sys.exit(1)
-
-    pnames = ['m',  'M1', 'M2', 'M3', 'delta', 'a21', 'a31', 'x1', 'x2', 'x3', 'y1', 'y2', 'y3', 't12', 't13', 't23']
-
-    for p in FIX.keys():
-        if not p in pnames:
-            print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
-            sys.exit(1)
-
-    for p in RNG.keys():
-        if not p in pnames:
-            print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
-            sys.exit(1)
-
-    # Number of dimensions our problem has
-    NP = len(RNG.keys())
-
-    if NP==0:
-        print("No floating parameters specified in {}, exiting.".format(args[0]))
-        sys.exit(1)
-
     # Disect the zrange string
     zmin, zmax, zsteps = opts.ZRANGE.split(",")
     zmin=float(zmin)
@@ -68,6 +41,30 @@ if __name__=="__main__":
             loop=opts.LOOP,
             debug=opts.DEBUG
             )
+
+    # Read parameter card and very explicit checks on parameter names
+    RNG, FIX = uls.readConfig(args[0])
+    if len(FIX) + len(RNG) != len(LEPTO.pnames):
+        print("Error, the number of parameters needs to be {}, user supplied {}, exiting".format(len(LEPTO.pnames), len(FIX)))
+        sys.exit(1)
+
+        for p in FIX.keys():
+            if not p in LEPTO.pnames:
+                print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
+                sys.exit(1)
+
+        for p in RNG.keys():
+            if not p in LEPTO.pnames:
+                print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
+                sys.exit(1)
+
+    # Number of dimensions our problem has
+    NP = len(RNG.keys())
+
+    if NP==0:
+        print("No floating parameters specified in {}, exiting.".format(args[0]))
+        sys.exit(1)
+
 
     # Output directory
     rank=0
