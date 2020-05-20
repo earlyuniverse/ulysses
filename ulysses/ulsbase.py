@@ -87,6 +87,7 @@ class ULSBase(object):
         self.setZS()
         self.sphalfact = kwargs["sphalfact"] if kwargs.get("sphalfact") is not None else 0.01
 
+        self.pnames = ['m',  'M1', 'M2', 'M3', 'delta', 'a21', 'a31', 'x1', 'x2', 'x3', 'y1', 'y2', 'y3', 't12', 't13', 't23']
 
 
     def shortname(self):
