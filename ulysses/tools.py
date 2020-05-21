@@ -21,6 +21,7 @@ def parseArgs(args):
 def readConfig(fname):
     from collections import OrderedDict
 
+    isCI = True
     fixed  = OrderedDict()
     ranges = OrderedDict()
     with open(fname) as f:
@@ -48,7 +49,9 @@ def readConfig(fname):
             else:
                 print ("Warning, not understood instruction:", l)
                 continue
-        return ranges, fixed
+        if "Y11_mag" in ranges or "Y11_mag" in fixed:
+            isCI = False
+        return ranges, fixed, isCI
 
 def getBuiltInModels():
      """
