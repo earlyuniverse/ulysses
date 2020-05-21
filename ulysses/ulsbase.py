@@ -3,6 +3,7 @@ import numpy as np
 from odeintw import odeintw
 import timeit
 from numpy import linalg
+import cmath
 
 def fast_isPerturbative(y):
     """
@@ -87,7 +88,9 @@ class ULSBase(object):
         self.setZS()
         self.sphalfact = kwargs["sphalfact"] if kwargs.get("sphalfact") is not None else 0.01
 
-        self.pnames = ['m',  'M1', 'M2', 'M3', 'delta', 'a21', 'a31', 'x1', 'x2', 'x3', 'y1', 'y2', 'y3', 't12', 't13', 't23']
+        self.isCasasIbarrra = True
+        self._manualh = np.zeros((3,3), dtype=np.complex128)
+        self.pnames = ['m', 'M1', 'M2', 'M3', 'delta', 'a21', 'a31', 'x1', 'x2', 'x3', 'y1', 'y2', 'y3', 't12', 't13', 't23']
 
 
     def shortname(self):
@@ -174,22 +177,39 @@ class ULSBase(object):
         """
         This set the model parameters. pdict is expected to be a dictionary
         """
-        self.delta    = pdict['delta']/180*np.pi
-        self.a21      = pdict['a21']/180*np.pi
-        self.a31      = pdict['a31']/180*np.pi
-        self.t12      = pdict['t12']/180*np.pi
-        self.t23      = pdict['t23']/180*np.pi
-        self.t13      = pdict['t13']/180*np.pi
-        self.x1       = pdict['x1']/180*np.pi
-        self.y1       = pdict['y1']/180*np.pi
-        self.x2       = pdict['x2']/180*np.pi
-        self.y2       = pdict['y2']/180*np.pi
-        self.x3       = pdict['x3']/180*np.pi
-        self.y3       = pdict['y3']/180*np.pi
-        self.m        = 10**pdict['m'] * 1e-9 # NOTE input is in log10(m1) in eV --- we convert here to the real value in GeV
-        self.M1       = 10**pdict['M1']  #
-        self.M2       = 10**pdict['M2']  #
-        self.M3       = 10**pdict['M3']  #
+        if self.isCasasIbarrra:
+            self.delta    = pdict['delta']/180*np.pi
+            self.a21      = pdict['a21']/180*np.pi
+            self.a31      = pdict['a31']/180*np.pi
+            self.t12      = pdict['t12']/180*np.pi
+            self.t23      = pdict['t23']/180*np.pi
+            self.t13      = pdict['t13']/180*np.pi
+            self.x1       = pdict['x1']/180*np.pi
+            self.y1       = pdict['y1']/180*np.pi
+            self.x2       = pdict['x2']/180*np.pi
+            self.y2       = pdict['y2']/180*np.pi
+            self.x3       = pdict['x3']/180*np.pi
+            self.y3       = pdict['y3']/180*np.pi
+            self.m        = 10**pdict['m'] * 1e-9 # NOTE input is in log10(m1) in eV --- we convert here to the real value in GeV
+            self.M1       = 10**pdict['M1']
+            self.M2       = 10**pdict['M2']
+            self.M3       = 10**pdict['M3']
+        else:
+            self.M1       = 10**pdict['M1']
+            self.M2       = 10**pdict['M2']
+            self.M3       = 10**pdict['M3']
+            # Explicit setting of yukawa matix entries
+            self._manualh[0][0] = cmath.rect(pdict["Y11_mag"], pdict["Y11_phs"])
+            self._manualh[0][1] = cmath.rect(pdict["Y12_mag"], pdict["Y12_phs"])
+            self._manualh[0][2] = cmath.rect(pdict["Y13_mag"], pdict["Y13_phs"])
+            self._manualh[1][0] = cmath.rect(pdict["Y21_mag"], pdict["Y21_phs"])
+            self._manualh[1][1] = cmath.rect(pdict["Y22_mag"], pdict["Y22_phs"])
+            self._manualh[1][2] = cmath.rect(pdict["Y23_mag"], pdict["Y23_phs"])
+            self._manualh[2][0] = cmath.rect(pdict["Y31_mag"], pdict["Y31_phs"])
+            self._manualh[2][1] = cmath.rect(pdict["Y32_mag"], pdict["Y32_phs"])
+            self._manualh[2][2] = cmath.rect(pdict["Y33_mag"], pdict["Y33_phs"])
+
+
 
 
     def printParams(self):
@@ -340,7 +360,10 @@ class ULSBase(object):
         """
         YUKAWA matrix.
         """
-        return self.h_loop if self.loop else self.h_tree
+        if self.isCasasIbarrra:
+            return self.h_loop if self.loop else self.h_tree
+        else:
+            return self._manualh
 
     @property
     def h_loop(self):
