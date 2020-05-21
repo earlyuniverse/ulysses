@@ -35,7 +35,7 @@ if __name__=="__main__":
     assert(zmin<zmax)
     assert(zsteps>0)
 
-    pfile, gdict = ulysses.tools.parseArgs(args)
+    pfile, gdict = uls.tools.parseArgs(args)
 
     LEPTO = uls.selectModel(opts.MODEL,
             zmin=zmin, zmax=zmax, zsteps=zsteps,
@@ -46,20 +46,24 @@ if __name__=="__main__":
             )
 
     # Read parameter card and very explicit checks on parameter names
-    RNG, FIX = uls.readConfig(pfile)
-    if len(FIX) + len(RNG) != len(LEPTO.pnames):
-        print("Error, the number of parameters needs to be {}, user supplied {}, exiting".format(len(LEPTO.pnames), len(FIX)+len(RNG)))
-        sys.exit(1)
+    RNG, FIX, isCasIb = uls.readConfig(pfile)
+    if isCasIb:
+        if len(FIX) + len(RNG) != len(LEPTO.pnames):
+            print("Error, the number of parameters needs to be {}, user supplied {}, exiting".format(len(LEPTO.pnames), len(FIX)+len(RNG)))
+            sys.exit(1)
 
-        for p in FIX.keys():
-            if not p in LEPTO.pnames:
-                print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
-                sys.exit(1)
+            for p in FIX.keys():
+                if not p in LEPTO.pnames:
+                    print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
+                    sys.exit(1)
 
-        for p in RNG.keys():
-            if not p in LEPTO.pnames:
-                print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
-                sys.exit(1)
+            for p in RNG.keys():
+                if not p in LEPTO.pnames:
+                    print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
+                    sys.exit(1)
+    else:
+        print("beware!")
+        LEPTO.isCasasIbarrra = False
 
     # Number of dimensions our problem has
     NP = len(RNG.keys())

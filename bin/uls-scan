@@ -44,7 +44,7 @@ if __name__=="__main__":
 
     import optparse, os, sys
     op = optparse.OptionParser(usage=__doc__)
-    op.add_option("-o", "--output",    dest="OUTPUT",      default=None, type=str, help="Output file name for evolution plots/data --- if not provided, only calculate etaB (default: %default)")
+    op.add_option("-o", "--output",    dest="OUTPUT",      default="scan.pdf", type=str, help="Output file name for evolution plots/data (default: %default)")
     op.add_option("-v", "--debug",     dest="DEBUG",       default=False, action="store_true", help="Turn on some debug messages")
     op.add_option("-m", "--model",     dest="MODEL",       default="1DME", help="Selection of of model (default: %default)")
     op.add_option("-n", "--n-scan",    dest="NSCAN",       default=30, type=int, help="Number of point to scan (default: %default)")
@@ -82,23 +82,28 @@ if __name__=="__main__":
             )
 
     # Read parameter card and very explicit checks on parameter names
-    RNG, FIX = ulysses.readConfig(pfile)
-    if len(FIX) != len(LEPTO.pnames)-1:
-        print("Error, the number of fixed parameters needs to be {}, user supplied {}, exiting".format(len(LEPTO.pnames)-1, len(FIX)))
-        sys.exit(1)
-
-    for p in FIX.keys():
-        if not p in LEPTO.pnames:
-            print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
-            sys.exit(1)
+    RNG, FIX, isCasIb = ulysses.readConfig(pfile)
 
     assert(len(RNG)==1)
-
     pscan = list(RNG.keys())[0]
     pmin, pmax = RNG[pscan]
-    if pscan not in LEPTO.pnames:
-        print("Scan-parameter {} in input file {} not recognised, exiting".format(pscan, args[0]))
 
+    if isCasIb:
+        if len(FIX) != len(LEPTO.pnames)-1:
+            print("Error, the number of fixed parameters needs to be {}, user supplied {}, exiting".format(len(LEPTO.pnames)-1, len(FIX)))
+            sys.exit(1)
+
+        for p in FIX.keys():
+            if not p in LEPTO.pnames:
+                print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
+                sys.exit(1)
+
+        if pscan not in LEPTO.pnames:
+            print("Scan-parameter {} in input file {} not recognised, exiting".format(pscan, args[0]))
+
+    else:
+        print("beware!")
+        LEPTO.isCasasIbarrra = False
 
     if opts.DEBUG:
         print(LEPTO)

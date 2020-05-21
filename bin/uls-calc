@@ -79,27 +79,34 @@ if __name__=="__main__":
             **gdict
             )
 
+
     # Read parameter card and very explicit checks on parameter names
-    _, FIX = ulysses.readConfig(pfile)
-    if len(FIX) != len(LEPTO.pnames):
-        print("Error, the number of parameters needs to be {}, user supplied {}, exiting".format(len(LEPTO.pnames), len(FIX)))
-        sys.exit(1)
+    _, FIX, isCasIb = ulysses.readConfig(pfile)
 
-    for p in FIX.keys():
-        if not p in LEPTO.pnames:
-            print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
+    if isCasIb:
+        if len(FIX) != len(LEPTO.pnames):
+            print("Error, the number of parameters needs to be {}, user supplied {}, exiting".format(len(LEPTO.pnames), len(FIX)))
             sys.exit(1)
 
-    for p in LEPTO.pnames:
-        if not p in FIX.keys():
-            print("Parameter {} not provided in input file {}, exiting".format(p, args[0]))
-            sys.exit(1)
+        for p in FIX.keys():
+            if not p in LEPTO.pnames:
+                print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
+                sys.exit(1)
+
+        for p in LEPTO.pnames:
+            if not p in FIX.keys():
+                print("Parameter {} not provided in input file {}, exiting".format(p, args[0]))
+                sys.exit(1)
+    else:
+        print(" beware!")
+        LEPTO.isCasasIbarrra = False
 
 
     if opts.DEBUG:
         print(LEPTO)
 
     etaB = LEPTO(FIX)
+    print(LEPTO.h)
     if opts.DEBUG:
         LEPTO.printParams()
         print(LEPTO.U)
