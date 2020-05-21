@@ -35,15 +35,18 @@ if __name__=="__main__":
     assert(zmin<zmax)
     assert(zsteps>0)
 
+    pfile, gdict = ulysses.tools.parseArgs(args)
+
     LEPTO = uls.selectModel(opts.MODEL,
             zmin=zmin, zmax=zmax, zsteps=zsteps,
             ordering=int(opts.INVORDERING),
             loop=opts.LOOP,
-            debug=opts.DEBUG
+            debug=opts.DEBUG,
+            **gdict
             )
 
     # Read parameter card and very explicit checks on parameter names
-    RNG, FIX = uls.readConfig(args[0])
+    RNG, FIX = uls.readConfig(pfile)
     if len(FIX) + len(RNG) != len(LEPTO.pnames):
         print("Error, the number of parameters needs to be {}, user supplied {}, exiting".format(len(LEPTO.pnames), len(FIX)+len(RNG)))
         sys.exit(1)
