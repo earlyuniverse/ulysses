@@ -1,6 +1,23 @@
 import cmath
 import ulysses
 
+
+def parseArgs(args):
+    """
+    Parse command line arguments. Interpret strings containing ":"
+    as setting global parameters.
+    """
+    gp = [x for x in args if     ":" in x]
+    pf = [x for x in args if not ":" in x]
+    if len(pf)!= 1:
+        raise Exception("{} parameter files specified, require exactly 1, exiting".format(len(pf)))
+    gdict = {}
+    for g in gp:
+        k, v = g.split(":")
+        gdict[k] = float(v)
+    return pf[0], gdict
+
+
 def readConfig(fname):
     from collections import OrderedDict
 
