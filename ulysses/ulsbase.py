@@ -175,18 +175,18 @@ class ULSBase(object):
         This set the model parameters. pdict is expected to be a dictionary
         """
         self.delta    = pdict['delta']/180*np.pi
-        self.a        = pdict['a21']/180*np.pi
-        self.b        = pdict['a31']/180*np.pi
-        self.theta12  = pdict['t12']/180*np.pi
-        self.theta23  = pdict['t23']/180*np.pi
-        self.theta13  = pdict['t13']/180*np.pi
+        self.a21      = pdict['a21']/180*np.pi
+        self.a31      = pdict['a31']/180*np.pi
+        self.t12      = pdict['t12']/180*np.pi
+        self.t23      = pdict['t23']/180*np.pi
+        self.t13      = pdict['t13']/180*np.pi
         self.x1       = pdict['x1']/180*np.pi
         self.y1       = pdict['y1']/180*np.pi
         self.x2       = pdict['x2']/180*np.pi
         self.y2       = pdict['y2']/180*np.pi
         self.x3       = pdict['x3']/180*np.pi
         self.y3       = pdict['y3']/180*np.pi
-        self.m1       = 10**pdict['m'] * 1e-9 # NOTE input is in log10(m1) in eV --- we convert here to the real value in GeV
+        self.m        = 10**pdict['m'] * 1e-9 # NOTE input is in log10(m1) in eV --- we convert here to the real value in GeV
         self.M1       = 10**pdict['M1']  #
         self.M2       = 10**pdict['M2']  #
         self.M3       = 10**pdict['M3']  #
@@ -251,12 +251,12 @@ class ULSBase(object):
         """
 
         if self.ordering==0:
-            m11 = np.sqrt(self.m1)
-            m22 = np.sqrt(np.sqrt(self.msplit2_solar       + self.m1*self.m1))
-            m33 = np.sqrt(np.sqrt(self.msplit2_athm_normal + self.m1*self.m1))
+            m11 = np.sqrt(self.m)
+            m22 = np.sqrt(np.sqrt(self.msplit2_solar       + self.m*self.m))
+            m33 = np.sqrt(np.sqrt(self.msplit2_athm_normal + self.m*self.m))
         elif self.ordering==1:
-            m11 = np.sqrt(np.sqrt(self.msplit2_athm_invert + self.m1*self.m1 - self.msplit2_solar))
-            m22 = np.sqrt(np.sqrt(self.msplit2_athm_invert + self.m1*self.m1))
+            m11 = np.sqrt(np.sqrt(self.msplit2_athm_invert + self.m*self.m - self.msplit2_solar))
+            m22 = np.sqrt(np.sqrt(self.msplit2_athm_invert + self.m*self.m))
             m33 = np.sqrt(self.m1)
         else:
             raise Exception("ordering %i not implemented"%self.ordering)
@@ -270,15 +270,15 @@ class ULSBase(object):
         """
         PMNS matrix using the PDG parametrisation convention.
         """
-        s12     = np.sin(self.theta12)
-        s23     = np.sin(self.theta23)
-        s13     = np.sin(self.theta13)
+        s12     = np.sin(self.t12)
+        s23     = np.sin(self.t23)
+        s13     = np.sin(self.t13)
         c12     = np.power(1-s12*s12,0.5)
         c23     = np.power(1-s23*s23,0.5)
         c13     = np.power(1-s13*s13,0.5)
-        return np.array([ [c12*c13,c13*s12*np.exp(self.a*1j/2.), s13*np.exp(self.b*1j/2-self.delta*1j)],
-                           [-c23*s12 - c12*np.exp(self.delta*1j)*s13*s23,np.exp((self.a*1j)/2.)*(c12*c23 - np.exp(self.delta*1j)*s12*s13*s23) , c13*np.exp((self.b*1j)/2.)*s23],
-                           [-c12*c23*np.exp(self.delta*1j)*s13 + s12*s23,np.exp((self.a*1j)/2.)*(-c23*np.exp(self.delta*1j)*s12*s13 - c12*s23) ,c13*c23*np.exp((self.b*1j)/2.)]], dtype=np.complex128)
+        return np.array([ [c12*c13,c13*s12*np.exp(self.a21*1j/2.), s13*np.exp(self.a31*1j/2-self.delta*1j)],
+                           [-c23*s12 - c12*np.exp(self.delta*1j)*s13*s23,np.exp((self.a21*1j)/2.)*(c12*c23 - np.exp(self.delta*1j)*s12*s13*s23) , c13*np.exp((self.a31*1j)/2.)*s23],
+                           [-c12*c23*np.exp(self.delta*1j)*s13 + s12*s23,np.exp((self.a21*1j)/2.)*(-c23*np.exp(self.delta*1j)*s12*s13 - c12*s23) ,c13*c23*np.exp((self.a31*1j)/2.)]], dtype=np.complex128)
 
 
     @property
