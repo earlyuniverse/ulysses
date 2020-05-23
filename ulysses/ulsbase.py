@@ -293,9 +293,9 @@ class ULSBase(object):
         s12     = np.sin(self.t12)
         s23     = np.sin(self.t23)
         s13     = np.sin(self.t13)
-        c12     = np.power(1-s12*s12,0.5)
-        c23     = np.power(1-s23*s23,0.5)
-        c13     = np.power(1-s13*s13,0.5)
+        c12     = (1-s12*s12)**0.5
+        c23     = (1-s23*s23)**0.5
+        c13     = (1-s13*s13)**0.5
         return np.array([ [c12*c13,c13*s12*np.exp(self.a21*1j/2.), s13*np.exp(self.a31*1j/2-self.delta*1j)],
                            [-c23*s12 - c12*np.exp(self.delta*1j)*s13*s23,np.exp((self.a21*1j)/2.)*(c12*c23 - np.exp(self.delta*1j)*s12*s13*s23) , c13*np.exp((self.a31*1j)/2.)*s23],
                            [-c12*c23*np.exp(self.delta*1j)*s13 + s12*s23,np.exp((self.a21*1j)/2.)*(-c23*np.exp(self.delta*1j)*s12*s13 - c12*s23) ,c13*c23*np.exp((self.a31*1j)/2.)]], dtype=np.complex128)
@@ -467,6 +467,12 @@ class ULSBase(object):
         b = my_kn1(x)
         c = my_kn2(x)
         return k*z*a*b/c
+
+    def NDW1(self, k, z):
+        mk1 = my_kn1(z)
+        mk2 = my_kn2(z)
+
+        return [3./8*z*z*mk2, k*z*mk1/mk2, 1./4*z*z*z*k*mk1]
 
     def N1Eq(self, z):
         """
