@@ -69,8 +69,10 @@ class EtaB_2DME(ulysses.ULSBase):
     """
 
     def shortname(self): return "2DME"
+    def flavourindices(self): return [2, 3, 4]
+    def flavourlabels(self): return ["$N_{\\tau\\tau}$", "$N_{\mu\mu}$", "$N_{ee}$"]
 
-    def RHS(self, y0, zzz, ETA, C, K, W):
+    def RHS(self, y0, zzz, ETA, _C, K, _W):
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA
         k1term,k2term = K
 
@@ -82,6 +84,11 @@ class EtaB_2DME(ulysses.ULSBase):
             self._n1eq    = self.N1Eq(zzz)
             self._n2eq    = self.N2Eq(zzz)
             self._currz=zzz
+        from numba.typed import List
+        C=List()
+        W=List()
+        [C.append(c) for c in _C]
+        [W.append(w) for w in _W]
 
         return fast_RHS(y0, eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me, C,self._d1,self._d2,self._w1,self._w2,self._n1eq,self._n2eq,W)
 
@@ -111,8 +118,6 @@ class EtaB_2DME(ulysses.ULSBase):
         y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         ys, _      = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
-        nb      = np.real(self.sphalfact*(ys[-1,2]+ys[-1,3]+ys[-1,4]))
 
-        self.ys = np.real(ys[:, [2,3,4]])
-
-        return np.real(nb)
+        self.setEvolData(ys)
+        return self.ys[-1][-1]

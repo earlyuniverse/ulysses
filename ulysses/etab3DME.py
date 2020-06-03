@@ -76,13 +76,22 @@ class EtaB_3DME(ulysses.ULSBase):
     """
 
     def shortname(self): return "3DME"
+    def flavourindices(self): return [3, 4, 5]
+    def flavourlabels(self): return ["$N_{\\tau\\tau}$", "$N_{\mu\mu}$", "$N_{ee}$"]
 
-    def RHS(self, y0, zzz, ETA, C, K, W):
+    def RHS(self, y0, zzz, ETA, _C, K, _W):
         N1, N2, N3, Ntt, Nmm, Nee, Ntm, Nte, Nme = y0
         (eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me) = ETA
-        c1t,c1m,c1e,c2t,c2m,c2e,c3t,c3m,c3e = C
+        c1t,c1m,c1e,c2t,c2m,c2e,c3t,c3m,c3e = _C
+        from numba.typed import List
+        C=List()
+        [C.append(c) for c in _C]
+
         k1term,k2term,k3term = K
-        widtht,widthm = W
+        widtht,widthm = _W
+        W=List()
+        [W.append(w) for w in _W]
+
         # Turns out, the Bessel functions are expensive, so let's just
         # evaluate them for every new zzz
         if zzz != self._currz or zzz == self.zmin:
@@ -134,8 +143,9 @@ class EtaB_3DME(ulysses.ULSBase):
         y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         ys, _   = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
-        nb      = np.real(self.sphalfact*(ys[-1,3]+ys[-1,4]+ys[-1,5]))
+        self.setEvolData(ys)
+        # nb      = np.real(self.sphalfact*(ys[-1,3]+ys[-1,4]+ys[-1,5]))
 
-        self.ys = np.real(ys[:, [3,4,5]])
+        # self.ys = np.real(ys[:, [3,4,5]])
 
-        return np.real(nb)
+        return self.ys[-1][-1]
