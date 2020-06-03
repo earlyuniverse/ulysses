@@ -12,6 +12,7 @@ from ulysses.etab2BE1F                import EtaB_2BE1F
 from ulysses.etab2BE3F                import EtaB_2BE3F
 from ulysses.etab3DMEscattering       import EtaB_3DME_Scattering
 from ulysses.etab3DMEscatteringRHtaur import EtaB_3DS_Scattering_RHtaur
+from ulysses.etab1BE1Fscalefactor import EtaB_1BE1Fscalefactor
 
 from ulysses.etab2resonant            import EtaB_2Resonant # Buggy
 from ulysses.etab2resonantspectators  import EtaB_2ResonantSpectator
