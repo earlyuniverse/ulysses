@@ -36,8 +36,10 @@ class EtaB_2Resonant(ulysses.ULSBase):
     """
 
     def shortname(self): return "2resonant"
+    def flavourindices(self): return [2, 3, 4]
+    def flavourlabels(self): return ["$N_{\\tau\\tau}$", "$N_{\mu\mu}$", "$N_{ee}$"]
 
-    def RHS(self, y0, zzz, ETA, C, K):
+    def RHS(self, y0, zzz, ETA, _C, K):
         k1term,k2term = K
         eps2tt,eps2mm,eps2ee,eps1tt,eps1mm,eps1ee = ETA
 
@@ -50,6 +52,9 @@ class EtaB_2Resonant(ulysses.ULSBase):
             self._n2eq          = self.N2Eq(zzz)
             self._currz=zzz
 
+        from numba.typed import List
+        C=List()
+        [C.append(c) for c in _C]
         return fast_RHS(y0, eps2tt, eps2mm, eps2ee, eps1tt, eps1mm, eps1ee, C,self._d1,self._d2,self._w1,self._w2,self._n1eq,self._n2eq)
 
     @property
@@ -79,8 +84,5 @@ class EtaB_2Resonant(ulysses.ULSBase):
         _K = [np.real(self.k1), np.real(self.k2)]
 
         ys      = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C, _K]), atol=1e-10)
-        nb      = self.sphalfact*(ys[-1,2]+ys[-1,3]+ys[-1,4])
-
-        self.ys = np.real(ys[:, [2,3,4]])
-
-        return np.real(nb)
+        self.setEvolData(ys)
+        return self.ys[-1][-1]
