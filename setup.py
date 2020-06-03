@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
   name = 'ulysses',
-  version = '0.3.1',
+  version = '0.3.2',
   description = 'ULYSSES: Universal LeptogeneSiS Equation Solver',
   url = 'https://github.com/iamholger/ulysses',
   author = 'Kris Moffat, Yuber Perez Gonzalez, Holger Schulz, Jessica Turner',
