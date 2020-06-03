@@ -17,7 +17,7 @@ setup(
     'mpi4py'
   ],
   python_requires='>3.5.2',
-  scripts=['bin/uls-calc', 'bin/uls-scan', 'bin/uls-nest'],
+  scripts=['bin/uls-calc', 'bin/uls-scan', 'bin/uls-nest', 'bin/uls-models'],
   extras_require = {
   },
   entry_points = {
