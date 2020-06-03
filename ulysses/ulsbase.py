@@ -91,10 +91,17 @@ class ULSBase(object):
         self.isCasasIbarrra = True
         self._manualh = np.zeros((3,3), dtype=np.complex128)
         self.pnames = ['m', 'M1', 'M2', 'M3', 'delta', 'a21', 'a31', 'x1', 'x2', 'x3', 'y1', 'y2', 'y3', 't12', 't13', 't23']
+        self.evolname="z"
 
 
     def shortname(self):
         return ""
+
+    @property
+    def flavourindices(self): return None
+
+    @property
+    def flavourlabels(self): return None
 
     @property
     def constants(self):
@@ -157,20 +164,29 @@ class ULSBase(object):
     @property
     def zsteps(self): return self._zsteps
 
+    def setEvolData(self, ys):
+        self.ys = np.empty((len(self.zs), max(self.flavourindices()) + 2))
+        self.ys[:,0] = self.zs
+        self.ys[:, self.flavourindices()] = ys[:, self.flavourindices()].real
+        self.ys[:,-1] = self.sphalfact*np.sum(self.ys[:,self.flavourindices()], axis=1)
+
     @property
     def evolData(self):
         r"""
 
-        :getter: Return a 4-D array of the evolution data.
+        :getter: Return an N-D array of the evolution data.
 
         The first column is the evolution variable
         The second column corresponds to Ntautau, the
         third to Nmumu and the last columnd to Nee
 
         """
-        pd = np.empty((self.zsteps, 4))
-        pd[:,      0] = self.zs
-        pd[:,[1,2,3]] = self.ys
+        if self.flavourindices is not None:
+            return self.ys
+        else: # FIXME this is only for some compatibility
+            pd = np.empty((self.zsteps, 4))
+            pd[:,      0] = self.zs
+            pd[:,[1,2,3]] = self.ys
         return pd
 
     def setParams(self, pdict):
@@ -217,8 +233,8 @@ class ULSBase(object):
         Print current parameters.
         """
         K = ('delta','a21','a31','t12','t23','t13','x1','y1','x2','y2','x3','y3','m','M1','M2','M3')
-        V = (self.delta/np.pi*180, self.a/np.pi*180, self.b/np.pi*180, self.theta12/np.pi*180, self.theta23/np.pi*180, self.theta13/np.pi*180, self.x1/np.pi*180, self.y1/np.pi*180, self.x2/np.pi*180, self.y2/np.pi*180, self.x3/np.pi*180, self.y3/np.pi*180,
-                np.log10(self.m1/1e-9), np.log10(self.M1), np.log10(self.M2), np.log10(self.M3))
+        V = (self.delta/np.pi*180, self.a21/np.pi*180, self.a31/np.pi*180, self.t12/np.pi*180, self.t23/np.pi*180, self.t13/np.pi*180, self.x1/np.pi*180, self.y1/np.pi*180, self.x2/np.pi*180, self.y2/np.pi*180, self.x3/np.pi*180, self.y3/np.pi*180,
+                np.log10(self.m/1e-9), np.log10(self.M1), np.log10(self.M2), np.log10(self.M3))
         for k, v in zip(K,V):
             print(k,v)
 
