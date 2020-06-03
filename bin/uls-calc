@@ -26,14 +26,19 @@ t13     8.52  # [deg]
 t23    49.58  # [deg]
 """
 
-def plotEvolution(data, f_out):
+def plotEvolution(LEPTO, f_out):
+    data = LEPTO.evolData
+    active = LEPTO.flavourindices()
+    labels= LEPTO.flavourlabels()
     import pylab
-    pylab.plot(data[:,0], abs(data[:,1]), label="$N_{\\tau\\tau}$")
-    pylab.plot(data[:,0], abs(data[:,2]), label="$N_{\mu\mu}$")
-    pylab.plot(data[:,0], abs(data[:,3]), label="$N_{ee}$")
-    pylab.plot(data[:,0], abs(data[:,4]), label="$\eta_B$")
+    for idx, lab in zip(active, labels):
+        pylab.plot(data[:,0], abs(data[:,idx]), label=lab)
+    pylab.plot(data[:,0], abs(data[:,-1]), label="$|\eta_B|$")
     pylab.legend()
-    pylab.xlabel("$z$")
+    try:
+        pylab.xlabel(LEPTO.evolname)
+    except:
+        pylab.xlabel("z")
     pylab.yscale("log")
     pylab.xscale("log")
     pylab.ylabel("$\left|N_{xx} \\right|, \eta_B$")
@@ -116,15 +121,14 @@ if __name__=="__main__":
         "Omega_b h^2".ljust(14), etaB/274.*1e10)
         )
     if opts.OUTPUT is not None:
+        # TODO header for text outputs
         D=LEPTO.evolData
-        E=np.sum(D[:,(1,2,3)], axis=1) * LEPTO.sphalfact
-        DATA = np.column_stack((D,E))
         if opts.OUTPUT.endswith(".txt"):
-            np.savetxt(opts.OUTPUT, DATA)
+            np.savetxt(opts.OUTPUT, D)
         elif opts.OUTPUT.endswith(".csv"):
-            np.savetxt(opts.OUTPUT, DATA, delimiter=",")
+            np.savetxt(opts.OUTPUT, D, delimiter=",")
         else:
-            plotEvolution(DATA, opts.OUTPUT)
+            plotEvolution(LEPTO, opts.OUTPUT)
         if opts.DEBUG:
             print("Output written to {}".format(opts.OUTPUT))
 
