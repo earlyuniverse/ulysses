@@ -23,6 +23,10 @@ class EtaB_1BE1F(ulysses.ULSBase):
 
     def shortname(self): return "1BE1F"
 
+    def flavourindices(self): return [1]
+
+    def flavourlabels(self): return ["$NBL$"]
+
     def RHS(self, y0,z,epstt,epsmm,epsee,k):
 
         if z != self._currz or z == self.zmin:
@@ -46,8 +50,6 @@ class EtaB_1BE1F(ulysses.ULSBase):
         params  = np.array([epstt,epsmm,epsee,k], dtype=np.complex128)
 
         ys      = odeintw(self.RHS, y0, self.zs, args = tuple(params))
-        nb      = self.sphalfact*(ys[-1,1])
+        self.setEvolData(ys)
 
-        self.ys  = np.real(ys[:, [1]])
-
-        return np.real(nb)
+        return self.ys[-1][-1]
