@@ -24,6 +24,10 @@ class EtaB_2BE1F(ulysses.ULSBase):
 
     def shortname(self): return "2BE1F"
 
+    def flavourindices(self): return [2]
+
+    def flavourlabels(self): return ["$NBL$"]
+
     def RHS(self, y0, z, ETA, K):
         eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me = ETA
         k1term,k2term = K
@@ -73,8 +77,5 @@ class EtaB_2BE1F(ulysses.ULSBase):
         _K = [np.real(self.k1), np.real(self.k2)]
 
         ys      = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _K]))
-        nb      = self.sphalfact*(ys[-1,2])
-
-        self.ys = np.real(ys[:, [2]])
-
-        return np.real(nb)
+        self.setEvolData(ys)
+        return self.ys[-1][-1]
