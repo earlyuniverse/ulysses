@@ -1,0 +1,27 @@
+# This folder contains a set of example points.
+# Example usages are :
+
+uls-calc -m 1BE1F 1N1F.dat
+uls-calc -m 1DME  1N3F.dat
+uls-calc -m 2DME  2N3F.dat
+uls-calc -m 3DME  3N3F.dat
+uls-calc -m 1BE2F 1N2F.dat
+uls-calc -m 1BE3F 1N3F.dat
+uls-calc -m 2BE1F 2N1F.dat
+uls-calc -m 2BE2F 2N2F.dat
+uls-calc -m 2BE3F 2N3F.dat
+uls-calc -m 3DMEsct 3N3F.dat
+uls-calc -m 2resonant Res.dat
+uls-calc -m 2resonantspectator Res.dat
+
+uls-calc -m 1BE1F     --inv 1N1FIO.dat
+uls-calc -m 1DME      --inv 1N3FIO.dat
+uls-calc -m 2DME      --inv 2N3FIO.dat
+uls-calc -m 3DME      --inv 3N3FIO.dat
+uls-calc -m 1BE2F     --inv 1N2FIO.dat
+uls-calc -m 1BE3F     --inv 1N3FIO.dat
+uls-calc -m 2BE1F     --inv 2N1FIO.dat
+uls-calc -m 2BE3F     --inv 2N3FIO.dat
+uls-calc -m 3DMEsct   --inv 3N3FIO.dat
+uls-calc -m 2resonant --inv ResIO.dat
+uls-calc -m 2resonantspectator ResIO.dat
