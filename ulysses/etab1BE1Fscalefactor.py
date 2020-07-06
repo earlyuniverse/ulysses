@@ -24,7 +24,8 @@ def fast_RHS(y0, a, rRADi, log10_ain, d, w1, epstt, epsmm, epsee, rnuRda_eq, Del
 
 class EtaB_1BE1Fscalefactor(ulysses.ULSBase):
     """
-    Density matrix equation (DME) with one decaying sterile. See arxiv:1112.4528.
+    Boltzmann equation with one decaying sterile. For detailed discussions of
+    equation derivation see arxiv:1104.2750.
     """
 
     def __init__(self, *args, **kwargs):
@@ -85,7 +86,7 @@ class EtaB_1BE1Fscalefactor(ulysses.ULSBase):
         y0      = np.array([0., Ti, 0.])
         nphi    = (2.*zeta(3)/np.pi**2) * Ti**3
         params  = np.array([epstt, epsmm, epsee, np.real(rRadi), 0.])
-        aflog10 = 3.0
+        aflog10 = 4.0
         t1 = np.linspace(0., aflog10, num=1000, endpoint=True)
 
         # solve equation
@@ -106,5 +107,3 @@ class EtaB_1BE1Fscalefactor(ulysses.ULSBase):
         self.ys[:,2]=ys[:,2]
         self.ys[:,-1] = coeffsph*( ys[:,2])*nphi/Ngamma
         return self.ys[-1][-1]
-        # return np.real( coeffsph*( ys[-1,2])*nphi/Ngamma[-1] )
-        # return np.real( coeffsph*( ys[-1,2])*nphi/Ngamma[-1] )
