@@ -293,7 +293,7 @@ class ULSBase(object):
         elif self.ordering==1:
             m11 = np.sqrt(np.sqrt(self.msplit2_athm_invert + self.m*self.m - self.msplit2_solar))
             m22 = np.sqrt(np.sqrt(self.msplit2_athm_invert + self.m*self.m))
-            m33 = np.sqrt(self.m1)
+            m33 = np.sqrt(self.m)
         else:
             raise Exception("ordering %i not implemented"%self.ordering)
 
