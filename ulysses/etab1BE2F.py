@@ -27,6 +27,8 @@ def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e):
 class EtaB_1BE2F(ulysses.ULSBase):
     """
     Two-flavoured Boltzmann equation with one decaying sterile. See arxiv:1112.4528.
+    Note these kinetic equations do not include off diagonal flavour
+    oscillations.
     """
 
     def shortname(self): return "1BE2F"

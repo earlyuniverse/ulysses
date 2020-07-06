@@ -25,7 +25,8 @@ def fast_RHS(y0, a, rRADi, log10_ain, d, w1, epstt, epsmm, epsee, rnuRda_eq, Del
 class EtaB_1BE1Fscalefactor(ulysses.ULSBase):
     """
     Boltzmann equation with one decaying sterile. For detailed discussions of
-    equation derivation see arxiv:1104.2750.
+    equation derivation see arxiv:1104.2750.  Note these kinetic equations do
+    not include off diagonal flavour oscillations.
     """
 
     def __init__(self, *args, **kwargs):

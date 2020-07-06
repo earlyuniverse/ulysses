@@ -18,7 +18,9 @@ def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee):
 
 class EtaB_1BE1F(ulysses.ULSBase):
     """
-    Boltzmann equation (BE) with one decaying sterile. See arxiv:1112.4528 Eqns. 4 and 5.
+    Boltzmann equation (BE) with one decaying sterile. See arxiv:1112.4528
+    Eqns. 4 and 5.  Note these kinetic equations do not include off diagonal
+    flavour oscillations.
     """
 
     def shortname(self): return "1BE1F"
