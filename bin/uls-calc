@@ -117,7 +117,7 @@ if __name__=="__main__":
         print(LEPTO.U)
     print("{}{}\n{}{}\n{}{}".format(
         "eta_b".ljust(      14), etaB,
-        "Y_b".ljust(        14), etaB/7.03969,
+        "Y_b".ljust(        14), etaB/7.03943,
         "Omega_b h^2".ljust(14), etaB/274.*1e10)
         )
     if opts.OUTPUT is not None:
