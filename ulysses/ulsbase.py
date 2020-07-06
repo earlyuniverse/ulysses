@@ -86,7 +86,7 @@ class ULSBase(object):
         self.zs=None
         self.ys=None
         self.setZS()
-        self.sphalfact = kwargs["sphalfact"] if kwargs.get("sphalfact") is not None else 0.01
+        self.sphalfact = kwargs["sphalfact"] if kwargs.get("sphalfact") is not None else 0.013
 
         self.isCasasIbarrra = True
         self._manualh = np.zeros((3,3), dtype=np.complex128)
