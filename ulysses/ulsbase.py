@@ -706,7 +706,7 @@ class ULSBase(object):
         gamma1    = (lsquare[0,0]/(8*np.pi))*M[0,0]
         gamma2    = (lsquare[1,1]/(8*np.pi))*M[1,1]
         DeltaM    = M[1,1]-M[0,0]
-        sum1      = np.imag(ldag[0,a]*l[a,1]*lsquare[0,1])+np.imag(ldag[0,a]*l[a,1]*lsquare[1,0])
+        sum1      = np.imag(ldag[0,a]*l[a,1]*lsquare[0,1]) + (M[0,0]/M[1,1]) *  np.imag(ldag[0,a]*l[a,1]*lsquare[1,0])
         epsbar1   = sum1/(lsquare[0,0]*lsquare[1,1])
         fmix      =  -2*(DeltaM/gamma2)/(1+(2*DeltaM/gamma2)**2)
         fosc      = -0.5*(DeltaM/gamma2)/(1+(DeltaM/gamma2)**2)
@@ -726,7 +726,7 @@ class ULSBase(object):
         gammai    = (lsquare[i,i]/(8*np.pi))*M[i,i]
         gammaj    = (lsquare[j,j]/(8*np.pi))*M[j,j]
         DeltaM    = M[j,j]-M[i,i]
-        sum1      = np.imag(ldag[i,a]*l[a,j]*lsquare[i,j])+np.imag(ldag[i,a]*l[a,j]*lsquare[j,i])
+        sum1      = np.imag(ldag[i,a]*l[a,j]*lsquare[i,j]) + (M[i,i]/M[j,j]) * np.imag(ldag[i,a]*l[a,j]*lsquare[j,i])
         epsbar1   = sum1/(lsquare[0,0]*lsquare[1,1])
         fmix      = ((M[i,i]**2 - M[j,j]**2) * M[i,i] * gammaj)/((M[i,i]**2 - M[j,j]**2)**2 + M[i,i]**2 * gammaj**2)#-2*(DeltaM/gammaj)/(1+(2*DeltaM/gammaj)**2)
         fosc      = ((M[i,i]**2 - M[j,j]**2) * M[i,i] * gammaj) /((M[i,i]**2-M[j,j]**2)**2 +  detpiece * (M[i,i] * gammai + M[j,j] * gammaj)**2)
