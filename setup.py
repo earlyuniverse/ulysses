@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 setup(
   name = 'ulysses',
-  version = '0.3.2',
+  version = '1.0.0',
   description = 'ULYSSES: Universal LeptogeneSiS Equation Solver',
-  url = 'https://github.com/iamholger/ulysses',
-  author = 'Kris Moffat, Yuber Perez Gonzalez, Holger Schulz, Jessica Turner',
-  author_email = 'hschulz@fnal.gov',
+  url = 'https://github.com/earlyuniverse/ulysses',
+  author = 'Kris Moffat, Yuber Perez Gonzalez, Alessandro Granelli, Holger Schulz, Jessica Turner',
+  author_email = 'jessicaturner.5390@gmail.com',
   packages = find_packages(),
   include_package_data = True,
   install_requires = [
