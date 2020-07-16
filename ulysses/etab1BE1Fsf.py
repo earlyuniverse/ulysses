@@ -101,7 +101,7 @@ class EtaB_1BE1Fsf(ulysses.ULSBase):
         ggamma      = 2.
         coeffNgamma = ggamma*zeta3/np.pi**2
         Ngamma      = coeffNgamma*(10**t1*T)**3
-        coeffsph    =  SMspl * gstarSrec/gstarSoff # 0.75 is our normalisation related to N1eq(0)=0.75
+        coeffsph    =  SMspl * gstarSrec/gstarSoff
         self.ys = np.empty((len(T), 4))
         self.ys[:,0]=t1
         self.ys[:,1]=T
