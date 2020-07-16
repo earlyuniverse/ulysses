@@ -22,7 +22,7 @@ def fast_RHS(y0, a, rRADi, log10_ain, d, w1, epstt, epsmm, epsee, rnuRda_eq, Del
     dNBLa        =      (epstt + epsmm + epsee) * expression1 - np.log(10.) * (w1/H) * NBL
     return [drnuRda, dTda, dNBLa]
 
-class EtaB_1BE1Fscalefactor(ulysses.ULSBase):
+class EtaB_1BE1Fsf(ulysses.ULSBase):
     """
     Boltzmann equations with one decaying sterile. For detailed discussions of
     equation derivation see arxiv:1104.2750.  Note these kinetic equations do
@@ -59,7 +59,7 @@ class EtaB_1BE1Fscalefactor(ulysses.ULSBase):
     def ipol_dgstarSdT(self,T):
         return interpolate.splev(T, self.tckS_, der = 1)
 
-    def shortname(self): return "1BE1Fscalefactor"
+    def shortname(self): return "1BE1Fsf"
 
     def flavourindices(self): return [1, 2]
 

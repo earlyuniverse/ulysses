@@ -30,12 +30,12 @@ def fast_RHS(y0, eps2tt,eps2mm,eps2ee,eps1tt,eps1mm,eps1ee,C,d1,d2,w1,w2,n1eq,n2
     RHStemp = [rhs1, rhs2, rhs3, rhs4, rhs5]
     return RHStemp
 
-class EtaB_2Resonant(ulysses.ULSBase):
+class EtaB_2RES(ulysses.ULSBase):
     """
     Resonant equations with two steriles and three lepton flavours. See arxiv:0705.2183.
     """
 
-    def shortname(self): return "2resonant"
+    def shortname(self): return "2RES"
     def flavourindices(self): return [2, 3, 4]
     def flavourlabels(self): return ["$N_{\\tau\\tau}$", "$N_{\mu\mu}$", "$N_{ee}$"]
 

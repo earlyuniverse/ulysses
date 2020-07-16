@@ -68,7 +68,7 @@ def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,e
     RHStemp = [rhs1, rhs2, rhs3, rhs4, rhs5, rhs6, rhs7, rhs8, rhs9]
     return RHStemp
 
-class EtaB_3DME_Scattering(ulysses.ULSBase):
+class EtaB_3DMEsct(ulysses.ULSBase):
     """
     Density matrix equation (DME) with three decaying steriles including
     scatterings. See hep-ph/0401240.
