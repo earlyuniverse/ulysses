@@ -144,8 +144,5 @@ class EtaB_3DME(ulysses.ULSBase):
 
         ys, _   = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
         self.setEvolData(ys)
-        # nb      = np.real(self.sphalfact*(ys[-1,3]+ys[-1,4]+ys[-1,5]))
-
-        # self.ys = np.real(ys[:, [3,4,5]])
 
         return self.ys[-1][-1]
