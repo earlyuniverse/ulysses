@@ -47,7 +47,7 @@ def fast_RHS(y0, eps2tt,eps2mm,eps2ee,eps1tt,eps1mm,eps1ee,C,d1,d2,w1,w2,n1eq,n2
 
 class EtaB_2ResonantSpectator(ulysses.ULSBase):
     """
-    Resonant equations with two steriles and three lepton flavours. See arXiv:hep-ph/0601084.
+    Resonant equations with two steriles and three lepton flavours including spectator processes. See arXiv:hep-ph/0601084.
     """
 
     def shortname(self): return "2resonantspectator"

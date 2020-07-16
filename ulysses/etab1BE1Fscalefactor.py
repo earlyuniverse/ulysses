@@ -24,7 +24,7 @@ def fast_RHS(y0, a, rRADi, log10_ain, d, w1, epstt, epsmm, epsee, rnuRda_eq, Del
 
 class EtaB_1BE1Fscalefactor(ulysses.ULSBase):
     """
-    Boltzmann equation with one decaying sterile. For detailed discussions of
+    Boltzmann equations with one decaying sterile. For detailed discussions of
     equation derivation see arxiv:1104.2750.  Note these kinetic equations do
     not include off diagonal flavour oscillations.
     """
@@ -82,12 +82,12 @@ class EtaB_1BE1Fscalefactor(ulysses.ULSBase):
         epstt = np.real(self.epsilon1ab(2,2))
         epsmm = np.real(self.epsilon1ab(1,1))
         epsee = np.real(self.epsilon1ab(0,0))
-        Ti      = 10 * self.M1 # initial temp 100 greater than mass N1
+        Ti      = 100 * self.M1 # initial temp 100 greater than mass N1
         rRadi   = np.pi**2 * self.ipol_gstar(Ti) / 30. * Ti**4 # initial radiation domination rho_RAD = pi^2* gstar(T[0])/30*T^4
         y0      = np.array([0., Ti, 0.])
         nphi    = (2.*zeta(3)/np.pi**2) * Ti**3
         params  = np.array([epstt, epsmm, epsee, np.real(rRadi), 0.])
-        aflog10 = 4.0
+        aflog10 = 5.0
         t1 = np.linspace(0., aflog10, num=1000, endpoint=True)
 
         # solve equation
@@ -101,7 +101,7 @@ class EtaB_1BE1Fscalefactor(ulysses.ULSBase):
         ggamma      = 2.
         coeffNgamma = ggamma*zeta3/np.pi**2
         Ngamma      = coeffNgamma*(10**t1*T)**3
-        coeffsph    =  SMspl * 0.75* gstarSrec/gstarSoff # 0.75 is our normalisation related to N1eq(0)=0.75
+        coeffsph    =  SMspl * gstarSrec/gstarSoff # 0.75 is our normalisation related to N1eq(0)=0.75
         self.ys = np.empty((len(T), 4))
         self.ys[:,0]=t1
         self.ys[:,1]=T
