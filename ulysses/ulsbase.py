@@ -86,7 +86,7 @@ class ULSBase(object):
         self.zs=None
         self.ys=None
         self.setZS()
-        self.sphalfact = kwargs["sphalfact"] if kwargs.get("sphalfact") is not None else 0.013
+        self.normfact = kwargs["normfact"] if kwargs.get("normfact") is not None else 0.013
 
         self.isCasasIbarrra = True
         self._manualh = np.zeros((3,3), dtype=np.complex128)
@@ -168,7 +168,7 @@ class ULSBase(object):
         self.ys = np.empty((len(self.zs), max(self.flavourindices()) + 2))
         self.ys[:,0] = self.zs
         self.ys[:, self.flavourindices()] = ys[:, self.flavourindices()].real
-        self.ys[:,-1] = self.sphalfact*np.sum(self.ys[:,self.flavourindices()], axis=1)
+        self.ys[:,-1] = self.normfact*np.sum(self.ys[:,self.flavourindices()], axis=1)
 
     @property
     def evolData(self):
