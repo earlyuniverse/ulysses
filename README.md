@@ -1,4 +1,4 @@
-# ULYSSES: Universal LeptogeneSiS Equation Solvers
+# ULYSSES: Universal LeptogeneSiS Equation Solver
 
 This package provides the calculation of the baryon assymetry parameter for different
 models of leptogenesis.
