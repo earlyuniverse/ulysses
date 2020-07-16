@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 import ulysses
+from scipy.special import zeta
 
 __doc__="""
 
@@ -115,10 +116,19 @@ if __name__=="__main__":
     if opts.DEBUG:
         LEPTO.printParams()
         print(LEPTO.U)
+        
+#Defining constants for the conversion, values taken from the PDG
+    mp = 1.672621898*1e-24 #proton mass in g
+    ngamma = 410.7 #present photon number density in cm^-3
+    rhoc = 1.87840*1e-29 #critical density of the Universe in h^2 g cm^-3 
+    gstaro = 43/11 #entropic effective degrees of freedom at present
+    ToYb = 45 * zeta(3) / (gstaro * np.pi**4)
+    ToOmegab = mp * ngamma / rhoc
+    
     print("{}{}\n{}{}\n{}{}".format(
         "eta_b".ljust(      14), etaB,
-        "Y_b".ljust(        14), etaB/7.03943,
-        "Omega_b h^2".ljust(14), etaB/274.*1e10)
+        "Y_b".ljust(        14), etaB * ToYb,
+        "Omega_b h^2".ljust(14), etaB * ToOmegab)
         )
     if opts.OUTPUT is not None:
         # TODO header for text outputs
