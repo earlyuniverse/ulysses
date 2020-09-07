@@ -1,0 +1,20 @@
+Directory structure:
+
+bin/ contains run-time scripts that work the ulysses library
+    uls-calc: Perform single point evaluation
+    uls-scan: Perform line-scan in parameter space
+    uls-nest: Perform multidimensional parameter scan using multinest
+    uls-models: Display available physics models
+
+doc/ conatains sphinx documentation source files
+
+examples/ contains example parameter cards
+
+odeintw/ contains Warren Weckesser's code for complex ode solving
+
+ulysses/ contains the library files
+    __init__.py: module loading
+    tools.py: general calculators and methods
+    ulsbase.py: Base class all calculators are derived from
+    etab*.py: Concrete implementations of physics models
+
