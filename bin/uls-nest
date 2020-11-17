@@ -83,8 +83,8 @@ if __name__=="__main__":
         if opts.DEBUG:
             print("[%i]/[%i] reporting for duty"%(rank, size))
     except Exception as e:
-        print("Problem:", e)
-        pass
+        print("MPI (mpi4py) is not available (try e.g. pip install mpi4py), proceeding serially:", e)
+        size = 1
 
     try:
         os.makedirs(opts.OUTPUT)
@@ -135,7 +135,21 @@ if __name__=="__main__":
         return loglikelihood
 
     # Run MultiNest
-    import pymultinest
+    try:
+        import pymultinest
+    except ImportError:
+        msg="""
+        Could not load the multinest module for python.
+        MultiNest requires libmultinest.so to be present in the
+        LD_LIBRARY_PATH.
+        The python package is easiest installed with pip or conda. Detailed
+        installation instructions can be found here:
+            https://johannesbuchner.github.io/PyMultiNest/ """
+        print(msg)
+        import sys
+        sys.exit(1)
+
+
     pymultinest.run(loglike, myprior, NP,
             importance_nested_sampling = not opts.NOIMPSAMP,
             verbose = False if opts.QUIET else True,
