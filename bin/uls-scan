@@ -112,7 +112,10 @@ if __name__=="__main__":
     EE = []
     print("Scanning {} in [{},{}] for {} values".format(pscan, pmin, pmax, opts.NSCAN))
 
-    for p in PP:
+    from progressbar import ProgressBar
+    pbar = ProgressBar()
+
+    for p in pbar(PP):
         FIX[pscan] = p
         etaB = LEPTO(FIX)
         EE.append(etaB)
