@@ -3,7 +3,7 @@ import ulysses
 import numpy as np
 from odeintw import odeintw
 
-from numba import jit
+from ulysses.numba import jit
 
 @jit
 def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,d1,d2,w1,w2,n1eq,n2eq):

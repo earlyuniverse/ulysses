@@ -3,7 +3,7 @@ import numpy as np
 from scipy import interpolate
 from scipy.integrate import odeint
 from scipy.special import zeta
-from numba import jit
+from ulysses.numba import jit
 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++#

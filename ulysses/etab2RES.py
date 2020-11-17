@@ -2,7 +2,7 @@
 import ulysses
 import numpy as np
 from odeintw import odeintw
-from numba import jit
+from ulysses.numba import jit
 
 @jit
 def fast_RHS(y0, eps2tt,eps2mm,eps2ee,eps1tt,eps1mm,eps1ee,C,d1,d2,w1,w2,n1eq,n2eq):
@@ -52,7 +52,7 @@ class EtaB_2RES(ulysses.ULSBase):
             self._n2eq          = self.N2Eq(zzz)
             self._currz=zzz
 
-        from numba.typed import List
+        from ulysses.numba import List
         C=List()
         [C.append(c) for c in _C]
         return fast_RHS(y0, eps2tt, eps2mm, eps2ee, eps1tt, eps1mm, eps1ee, C,self._d1,self._d2,self._w1,self._w2,self._n1eq,self._n2eq)

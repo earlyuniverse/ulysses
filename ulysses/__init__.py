@@ -1,3 +1,5 @@
+from ulysses import numba
+
 from ulysses.tools import *
 
 from ulysses.ulsbase import ULSBase

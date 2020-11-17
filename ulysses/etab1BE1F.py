@@ -4,7 +4,7 @@ import numpy as np
 from odeintw import odeintw
 
 
-from numba import jit
+from ulysses.numba import jit
 @jit
 def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee):
     N1      = y0[0]
