@@ -100,7 +100,7 @@ def loadPlugin(model, **kwargs):
     m_file, m_name = model.split(":")
     import os
     if not os.path.exists(m_file):
-        raise Exception("Specified module file '{}' does not exist.{}".format(m_file))
+        raise Exception("Specified module file '{}' does not exist.".format(m_file))
 
     # https://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
     from importlib.machinery import SourceFileLoader
