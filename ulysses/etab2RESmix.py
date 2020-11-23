@@ -83,7 +83,6 @@ class EtaB_2RESmix(ulysses.ULSBase):
         _C = [  self.c1a(2), self.c1a(1), self.c1a(0), self.c2a(2), self.c2a(1), self.c2a(0)]
         _K = [np.real(self.k1), np.real(self.k2)]
 
-        ys      = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C, _K]), atol=1e-14, rtol = 1e-10)
-        self.moreys = np.real(ys[:, [0,1,2,3,4]])
+        ys      = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C, _K]), atol=1e-10)
         self.setEvolData(ys)
         return self.ys[-1][-1]
