@@ -18,6 +18,7 @@ from ulysses.etab3DMEsct              import EtaB_3DMEsct
 from ulysses.etab1BE1Fsf              import EtaB_1BE1Fsf
 
 from ulysses.etab2RES                 import EtaB_2RES # Buggy
+from ulysses.etab2RESmix              import EtaB_2RESmix
 from ulysses.etab2RESsp               import EtaB_2RESsp
 
 testpars = {
