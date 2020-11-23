@@ -732,6 +732,25 @@ class ULSBase(object):
         fosc      = ((M[i,i]**2 - M[j,j]**2) * M[i,i] * gammaj) /((M[i,i]**2-M[j,j]**2)**2 +  detpiece * (M[i,i] * gammai + M[j,j] * gammaj)**2)
         epsbar    = -epsbar1 * (fosc + fmix)
         return epsbar
+    
+    def epsiloniaaRESmix(self,a,i,j):
+        """
+        CP asymmetry for resonant leptogenesis in terms of i and j.
+        """
+        l         = self.h
+        ldag      = np.conjugate(np.transpose(l))
+        lcon      = np.conjugate(l)
+        M         = self.DM
+        lsquare   = np.dot(ldag,l)[0:2,0:2]
+        detpiece  = np.linalg.det(np.real(lsquare))/(lsquare[0,0]*lsquare[1,1])
+        gammai    = (lsquare[i,i]/(8*np.pi))*M[i,i]
+        gammaj    = (lsquare[j,j]/(8*np.pi))*M[j,j]
+        DeltaM    = M[j,j]-M[i,i]
+        sum1      = np.imag(ldag[i,a]*l[a,j]*lsquare[i,j]) + (M[i,i]/M[j,j]) * np.imag(ldag[i,a]*l[a,j]*lsquare[j,i])
+        epsbar1   = sum1/(lsquare[0,0]*lsquare[1,1])
+        fmix      = ((M[i,i]**2 - M[j,j]**2) * M[i,i] * gammaj)/((M[i,i]**2 - M[j,j]**2)**2 + M[i,i]**2 * gammaj**2)#-2*(DeltaM/gammaj)/(1+(2*DeltaM/gammaj)**2)
+        epsbar    = -epsbar1 * fmix
+        return epsbar
 
     def resonance(self, z):
         """
