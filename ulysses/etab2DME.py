@@ -77,8 +77,8 @@ class EtaB_2DME(ulysses.ULSBase):
         k1term,k2term = K
 
         if zzz != self._currz or zzz == self.zmin:
-            self._d1      = np.real(self.DS(k1term, zzz))
-            self._w1      = self.scat(zzz)*np.real(self.W1(k1term, zzz))
+            self._d1      = np.real(self.D1(k1term, zzz))
+            self._w1      = np.real(self.W1(k1term, zzz))
             self._d2      = np.real(self.D2(k2term, zzz))
             self._w2      = np.real(self.W2(k2term, zzz))
             self._n1eq    = self.N1Eq(zzz)
