@@ -34,7 +34,7 @@ class EtaB_2BE2F(ulysses.ULSBase):
     """
 
     def shortname(self): return "2BE2F"
-    def flavourindices(self): return [1, 2]
+    def flavourindices(self): return [2, 3]
     def flavourlabels(self): return ["$N_{\\tau\\tau}$", "$N_{\\tau\perp\\tau\perp}$"]
 
     def RHS(self, y0, z, ETA, _C, K):
