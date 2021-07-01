@@ -1,8 +1,11 @@
-##################################################################################
-#                                                                                #
-#                    Schwarzschild and Kerr BHs Library                          #
-#                                                                                #
-##################################################################################
+###################################################################################################
+#                                                                                                 #
+#                               Schwarzschild and Kerr BHs Library                                #
+#                                                                                                 #
+#         Authors: Andrew Cheek, Lucien Heurtier, Yuber F. Perez-Gonzalez, Jessica Turner         #
+#                                   Based on: arXiv:2107.xxxxx                                    #
+#                                                                                                 #
+###################################################################################################
 
 import numpy as np
 import pandas as pd
@@ -31,7 +34,7 @@ ms   = 95e-3
 mc   = 1.275
 mb   = 4.18
 mt   = 173.1
-mg   = 0.6              # Ficticious gluon mass ---> indicates the QCD phase transition
+mg   = 0.6      # Ficticious gluon mass ---> indicates the QCD phase transition
 
 # Degrees of freedom of the SM ---> Before the EW phase transition
 
@@ -68,9 +71,8 @@ cm_in_invkeV = 5.067730938543699e7       # 1cm in keV^-1
 year_in_s    = 3.168808781402895e-8      # 1 year in s
 GeV_in_invs  = cm_in_invkeV * c * 1.e11  # 1 GeV in s^-1
 
-MPL   = mPL * GeV_in_g   # Planck mass in g
-
-kappa  =  mPL**4 * GeV_in_g**3     # Evaporation constant in g^3 * GeV -- from PRD41(1990)3052
+MPL   = mPL * GeV_in_g        # Planck mass in g
+kappa = mPL**4 * GeV_in_g**3  # Evaporation constant in g^3 * GeV
 
 #-------------------------------------------------------------------------------------------------------------------------------------#
 #                                                  Evaporation functions for Kerr BHs                                                 #
@@ -229,7 +231,7 @@ def Gamma_GO(M, ast, m):# Geometric optics limit
 #-------------------------------------------------------------------------------------------------------------------------------------#
 
 #-------------------------------------------------------------------#
-#                         f and g functions                         #
+#                     Fitted f and g functions                      #
 #            taken from PRD14(1976)3260 + 9801044[gr-qc]            #
 #-------------------------------------------------------------------#
 
