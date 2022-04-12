@@ -29,7 +29,7 @@ def f_YHeqSM(z): # this is simply a constant ask Brian
 def f_nNeq(M ,z):
     return (M * M * Tew * kn(2, M * z /Tew)) / (2. * np.pi * np.pi * z )
     
-def f_YNeq(M z):
+def f_YNeq(M, z):
     return f_nNeq(M ,z)/ f_ss(z)
     
 def f_Yieldeq(M, z):
@@ -41,10 +41,8 @@ def f_convertmutoY(z):
 def f_convertYBLtoYB(z):
     return z * 28./79.
 
-def f_DYNeq(M, z):
-    mathematicaoutput =  (45. * M**2 * x * kn(2, (M * x)/Tew))/(2. * gss * np.pi**4 * Tew**2) +
-     -  (45. * M**3 * x**2 * (-kn(1 , (M * x)/Tew) - kn( 3 , (M * x)/Tew)))/
-     -   (8. * gss * np.pi**4 * Tew**3)
+def f_DYNeq(M, x):
+    mathematicaoutput =  (45. * M**2 * x * kn(2, (M * x)/Tew))/(2. * gss * np.pi**4 * Tew**2)  - (45. * M**3 * x**2 * (-kn(1 , (M * x)/Tew) - kn( 3 , (M * x)/Tew)))/  -   (8. * gss * np.pi**4 * Tew**3)
     return mathematicaoutput
 
 def commutator(X, Y):
@@ -71,19 +69,20 @@ def matrix_rot12(th12):
                     [-np.sin(th12), np.cos(th12), 0.0],
                     [          0.0,  0.0,         1.0]])
 
-def matrix_rot13(th13, delta):
-    return np.array([[                     np.cos(th13), 0.0, np.sin(th13) * np.exp(-1j * delta)],
+def matrix_rot13(th13):
+    return np.array([[                     np.cos(th13), 0.0, np.sin(th13) ],
                     [                     0.0         , 1.0, 0.0                               ],
-                    [-np.sin(th13)* np.exp(1j * delta), 0.0, np.cos(th13)]],
+                    [-np.sin(th13), 0.0, np.cos(th13)]],
                     dtype=np.complex64)
 
 def matrix_pmns(th12, th13, th23, delta, alpha1):
-    return matrix_rot23(th23) @ matrix_diag3(np.exp(-1j * delta/2),  1, np.exp(1j * delta/2)) @ matrix_rot13(th13, delta) @  matrix_diag3(np.exp(1j * delta/2),  1, np.exp(-1j * delta/2)) @ matrix_rot12(th12) @ matrix_diag3(1, np.exp(-1j * alpha1), 1)
+    return matrix_rot23(th23) @ matrix_diag3(np.exp(-1j * delta/2),  1, np.exp(1j * delta/2)) @ matrix_rot13(th13) @  matrix_diag3(np.exp(1j * delta/2),  1, np.exp(-1j * delta/2)) @ matrix_rot12(th12) @ matrix_diag3(1, np.exp(-1j * alpha1), 1)
 
     
-from ulysses.numba import jit
-@jit
-def fast_RHS(y, z, Fmat, M1, deltaM):
+#from ulysses.numba import jit
+#@jit
+def fast_RHS(y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM):
+    Fmat               = np.matrix([[Fmat11, Fmat12],[Fmat21, Fmat22],[Fmat31, Fmat32]])
 
 # constants
     c0LPM   = 4.22
@@ -111,10 +110,10 @@ def fast_RHS(y, z, Fmat, M1, deltaM):
 
 # matrices
     r_mat       = np.matrix([[0,0], [0, r2**3]], dtype=np.complex128)
-    omu_mat     =
+
   
 # RHS matrices
-    chi_mat     =  -1./711. * np.matrix([[257,  20,  20], [20,  257,  20], [20, 20, 257 ]], dtype=np.real128)
+    chi_mat     =  -1./711. * np.matrix([[257,  20,  20], [20,  257,  20], [20, 20, 257 ]])
     RN_mat      =  np.matrix([[y[0], y[1]], [y[2], y[3]]], dtype=np.complex128)
     RNb_mat     =  np.matrix([[y[4], y[5]], [y[6], y[7]]], dtype=np.complex128)
     mud_mat     =  np.matrix([[y[8],  0,  0], [0,  y[9],  0], [0, 0, y[10] ]], dtype=np.complex128)
@@ -131,21 +130,15 @@ def fast_RHS(y, z, Fmat, M1, deltaM):
     FstarRNbFtrans_mat = np.conjugate(Fmat) @ RNb_mat @ Fmat.T
     FFdagger           = Fmat @ Fmat.H
     
-    RNRHS_mat   = 1j * commutator(RN_mat, WN_mat) + 3j * z * z * commutator(RN_mat,r_mat) - phi0 * anticommutator(RN_mat, WN_mat)
-                  - phit0  * anticommutator(RN_mat, WNLNV_mat) + 2 * phi0 * WN_mat + 2 * phit0 * WNLNV_mat + phi1a * omu_mat
-                  - phit1a * omuLNV_mat + 0.5 * phi1b * anticommutator(omu_mat, RN_mat) - 0.5 * phit1b * anticommutator(omuLNV_mat, RN_mat)
-                  - RN_mat/f_YNeq(M1, z) * f_DYNeq(M1, z)
+#    from IPython import embed
+#    embed()
+    
+    RNRHS_mat   = 1j * commutator(RN_mat, WN_mat) + 3j * z * z * commutator(RN_mat,r_mat) - phi0 * anticommutator(RN_mat, WN_mat) - phit0  * anticommutator(RN_mat, WNLNV_mat) + 2 * phi0 * WN_mat + 2 * phit0 * WNLNV_mat + phi1a * omu_mat - phit1a * omuLNV_mat + 0.5 * phi1b * anticommutator(omu_mat, RN_mat) - 0.5 * phit1b * anticommutator(omuLNV_mat, RN_mat) - RN_mat/f_YNeq(M1, z) * f_DYNeq(M1, z)
+    
 
-    RNbRHS_mat  = 1j * commutator(RNb_mat, WN_mat.T) + 3j * z * z * commutator(RNb_mat,r_mat) - phi0 * anticommutator(RNb_mat, WN_mat.T)
-                  - phit0  * anticommutator(RNb_mat, WNLNV_mat.T) + 2 * phi0 * WN_mat.T + 2 * phit0 * WNLNV_mat.T + phi1a * omub_mat
-                  - phit1a * omubLNV_mat + 0.5 * phi1b * anticommutator(omub_mat, RNb_mat) - 0.5 * phit1b * anticommutator(omubLNV_mat, RNb_mat)
-                  - RNb_mat/f_YNeq(M1, z) * f_DYNeq(M1, z)
+    RNbRHS_mat  = 1j * commutator(RNb_mat, WN_mat.T) + 3j * z * z * commutator(RNb_mat,r_mat) - phi0 * anticommutator(RNb_mat, WN_mat.T) - phit0  * anticommutator(RNb_mat, WNLNV_mat.T) + 2 * phi0 * WN_mat.T + 2 * phit0 * WNLNV_mat.T + phi1a * omub_mat - phit1a * omubLNV_mat + 0.5 * phi1b * anticommutator(omub_mat, RNb_mat) - 0.5 * phit1b * anticommutator(omubLNV_mat, RNb_mat) - RNb_mat/f_YNeq(M1, z) * f_DYNeq(M1, z)
                   
-    muDeltaRHS  = M0/(32 * Tew) * (
-                      (M1 * M1 * phit0  - phi0) *                                    (  FRNFdagger_mat - FstarRNbFtrans_mat )
-                    + (0.5 * phi1b     - 0.5 * M1 * M1 * phit1b )        *           (  FRNFdagger_mat + FstarRNbFtrans_mat ) @ mu_mat
-                    + (M1 * M1 * phit1a  + phi1a)                        *           (  FFdagger                            ) @ mu_mat
-                    ).diagonal()
+    muDeltaRHS  = M0/(32 * Tew) * ((M1 * M1 * phit0  - phi0) *    (  FRNFdagger_mat - FstarRNbFtrans_mat ) + (0.5 * phi1b     - 0.5 * M1 * M1 * phit1b )        *           (  FRNFdagger_mat + FstarRNbFtrans_mat ) @ mu_mat + (M1 * M1 * phit1a  + phi1a)                        *           (  FFdagger      ) @ mu_mat).diagonal()
                     
                     
     
@@ -166,22 +159,51 @@ class EtaB_ARS(ulysses.ULSBase):
     def RHS(self, y, z, Fmat, M1, deltaM):
 
       
-        return fast_RHS(y, z, Fmat, M1, deltaM):
+        return fast_RHS(y, z, Fmat, M1, deltaM)
 
-    @property
-    def EtaB(self):
-        # intial conditions in the order RN11, RN12, RN21, RN22, RNb11, RNb12, RNb21, RNb22, mudelta1, mudelta2,  mudelta3
+#    @property
+if __name__=="__main__":
+#    def EtaB(self):
+#        # intial conditions in the order RN11, RN12, RN21, RN22, RNb11, RNb12, RNb21, RNb22, mudelta1, mudelta2,  mudelta3
         y0       = np.array([1+0j,0+0j, 0+0j, 1+0j, 1+0j, 0+0j, 0+0j, 1+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
 
-        params   = np.array([epstt,epsmm,epsee,k], dtype=np.complex128)
-     
-        mnu      = matrix_diag3(m1, m2, m3)
-        mM       = matrix_diag2(M1, M2)
-        omegaval = np.pi/4 - 0.7 * j
-        R_mat    = np.matrix([ [0,0] , [np.cos(omegaval), np.sin(omegaval)] , [-np.sin(omegaval), np.cos(omegaval)] ])
-     
-        ys      = odeintw(self.RHS, y0, self.zs, args = tuple(params))
-        self.setEvolData(ys)
+#        params   = np.array([epstt,epsmm,epsee,k], dtype=np.complex128)
+        
+        # CI parameters for test
+        th12val  = np.arcsin(0.557)
+        th13val  = np.arcsin(0.1497)
+        th23val  = np.arcsin(0.75)
+        omegaval = np.pi/4 - 0.7 * 1j
+        m1val    = 0.
+        m2val    = 8.6e-12
+        m3val    = 58e-12
+        M1val    = 40.0
+        dMval    = 0.2e-10
+        M2val    = M1val + dMval
+        deltaval = 221. * np.pi/180.
+        alpha1val= np.pi/3 - deltaval
+        vev      = 246.
+        
 
-        return self.ys[-1][-1]
+        
+        # construct the CI parametrsition for internal tests
+        
+        mnu      = matrix_diag3(m1val, m2val, m3val)
+        mM       = matrix_diag2(M1val, M2val)
+        R_mat    = np.matrix([ [0,0] , [np.cos(omegaval), np.sin(omegaval)] , [-np.sin(omegaval), np.cos(omegaval)] ])
+        
+        
+        Fmat     = (np.sqrt(2)/ vev) * matrix_pmns(th12val, th13val, th23val, deltaval, alpha1val).conjugate() @ np.sqrt( mnu ) @ R_mat.conjugate() @ np.sqrt(mM)
+
+#fast_RHS(y, z, Fmat, M1, deltaM)
+        zs      = np.geomspace(1e-6, 1.0, 100)
+        print(Fmat)
+        print(Fmat.shape)
+#        from IPython import embed
+#        embed()
+        params  = np.array([Fmat[0, 0], Fmat[0, 1], Fmat[1, 0], Fmat[1, 1], Fmat[2, 0], Fmat[2, 1], M1val, dMval], dtype=np.complex128)
+#        fast_RHS(y0, 1, Fmat, M1val, dMval)
+        ys      = odeintw(fast_RHS, y0, zs,  args=tuple(params))
+
+#        print(ys[-1][-1]), args = tuple([Fmat, M1val, dMval])
 
