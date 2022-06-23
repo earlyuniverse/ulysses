@@ -3,6 +3,7 @@ from scipy.special import kn
 import ulysses
 import numpy as np
 from odeintw import odeintw
+import matplotlib.pyplot as plt
 
 
 # global constants (masses in GeV)
@@ -25,15 +26,18 @@ def f_nphieqSM(z):
     
 def f_YHeqSM(z): # this is simply a constant ask Brian
     return (2 * f_nphieqSM(z) )/ f_ss(z)
-    
+
+
 def f_nNeq(M ,z):
-    return (M * M * Tew * kn(2, M * z /Tew)) / (2. * np.pi * np.pi * z )
+    temp = M * z /Tew
+    return (M * M * Tew * kn(2, temp.real)) / (2. * np.pi * np.pi * z )
     
 def f_YNeq(M, z):
     return f_nNeq(M ,z)/ f_ss(z)
     
 def f_Yieldeq(M, z):
-    return (45. / (4. * np.pi**4 * gss) * (M * z / Tew) * (M * z / Tew)) * kn(2, M * z /Tew)
+    temp = M * z /Tew
+    return (45. / (4. * np.pi**4 * gss) * (M * z / Tew) * (M * z / Tew)) * kn(2, temp.real)
     
 def f_convertmutoY(z):
     return (z * 90.) /(12 * np.pi**2 * gss)
@@ -42,7 +46,8 @@ def f_convertYBLtoYB(z):
     return z * 28./79.
 
 def f_DYNeq(M, x):
-    mathematicaoutput =  (45. * M**2 * x * kn(2, (M * x)/Tew))/(2. * gss * np.pi**4 * Tew**2)  - (45. * M**3 * x**2 * (-kn(1 , (M * x)/Tew) - kn( 3 , (M * x)/Tew)))/  -   (8. * gss * np.pi**4 * Tew**3)
+    temp = M * x /Tew
+    mathematicaoutput =  (45. * M**2 * x * kn(2, temp.real))/(2. * gss * np.pi**4 * Tew**2)  - (45. * M**3 * x**2 * (-kn(1 , temp.real) - kn( 3 , temp.real)))/  -   (8. * gss * np.pi**4 * Tew**3)
     return mathematicaoutput
 
 def commutator(X, Y):
@@ -71,7 +76,7 @@ def matrix_rot12(th12):
 
 def matrix_rot13(th13):
     return np.array([[                     np.cos(th13), 0.0, np.sin(th13) ],
-                    [                     0.0         , 1.0, 0.0                               ],
+                    [                     0.0         , 1.0, 0.0   ],
                     [-np.sin(th13), 0.0, np.cos(th13)]],
                     dtype=np.complex64)
 
@@ -79,11 +84,11 @@ def matrix_pmns(th12, th13, th23, delta, alpha1):
     return matrix_rot23(th23) @ matrix_diag3(np.exp(-1j * delta/2),  1, np.exp(1j * delta/2)) @ matrix_rot13(th13) @  matrix_diag3(np.exp(1j * delta/2),  1, np.exp(-1j * delta/2)) @ matrix_rot12(th12) @ matrix_diag3(1, np.exp(-1j * alpha1), 1)
 
     
-#from ulysses.numba import jit
-#@jit
-def fast_RHS(y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM):
-    Fmat               = np.matrix([[Fmat11, Fmat12],[Fmat21, Fmat22],[Fmat31, Fmat32]])
 
+def fast_RHS(y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM):
+#    Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM = params
+    Fmat    = np.matrix([[Fmat11, Fmat12],[Fmat21, Fmat22],[Fmat31, Fmat32]])
+    z       = 1
 # constants
     c0LPM   = 4.22
     c1aLPM  = 3.56
@@ -105,22 +110,30 @@ def fast_RHS(y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM):
     phit1b   = (0.101461 * z * z)/ (Tew * Tew)
     FdF     = Fmat.H @ Fmat
     deltaM2 = 2 * M1 * deltaM + deltaM * deltaM
-    TL2     = 377923. * deltaM2**1./3.
+    TL2     = 377923. * deltaM2**(1./3.)
     r2      = TL2/Tew
 
 # matrices
     r_mat       = np.matrix([[0,0], [0, r2**3]], dtype=np.complex128)
-
   
 # RHS matrices
     chi_mat     =  -1./711. * np.matrix([[257,  20,  20], [20,  257,  20], [20, 20, 257 ]])
+ 
     RN_mat      =  np.matrix([[y[0], y[1]], [y[2], y[3]]], dtype=np.complex128)
     RNb_mat     =  np.matrix([[y[4], y[5]], [y[6], y[7]]], dtype=np.complex128)
     mud_mat     =  np.matrix([[y[8],  0,  0], [0,  y[9],  0], [0, 0, y[10] ]], dtype=np.complex128)
+    
     mu_mat      =  2 * chi_mat @ mud_mat
+
+
     WN_mat      =  (0.057018 * M0)/Tew * FdF
+
     WNLNV_mat   =  (0.057018 * M0)/Tew * M1 * M1 * FdF
+
+    
     omu_mat     =  (4.048280300459774e16 / Tew) * Fmat.H @ mu_mat @ Fmat
+    
+
     omub_mat    = -(4.048280300459774e16 / Tew) * Fmat.T @ mu_mat @ np.conjugate(Fmat)
     omuLNV_mat  =  omu_mat * M1 * M1
     omubLNV_mat =  omub_mat * M1 * M1
@@ -141,13 +154,31 @@ def fast_RHS(y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM):
     muDeltaRHS  = M0/(32 * Tew) * ((M1 * M1 * phit0  - phi0) *    (  FRNFdagger_mat - FstarRNbFtrans_mat ) + (0.5 * phi1b     - 0.5 * M1 * M1 * phit1b )        *           (  FRNFdagger_mat + FstarRNbFtrans_mat ) @ mu_mat + (M1 * M1 * phit1a  + phi1a)                        *           (  FFdagger      ) @ mu_mat).diagonal()
                     
                     
-    
-    return RNRHS_mat.flatten().tolist() + RNbRHS_mat.flatten().tolist() +  muDeltaRHS.flatten().tolist()
+    stuff = np.array([1+0j,0+0j, 0+0j, 1+0j, 1+0j, 0+0j, 0+0j, 1+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
 
+#    return RNRHS_mat.flatten().tolist() + RNbRHS_mat.flatten().tolist() +  muDeltaRHS.flatten().tolist()
+    stuff[0]  = RNRHS_mat[0,0]
+    stuff[1]  = RNRHS_mat[0,1]
+    stuff[2]  = RNRHS_mat[1,0]
+    stuff[3]  = RNRHS_mat[1,1]
+    
+    stuff[4]  = RNbRHS_mat[0,0]
+    stuff[5]  = RNbRHS_mat[0,1]
+    stuff[6]  = RNbRHS_mat[1,0]
+    stuff[7]  = RNbRHS_mat[1,1]
+    
+    stuff[8]  = muDeltaRHS[0,0]
+    stuff[9]  = muDeltaRHS[0,1]
+    stuff[10] = muDeltaRHS[0,2]
+    
+    return stuff
+#    other = RNRHS_mat.flatten().tolist() + RNbRHS_mat.flatten().tolist() +  muDeltaRHS.flatten().tolist()
+#    from IPython import embed
+#    embed()
+    
 class EtaB_ARS(ulysses.ULSBase):
     """
-    Boltzmann equation (BE) for resonant leptogenesis with RHNs. See arxiv:2109.10908
-    Eqns. 33 and 34.
+    add description of where to find BEs
     """
 
     def shortname(self): return "BEARS"
@@ -156,13 +187,14 @@ class EtaB_ARS(ulysses.ULSBase):
 
     def flavourlabels(self): return ["$NBL$"]
 
-    def RHS(self, y, z, Fmat, M1, deltaM):
+    def RHS(self, y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM ):
 
-      
-        return fast_RHS(y, z, Fmat, M1, deltaM)
+        return fast_RHS(y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM)
 
+    @property
+    def EtaB(self):
 #    @property
-if __name__=="__main__":
+#if __name__=="__main__":
 #    def EtaB(self):
 #        # intial conditions in the order RN11, RN12, RN21, RN22, RNb11, RNb12, RNb21, RNb22, mudelta1, mudelta2,  mudelta3
         y0       = np.array([1+0j,0+0j, 0+0j, 1+0j, 1+0j, 0+0j, 0+0j, 1+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
@@ -192,18 +224,33 @@ if __name__=="__main__":
         mM       = matrix_diag2(M1val, M2val)
         R_mat    = np.matrix([ [0,0] , [np.cos(omegaval), np.sin(omegaval)] , [-np.sin(omegaval), np.cos(omegaval)] ])
         
-        
         Fmat     = (np.sqrt(2)/ vev) * matrix_pmns(th12val, th13val, th23val, deltaval, alpha1val).conjugate() @ np.sqrt( mnu ) @ R_mat.conjugate() @ np.sqrt(mM)
+#        print(Fmat)
 
 #fast_RHS(y, z, Fmat, M1, deltaM)
-        zs      = np.geomspace(1e-6, 1.0, 100)
-        print(Fmat)
-        print(Fmat.shape)
+        zs      = np.geomspace(1e-6, 1.0, 1000)
+#        print(zs)
+        
+        params  = np.array([Fmat[0, 0], Fmat[0, 1], Fmat[1, 0], Fmat[1, 1], Fmat[2, 0], Fmat[2, 1], M1val, dMval], dtype=np.complex128)
 #        from IPython import embed
 #        embed()
-        params  = np.array([Fmat[0, 0], Fmat[0, 1], Fmat[1, 0], Fmat[1, 1], Fmat[2, 0], Fmat[2, 1], M1val, dMval], dtype=np.complex128)
 #        fast_RHS(y0, 1, Fmat, M1val, dMval)
-        ys      = odeintw(fast_RHS, y0, zs,  args=tuple(params))
+        ys        = odeintw(self.RHS, y0, zs,  args = tuple(params))
+#        return ys[-1][-1]
+        mudelta1  = ys[-1][-3]
+        mudelta2  = ys[-1][-2]
+        mudelta3  = ys[-1][-1]
+        sumdeltas = np.abs(mudelta1 + mudelta2 + mudelta3)
+        
+        tableData = [[ys[-1,0], ys[-1,1], ys[-1,2], ys[-1,3], ys[-1,4], ys[-1,5], ys[-1,6], ys[-1,7], ys[-1,8], ys[-1,9], ys[-1,10]]]
+        for v in zip(*tableData):
+            print (*v)
 
-#        print(ys[-1][-1]), args = tuple([Fmat, M1val, dMval])
-
+#        print( ys[-1,0],ys[-1,1],ys[-1,2],ys[-1,3], ys[-1,4],ys[-1,5],ys[-1,6],ys[-1,7])
+#        plt.plot(zs , np.abs(ys[:,-1]))
+#        plt.xscale('log')
+#        plt.yscale('log')
+#        plt.xlabel('time')
+#        plt.ylabel('y(t)')
+#        plt.show()
+        return ys[-1][-1]
