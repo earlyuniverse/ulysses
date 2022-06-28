@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 # global constants (masses in GeV)
 Tew   = 131.7
+#this needs to be changed to 106.75
 gss   = 107.75
 M0    = 7.1e17
 zeta3 = 1.20206
@@ -24,7 +25,7 @@ def f_HH(z):
 def f_nphieqSM(z):
     return f_TSM(z)**3/(np.pi * np.pi)
     
-def f_YHeqSM(z): # this is simply a constant ask Brian
+def f_YHeqSM(z):
     return (2 * f_nphieqSM(z) )/ f_ss(z)
 
 
@@ -142,35 +143,20 @@ def fast_RHS(y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM):
     omubLNV_mat =  omub_mat * M1 * M1
     
 # matrices for muDeltaRHS
-#    FRNFdagger_mat     = Fmat @ RN_mat @ Fmat.H
-#    FstarRNbFtrans_mat = np.conjugate(Fmat) @ RNb_mat @ Fmat.T
-#
-#    FFdagger           = Fmat @ Fmat.H
-#
-#    RNRHS_mat   = 1j * commutator(RN_mat, WN_mat)                                                                                                                                                   + 3j * z * z * commutator(RN_mat,r_mat)                                                                                                                                            - phit0  * anticommutator(RN_mat, WNLNV_mat)                                                                                                                                       - phi0 * anticommutator(RN_mat, WN_mat)                                                                                                                                            + 2 * phi0 * WN_mat                                                                                                                                                                + 2 * phit0 * WNLNV_mat                                                                                                                                                            - RN_mat/f_YNeq(M1, z) * f_DYNeq(M1, z)                                                                                                                                            + phi1a * omu_mat                                                                                                                                                                  - phit1a * omuLNV_mat                                                                                                                                                              + 0.5 * phi1b * anticommutator(omu_mat, RN_mat)                                                                                                                                    - 0.5 * phit1b * anticommutator(omuLNV_mat, RN_mat)
-#
-#    RNbRHS_mat  = 1j * commutator(RNb_mat, WN_mat.T)                                                                                                                                                + 3j * z * z * commutator(RNb_mat,r_mat)                                                                                                                                           - phit0  * anticommutator(RNb_mat, WNLNV_mat.T)                                                                                                                                    - RNb_mat/f_YNeq(M1, z) * f_DYNeq(M1, z)                                                                                                                                           - phi0 * anticommutator(RNb_mat, WN_mat.T)                                                                                                                                         +  2 * phi0 * WN_mat.T                                                                                                                                                             +  2 * phit0 * WNLNV_mat.T                                                                                                                                                         + phi1a * omub_mat                                                                                                                                                                 - phit1a * omubLNV_mat                                                                                                                                                             - 0.5 * phit1b * anticommutator(omubLNV_mat, RNb_mat)                                                                                                                              + 0.5 * phi1b  * anticommutator(omub_mat, RNb_mat)
-#
-#    muDeltaRHS  = M0/(32 * Tew) * (  -phi0  * (FRNFdagger_mat - FstarRNbFtrans_mat).diagonal()                                                                                                                          + phi1a * (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )                                                                                                    + phi1b/2. * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal()                                                                       + M1 * M1 * phit0 * ( FRNFdagger_mat - FstarRNbFtrans_mat).diagonal()                                                                                                              - M1 * M1 * phit1a *  (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )                                                                                        - 0.5 * M1 * M1 * phit1b  * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal()                                                                                                 )
-#  # matrices for muDeltaRHS
     FRNFdagger_mat     = Fmat @ RN_mat @ Fmat.H
-#    FstarRNbFtrans_mat = np.conjugate(Fmat) @ RNb_mat @ Fmat.T
     FstarRNbFtrans_mat = np.conjugate(Fmat) @ RNb_mat @ Fmat.T
-
     FFdagger           = Fmat @ Fmat.H
-    
-#    from IPython import embed
-#    embed()
-    RNRHS_mat   = 1j * commutator(RN_mat, WN_mat)                                                           + 3j * z * z * commutator(RN_mat,r_mat)                                                     - phit0  * anticommutator(RN_mat, WNLNV_mat)                                                - phi0 * anticommutator(RN_mat, WN_mat)                                                     + 2 * phi0 * WN_mat                                                                         + 2 * phit0 * WNLNV_mat                                                                     - RN_mat/f_YNeq(M1, z) * f_DYNeq(M1, z)                                                     + phi1a * omu_mat                                                                           - phit1a * omuLNV_mat                                                                       + 0.5 * phi1b * anticommutator(omu_mat, RN_mat)                                             - 0.5 * phit1b * anticommutator(omuLNV_mat, RN_mat)
+
+    RNRHS_mat   = 1j * commutator(RN_mat, WN_mat)     + 3j * z * z * commutator(RN_mat,r_mat)    - phit0  * anticommutator(RN_mat, WNLNV_mat)          - phi0 * anticommutator(RN_mat, WN_mat)    + 2 * phi0 * WN_mat      + 2 * phit0 * WNLNV_mat    - RN_mat/f_YNeq(M1, z) * f_DYNeq(M1, z)   + phi1a * omu_mat    - phit1a * omuLNV_mat       + 0.5 * phi1b * anticommutator(omu_mat, RN_mat)   - 0.5 * phit1b * anticommutator(omuLNV_mat, RN_mat)
     
 
-    RNbRHS_mat  = 1j * commutator(RNb_mat, WN_mat.T)                                                         + 3j * z * z * commutator(RNb_mat,r_mat)                                                   - phit0  * anticommutator(RNb_mat, WNLNV_mat.T)                                             - RNb_mat/f_YNeq(M1, z) * f_DYNeq(M1, z)                                                    - phi0 * anticommutator(RNb_mat, WN_mat.T)                                                  + 2 * phi0 * WN_mat.T                                                                       + 2 * phit0 * WNLNV_mat.T                                                                   + phi1a * omub_mat                                                                          - phit1a * omubLNV_mat                                                                      - 0.5 * phit1b * anticommutator(omubLNV_mat, RNb_mat)                                       + 0.5 * phi1b * anticommutator(omub_mat, RNb_mat)
+    RNbRHS_mat  = 1j * commutator(RNb_mat, WN_mat.T)  + 3j * z * z * commutator(RNb_mat,r_mat)  - phit0  * anticommutator(RNb_mat, WNLNV_mat.T)   - RNb_mat/f_YNeq(M1, z) * f_DYNeq(M1, z)     - phi0 * anticommutator(RNb_mat, WN_mat.T)  + 2 * phi0 * WN_mat.T    + 2 * phit0 * WNLNV_mat.T   + phi1a * omub_mat    - phit1a * omubLNV_mat    - 0.5 * phit1b * anticommutator(omubLNV_mat, RNb_mat)    + 0.5 * phi1b * anticommutator(omub_mat, RNb_mat)
 
 
     
-    muDeltaRHS  = M0/(32 * Tew) * (                                                                      -phi0  * (FRNFdagger_mat - FstarRNbFtrans_mat).diagonal()                                  + phi1a * (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )             + phi1b/2. * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal() + M1 * M1 * phit0 * ( FRNFdagger_mat - FstarRNbFtrans_mat).diagonal() - M1 * M1 * phit1a *  (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )   - 0.5 * M1 * M1 * phit1b  * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal()                                                                                                 )
+    muDeltaRHS  = M0/(32 * Tew) * (   -phi0  * (FRNFdagger_mat - FstarRNbFtrans_mat).diagonal()    + phi1a * (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )             + phi1b/2. * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal() + M1 * M1 * phit0 * ( FRNFdagger_mat - FstarRNbFtrans_mat).diagonal() - M1 * M1 * phit1a *  (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )   - 0.5 * M1 * M1 * phit1b  * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal())
                     
-    stuff = np.array([1+0j,0+0j, 0+0j, 1+0j, 1+0j, 0+0j, 0+0j, 1+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
+    stuff = np.array([0+0j,0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
 
     stuff[0]  = RNRHS_mat[0,0]
     stuff[1]  = RNRHS_mat[0,1]
@@ -207,8 +193,7 @@ class EtaB_ARS(ulysses.ULSBase):
     @property
     def EtaB(self):
 #        # intial conditions in the order RN11, RN12, RN21, RN22, RNb11, RNb12, RNb21, RNb22, mudelta1, mudelta2,  mudelta3
-        y0       = np.array([1+0j,0+0j, 0+0j, 1+0j, 1+0j, 0+0j, 0+0j, 1+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
-
+        y0       = np.array([0+0j,0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
 
         
         # CI parameters for test
@@ -231,9 +216,7 @@ class EtaB_ARS(ulysses.ULSBase):
         mnu      = matrix_diag3(m1val, m2val, m3val)
         mM       = matrix_diag2(M1val, M2val)
         R_mat    = np.matrix([ [0,0] , [np.cos(omegaval), np.sin(omegaval)] , [-np.sin(omegaval), np.cos(omegaval)] ])
-        
         Fmat     = (np.sqrt(2)/ vev) * matrix_pmns(th12val, th13val, th23val, deltaval, alpha1val).conjugate() @ np.sqrt( mnu ) @ R_mat.conjugate() @ np.sqrt(mM)
-
         zs      = np.geomspace(1e-6, 1., 1000)
 
         
@@ -254,4 +237,54 @@ class EtaB_ARS(ulysses.ULSBase):
         tableDataB         = np.abs(tableData)
         for v in zip(*tableDataB):
             print (*v)
+#
+        temp1 = np.empty((zs.size,2))
+        temp2 = np.empty((zs.size,2))
+        temp3 = np.empty((zs.size,2))
+        temp4 = np.empty((zs.size,2))
+        temp5 = np.empty((zs.size,2))
+        temp6 = np.empty((zs.size,2))
+        temp7 = np.empty((zs.size,2))
+        temp8 = np.empty((zs.size,2))
+        temp9 = np.empty((zs.size,2))
+        temp10 = np.empty((zs.size,2))
+        temp11 = np.empty((zs.size,2))
+        
+        temp1[:,0] = zs
+        temp2[:,0] = zs
+        temp3[:,0] = zs
+        temp4[:,0] = zs
+        temp5[:,0] = zs
+        temp6[:,0] = zs
+        temp7[:,0] = zs
+        temp8[:,0] = zs
+        temp9[:,0] = zs
+        temp10[:,0] = zs
+        temp11[:,0] = zs
+        
+        temp1[:,1]  = np.abs(ys[:,0])
+        temp2[:,1]  = np.abs(ys[:,1])
+        temp3[:,1]  = np.abs(ys[:,2])
+        temp4[:,1]  = np.abs(ys[:,3])
+        temp5[:,1]  = np.abs(ys[:,4])
+        temp6[:,1]  = np.abs(ys[:,5])
+        temp7[:,1]  = np.abs(ys[:,6])
+        temp8[:,1]  = np.abs(ys[:,7])
+        temp9[:,1]  = np.abs(ys[:,8])
+        temp10[:,1]  = np.abs(ys[:,9])
+        temp11[:,1]  = np.abs(ys[:,10])
+        
+        np.savetxt('RN11.txt', temp1)
+        np.savetxt('RN12.txt', temp2)
+        np.savetxt('RN21.txt', temp3)
+        np.savetxt('RN22.txt', temp4)
+        np.savetxt('RNb11.txt', temp5)
+        np.savetxt('RNb12.txt', temp6)
+        np.savetxt('RNb21.txt', temp7)
+        np.savetxt('RNb22.txt', temp8)
+        np.savetxt('mu1.txt', temp9)
+        np.savetxt('mu2.txt', temp10)
+        np.savetxt('mu3.txt', temp11)
+
+
         return ys[-1][-1]
