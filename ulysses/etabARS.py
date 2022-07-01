@@ -123,8 +123,8 @@ def fast_RHS(y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM):
     mud_mat     =  np.matrix([[y[8],  0,  0], [0,  y[9],  0], [0, 0, y[10] ]], dtype=np.complex128)
     chi_mat     =  -1./711. * np.matrix([[257,  20,  20], [20,  257,  20], [20, 20, 257 ]], dtype=np.complex128)
  
-    mu_mat      =  np.matrix([[-514/711 * y[8],  0,  0], [0, -514/711 * y[9],  0], [0, 0,-514/711 * y[10] ]], dtype=np.complex128)
-
+#    mu_mat      =  np.matrix([[-514/711 * y[8],  0,  0], [0, -514/711 * y[9],  0], [0, 0,-514/711 * y[10] ]], dtype=np.complex128)
+    mu_mat      = 2 * chi_mat @ mud_mat
 
     WN_mat      =  (np.pi * np.pi * M0)/(144 * zeta3 * Tew) * FdF
     
@@ -154,8 +154,11 @@ def fast_RHS(y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM):
 
 
     
-    muDeltaRHS  = M0/(32 * Tew) * (   -phi0  * (FRNFdagger_mat - FstarRNbFtrans_mat).diagonal()    + phi1a * (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )             + phi1b/2. * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal() + M1 * M1 * phit0 * ( FRNFdagger_mat - FstarRNbFtrans_mat).diagonal() - M1 * M1 * phit1a *  (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )   - 0.5 * M1 * M1 * phit1b  * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal())
-                    
+#    muDeltaRHS  = M0/(32 * Tew) * (   -phi0  * (FRNFdagger_mat - FstarRNbFtrans_mat).diagonal()    + phi1a * (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )             + phi1b/2. * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal() + M1 * M1 * phit0 * ( FRNFdagger_mat - FstarRNbFtrans_mat).diagonal() - M1 * M1 * phit1a *  (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )   - 0.5 * M1 * M1 * phit1b  * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal())
+#    muDeltaRHS  = M0/(32 * Tew) * ( phi1b/2. * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal())
+
+    muDeltaRHS  = M0/(32 * Tew) * (  - phi0  * (FRNFdagger_mat - FstarRNbFtrans_mat ) + phi1a *  mu_mat @  FFdagger   + phi1b/2.* mu_mat @ (FRNFdagger_mat + FstarRNbFtrans_mat) +  M1 * M1 * phit0 * (FRNFdagger_mat - FstarRNbFtrans_mat) - M1 * M1 * phit1a * mu_mat @ FFdagger            - 0.5 * M1 * M1 * phit1b  * mu_mat @ (FRNFdagger_mat + FstarRNbFtrans_mat) ).diagonal()
+#
     stuff = np.array([0+0j,0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
 
     stuff[0]  = RNRHS_mat[0,0]
@@ -193,13 +196,16 @@ class EtaB_ARS(ulysses.ULSBase):
     @property
     def EtaB(self):
 #        # intial conditions in the order RN11, RN12, RN21, RN22, RNb11, RNb12, RNb21, RNb22, mudelta1, mudelta2,  mudelta3
-        y0       = np.array([0+0j,0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
+        y0       = np.array([0.+0j,0+0j, 0+0j, 0.+0j, 0.+0j, 0+0j, 0+0j, 0.+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
 
         
         # CI parameters for test
-        th12val  = np.arcsin(0.557)
+#        th13val  = np.arcsin(0.557)
         th13val  = np.arcsin(0.1497)
+        th12val  = np.arcsin(0.557)
+#        th13val  = np.pi/4.
         th23val  = np.arcsin(0.75)
+#         np.arcsin(0.75)
         omegaval = np.pi/4 - 0.7 * 1j
         m1val    = 0.
         m2val    = 8.6e-12
