@@ -4,6 +4,7 @@ import ulysses
 import numpy as np
 from odeintw import odeintw
 import matplotlib.pyplot as plt
+from scipy.special import zeta
 
 
 # global constants (masses in GeV)
@@ -12,6 +13,8 @@ Tew   = 131.7
 gss   = 107.75
 M0    = 7.1e17
 zeta3 = 1.20206
+gstaro = 43/11 #entropic effective degrees of freedom at present
+
 
 def f_TSM(z):
     return Tew/z
@@ -122,8 +125,6 @@ def fast_RHS(y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM):
     
     mud_mat     =  np.matrix([[y[8],  0,  0], [0,  y[9],  0], [0, 0, y[10] ]], dtype=np.complex128)
     chi_mat     =  -1./711. * np.matrix([[257,  20,  20], [20,  257,  20], [20, 20, 257 ]], dtype=np.complex128)
- 
-#    mu_mat      =  np.matrix([[-514/711 * y[8],  0,  0], [0, -514/711 * y[9],  0], [0, 0,-514/711 * y[10] ]], dtype=np.complex128)
     mu_mat      = 2 * chi_mat @ mud_mat
 
     WN_mat      =  (np.pi * np.pi * M0)/(144 * zeta3 * Tew) * FdF
@@ -154,11 +155,8 @@ def fast_RHS(y, z, Fmat11, Fmat12,Fmat21,Fmat22,Fmat31,Fmat32, M1, deltaM):
 
 
     
-#    muDeltaRHS  = M0/(32 * Tew) * (   -phi0  * (FRNFdagger_mat - FstarRNbFtrans_mat).diagonal()    + phi1a * (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )             + phi1b/2. * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal() + M1 * M1 * phit0 * ( FRNFdagger_mat - FstarRNbFtrans_mat).diagonal() - M1 * M1 * phit1a *  (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )   - 0.5 * M1 * M1 * phit1b  * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal())
-#    muDeltaRHS  = M0/(32 * Tew) * ( phi1b/2. * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal())
+    muDeltaRHS  = M0/(32 * Tew) * (   -phi0  * (FRNFdagger_mat - FstarRNbFtrans_mat).diagonal()    + phi1a * (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )             + phi1b/2. * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal() + M1 * M1 * phit0 * ( FRNFdagger_mat - FstarRNbFtrans_mat).diagonal() - M1 * M1 * phit1a *  (np.diag(np.diag(FFdagger))  @ np.diag(np.diag( mu_mat)).diagonal() )   - 0.5 * M1 * M1 * phit1b  * (np.diag(np.diag(FRNFdagger_mat + FstarRNbFtrans_mat))  @ np.diag(np.diag( mu_mat))).diagonal())
 
-    muDeltaRHS  = M0/(32 * Tew) * (  - phi0  * (FRNFdagger_mat - FstarRNbFtrans_mat ) + phi1a *  mu_mat @  FFdagger   + phi1b/2.* mu_mat @ (FRNFdagger_mat + FstarRNbFtrans_mat) +  M1 * M1 * phit0 * (FRNFdagger_mat - FstarRNbFtrans_mat) - M1 * M1 * phit1a * mu_mat @ FFdagger            - 0.5 * M1 * M1 * phit1b  * mu_mat @ (FRNFdagger_mat + FstarRNbFtrans_mat) ).diagonal()
-#
     stuff = np.array([0+0j,0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
 
     stuff[0]  = RNRHS_mat[0,0]
@@ -197,15 +195,11 @@ class EtaB_ARS(ulysses.ULSBase):
     def EtaB(self):
 #        # intial conditions in the order RN11, RN12, RN21, RN22, RNb11, RNb12, RNb21, RNb22, mudelta1, mudelta2,  mudelta3
         y0       = np.array([0.+0j,0+0j, 0+0j, 0.+0j, 0.+0j, 0+0j, 0+0j, 0.+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
-
         
         # CI parameters for test
-#        th13val  = np.arcsin(0.557)
         th13val  = np.arcsin(0.1497)
         th12val  = np.arcsin(0.557)
-#        th13val  = np.pi/4.
         th23val  = np.arcsin(0.75)
-#         np.arcsin(0.75)
         omegaval = np.pi/4 - 0.7 * 1j
         m1val    = 0.
         m2val    = 8.6e-12
@@ -218,7 +212,6 @@ class EtaB_ARS(ulysses.ULSBase):
         vev      = 246.
         
 
-        
         mnu      = matrix_diag3(m1val, m2val, m3val)
         mM       = matrix_diag2(M1val, M2val)
         R_mat    = np.matrix([ [0,0] , [np.cos(omegaval), np.sin(omegaval)] , [-np.sin(omegaval), np.cos(omegaval)] ])
@@ -229,68 +222,11 @@ class EtaB_ARS(ulysses.ULSBase):
         params  = np.array([Fmat[0, 0], Fmat[0, 1], Fmat[1, 0], Fmat[1, 1], Fmat[2, 0], Fmat[2, 1], M1val, dMval], dtype=np.complex128)
         ys        = odeintw(self.RHS, y0, zs,  args = tuple(params))
         
-        Fmat11    = Fmat[0, 0]
-        Fmat12    = Fmat[0, 1]
-        Fmat21    = Fmat[1, 0]
-        Fmat22    = Fmat[1, 1]
-        Fmat31    = Fmat[2, 0]
-        Fmat32    = Fmat[2, 1]
-        Fmat      = np.matrix([[Fmat11, Fmat12],[Fmat21, Fmat22],[Fmat31, Fmat32]])
-        FdF       = Fmat.H @ Fmat
-
+        print(f_convertmutoY(np.abs(ys[-1,8] + ys[-1,9] + ys[-1,10])))
         
-        tableData          = [[ys[-1,0], ys[-1,1], ys[-1,2], ys[-1,3], ys[-1,4], ys[-1,5], ys[-1,6], ys[-1,7], ys[-1,8], ys[-1,9], ys[-1,10]]]
-        tableDataB         = np.abs(tableData)
-        for v in zip(*tableDataB):
-            print (*v)
-#
-        temp1 = np.empty((zs.size,2))
-        temp2 = np.empty((zs.size,2))
-        temp3 = np.empty((zs.size,2))
-        temp4 = np.empty((zs.size,2))
-        temp5 = np.empty((zs.size,2))
-        temp6 = np.empty((zs.size,2))
-        temp7 = np.empty((zs.size,2))
-        temp8 = np.empty((zs.size,2))
-        temp9 = np.empty((zs.size,2))
-        temp10 = np.empty((zs.size,2))
-        temp11 = np.empty((zs.size,2))
+#         Brian's code returns YN, and ulysses expects etaB so convert YB to etaB
+        YB      = f_convertYBLtoYB(f_convertmutoY(np.abs(ys[-1,8] + ys[-1,9] + ys[-1,10])))
+        YBtoetaB= (gstaro * np.pi**4)/ (45 * zeta(3))
+        print( YB )
+        return YBtoetaB
         
-        temp1[:,0] = zs
-        temp2[:,0] = zs
-        temp3[:,0] = zs
-        temp4[:,0] = zs
-        temp5[:,0] = zs
-        temp6[:,0] = zs
-        temp7[:,0] = zs
-        temp8[:,0] = zs
-        temp9[:,0] = zs
-        temp10[:,0] = zs
-        temp11[:,0] = zs
-        
-        temp1[:,1]  = np.abs(ys[:,0])
-        temp2[:,1]  = np.abs(ys[:,1])
-        temp3[:,1]  = np.abs(ys[:,2])
-        temp4[:,1]  = np.abs(ys[:,3])
-        temp5[:,1]  = np.abs(ys[:,4])
-        temp6[:,1]  = np.abs(ys[:,5])
-        temp7[:,1]  = np.abs(ys[:,6])
-        temp8[:,1]  = np.abs(ys[:,7])
-        temp9[:,1]  = np.abs(ys[:,8])
-        temp10[:,1]  = np.abs(ys[:,9])
-        temp11[:,1]  = np.abs(ys[:,10])
-        
-        np.savetxt('RN11.txt', temp1)
-        np.savetxt('RN12.txt', temp2)
-        np.savetxt('RN21.txt', temp3)
-        np.savetxt('RN22.txt', temp4)
-        np.savetxt('RNb11.txt', temp5)
-        np.savetxt('RNb12.txt', temp6)
-        np.savetxt('RNb21.txt', temp7)
-        np.savetxt('RNb22.txt', temp8)
-        np.savetxt('mu1.txt', temp9)
-        np.savetxt('mu2.txt', temp10)
-        np.savetxt('mu3.txt', temp11)
-
-
-        return ys[-1][-1]
