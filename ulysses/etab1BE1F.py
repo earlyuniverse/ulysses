@@ -36,8 +36,6 @@ class EtaB_1BE1F(ulysses.ULSBase):
             self._w1      = np.real(self.W1(k,z))
             self._n1eq    = self.N1Eq(z)
             self._currz=z
-#        from IPython import embed
-#        embed()
         return fast_RHS(y0, self._d, self._w1, self._n1eq, epstt,epsmm,epsee)
 
     @property
@@ -54,5 +52,4 @@ class EtaB_1BE1F(ulysses.ULSBase):
 
         ys      = odeintw(self.RHS, y0, self.zs, args = tuple(params))
         self.setEvolData(ys)
-
         return self.ys[-1][-1]
