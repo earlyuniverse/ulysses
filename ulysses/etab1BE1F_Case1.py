@@ -75,8 +75,12 @@ def NLrhs(z, Nl, K, eps, case, highlim = 300, epsrel = 1e-10, epsabs = 1e-10):
         D = z * K * (kn(1, z) / kn(2, z))
         alpha = calc.solD1_.sol(z) - 0.375 * z * z * kn(2, z)
         W = 0.25 * K * z * z * z * kn(1, z)
-        return (-W * Nl + eps * D * alpha )* 2
-
+        print("Nl - Case 1", "z:", z, "Nl:", Nl)
+        if z == 50:
+                if len(results) == 0:
+                    results.append(Nl[0])
+        return (-W * Nl + eps * D * alpha )
+        
 def Nneq(z_eval, z, y):
     """Returns N_N^{eq}"""
     en = np.sqrt(z * z + y * y)
@@ -113,9 +117,7 @@ def Lsol(z_span, z_eval, K, eps, method="RK45", atol=1e-10, rtol=1e-10):
 
 # number of points to evaluate yn (three-momentum of RHN normalised to T) and number of z points to be evaluated.
 nevals     =  500
-# yn integration range
 yn_vals    = np.logspace(-3., np.log10(350.), nevals)
-# span of ODE in z (mass of RHN normalised to T)
 z_span     =  [1e-1,10.]
 z_eval     = np.logspace(np.log10(z_span[0]), np.log10(z_span[1]), nevals)
 
@@ -129,7 +131,7 @@ class EtaB_1BE1F_Case1(ulysses.ULSBase):
     flavour oscillations.
     """
 
-    def shortname(self): return "1BE1FCase2"
+    def shortname(self): return "1BE1FCase1"
 
     def flavourindices(self): return [1]
 
@@ -141,6 +143,7 @@ class EtaB_1BE1F_Case1(ulysses.ULSBase):
             self._d       = np.real(self.D1(k,z))
             self._w1      = np.real(self.W1(k,z))
             self._n1eq    = self.N1Eq(z)
+            self._K       = np.real(self.k1)
             self._currz=z
 
         return Lsol(z_span, z_eval, K, eps, method="RK45", atol=1e-10, rtol=1e-10)
@@ -154,12 +157,14 @@ class EtaB_1BE1F_Case1(ulysses.ULSBase):
         eps   = epsee + epsmm + epstt
         K       = np.real(self.k1)
         y0      = np.array([0+0j,0+0j], dtype=np.complex128)
+        normfact= 0.013
        
         solLD1 = solve_ivp(NLrhs, z_span, [0], t_eval=z_eval,
                        args=(K, eps, 1,), method="RK45", atol=1e-10,
                        rtol=1e-10, dense_output=True)
-#        due to difference return structure of return statement we must normalise internally in this code rather than call on line 89 ulsbase.py
-        normfact = 0.013
+
+        print(K)
+        print(eps)
         return   solLD1.y[-1][-1] * normfact
 
 

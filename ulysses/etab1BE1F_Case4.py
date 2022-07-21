@@ -121,7 +121,7 @@ def NLrhs(z, Nl, K, eps, case, highlim = 300, epsrel = 1e-10, epsabs = 1e-10):
         Nn = None
         integral1 = quad(ynintegral, llowerlim, highlim, args=(z, Nl, eps, Nn,  4,), epsabs=epsabs, epsrel=epsrel)
         int = integral1[0]
-        return -z * z * K * int * (3 / 16)  * 2
+        return -z * z * K * int * (3 / 16)  
 
 
 def Nneq(z_eval, z, y):

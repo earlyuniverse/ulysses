@@ -221,7 +221,7 @@ class EtaB_ARS(ulysses.ULSBase):
         
         params  = np.array([Fmat[0, 0], Fmat[0, 1], Fmat[1, 0], Fmat[1, 1], Fmat[2, 0], Fmat[2, 1], M1val, dMval], dtype=np.complex128)
         ys        = odeintw(self.RHS, y0, zs,  args = tuple(params))
-        
+        print(Fmat)
 #        print(f_convertmutoY(np.abs(ys[-1,8] + ys[-1,9] + ys[-1,10])))
         
 #         Brian's code returns YN, and ulysses expects etaB so convert YB to etaB
