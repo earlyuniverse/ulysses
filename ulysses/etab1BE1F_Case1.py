@@ -15,8 +15,52 @@ from numba import njit
 ##################################################################################
 
 
+def NLrhs(z, Nl, K, eps, case, calc, highlim = 300, epsrel = 1e-10, epsabs = 1e-10):
+    """Retrieves solutions of yn integration and integrates over yl.
+       Returns the full RHS of N_{l-l} equation for each case"""
+    llowerlim = 1e-10
+    if case == 1:
+        """Case 1"""
+        D = z * K * (kn(1, z) / kn(2, z))
+        alpha = calc.solD1_.sol(z) - 0.375 * z * z * kn(2, z)
+        W = 0.25 * K * z * z * z * kn(1, z)
+        return (-W * Nl + eps * D * alpha )
+        
+def Nneq(z_eval, z, y):
+    """Returns N_N^{eq}"""
+    en = np.sqrt(z * z + y * y)
+    func = 1 / (np.exp(en) + 1)
+    sol = Normalise(func, z_eval, y)
+    return sol
+
+
+def Normalise(array, y_eval, y):
+    """Integrates inputted array over normalised yn phase space"""
+    integrand = np.multiply(array, y * y * (3 / 8))
+    result = simpson(integrand, x=y_eval, axis=0)
+    return result.ravel()
+
+
+def rhNsol(z_eval):
+    """Retrives the solutions from calc, normalises f_N solutions (cases 2 and 4)
+    and plots the solutions for N_N(z)"""
+    z, y  = np.meshgrid(z_eval, calc.yn_)
+    Neq   = Nneq(z_eval, z, y)
+    solD1 = calc.solD1_.sol(z_eval).ravel()
+    return solD1
+      
+      
+def Lsol(z_span, z_eval, K, eps, calc, method="RK45", atol=1e-10, rtol=1e-10):
+    """Solves differential equations for each case to get N_{l-l}(z), plots the absolute value
+    against z"""
+    solLD1 = solve_ivp(NLrhs, z_span, [0], t_eval=z_eval,
+                       args=(K, eps, 1, calc), method=method, atol=atol,
+                       rtol=rtol, dense_output=True)
+                           
+    return   solLD1.y[-1][-1]
+
 class Calculator(object):
-    
+
     def __init__(self, K, yn, tMin=0.1, tMax=50):
         self.y0_ = np.zeros_like(yn)
         self.yn_ = yn
@@ -46,9 +90,6 @@ class Calculator(object):
         self.solD1_ = solve_ivp(self.D1Nrhs, [self.tMin_, self.tMax_],
                                 fN0, max_step=max_step, method=method,
                                 dense_output=True)
-
-            
-
     def logindex(self, y):
         """
         Find the index in the ynvals array that corresponds to point
@@ -63,79 +104,23 @@ class Calculator(object):
         """
         return fn1 + (y - y1) * (fn2 - fn1) / (y2 - y1)
 
-  
-
-
-def NLrhs(z, Nl, K, eps, case, highlim = 300, epsrel = 1e-10, epsabs = 1e-10):
-    """Retrieves solutions of yn integration and integrates over yl.
-       Returns the full RHS of N_{l-l} equation for each case"""
-    llowerlim = 1e-10
-    if case == 1:
-        """Case 1"""
-        D = z * K * (kn(1, z) / kn(2, z))
-        alpha = calc.solD1_.sol(z) - 0.375 * z * z * kn(2, z)
-        W = 0.25 * K * z * z * z * kn(1, z)
-        print("Nl - Case 1", "z:", z, "Nl:", Nl)
-        if z == 50:
-                if len(results) == 0:
-                    results.append(Nl[0])
-        return (-W * Nl + eps * D * alpha )
-        
-def Nneq(z_eval, z, y):
-    """Returns N_N^{eq}"""
-    en = np.sqrt(z * z + y * y)
-    func = 1 / (np.exp(en) + 1)
-    sol = Normalise(func, z_eval, y)
-    return sol
-
-
-def Normalise(array, y_eval, y):
-    """Integrates inputted array over normalised yn phase space"""
-    integrand = np.multiply(array, y * y * (3 / 8))
-    result = simpson(integrand, x=y_eval, axis=0)
-    return result.ravel()
-
-
-def rhNsol(z_eval):
-    """Retrives the solutions from calc, normalises f_N solutions (cases 2 and 4)
-    and plots the solutions for N_N(z)"""
-    z, y = np.meshgrid(z_eval, calc.yn_)
-    Neq = Nneq(z_eval, z, y)
-    solD1 = calc.solD1_.sol(z_eval).ravel()
-    return solD1
-      
-      
-def Lsol(z_span, z_eval, K, eps, method="RK45", atol=1e-10, rtol=1e-10):
-    """Solves differential equations for each case to get N_{l-l}(z), plots the absolute value
-    against z"""
-    solLD1 = solve_ivp(NLrhs, z_span, [0], t_eval=z_eval,
-                       args=(K, eps, 1,), method=method, atol=atol,
-                       rtol=rtol, dense_output=True)
-                           
-    return   solLD1.y[-1][-1]
-
-
-# number of points to evaluate yn (three-momentum of RHN normalised to T) and number of z points to be evaluated.
-nevals     =  500
-yn_vals    = np.logspace(-3., np.log10(350.), nevals)
-z_span     =  [1e-1,10.]
-z_eval     = np.logspace(np.log10(z_span[0]), np.log10(z_span[1]), nevals)
-
-# THIS NEEDS TO BE FIXED HERE 10 IS THE K PARAMETER BUT THIS SHOULD BE SET INTERNALLY
-calc = Calculator(2.2778530535805257, yn_vals, tMin=z_span[0], tMax=z_span[1])
-
 class EtaB_1BE1F_Case1(ulysses.ULSBase):
     """
     Boltzmann equation (BE) with one decaying sterile Case D1 i.e. dropping assumption of kinetic equilibrium. See arxiv:0907.0205
     Eqns. 3.25 and 3.27.  Note these kinetic equations do not include off diagonal
     flavour oscillations.
     """
+   
+    def __init__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+        self.calc = None
 
     def shortname(self): return "1BE1FCase1"
 
     def flavourindices(self): return [1]
 
     def flavourlabels(self): return ["$NBL$"]
+    
 
     def RHS(self, y0,z,epstt,epsmm,epsee,k):
 
@@ -143,28 +128,31 @@ class EtaB_1BE1F_Case1(ulysses.ULSBase):
             self._d       = np.real(self.D1(k,z))
             self._w1      = np.real(self.W1(k,z))
             self._n1eq    = self.N1Eq(z)
-            self._K       = np.real(self.k1)
             self._currz=z
 
-        return Lsol(z_span, z_eval, K, eps, method="RK45", atol=1e-10, rtol=1e-10)
-        
+        return Lsol(self.z_span, self.z_eval, self._K, self.eps, self.calc, method="RK45", atol=1e-10, rtol=1e-10)
+ 
+
     @property
     def EtaB(self):
-        #Define fixed quantities for BEs
-        epstt = np.real(self.epsilon1ab(2,2))
-        epsmm = np.real(self.epsilon1ab(1,1))
-        epsee = np.real(self.epsilon1ab(0,0))
-        eps   = epsee + epsmm + epstt
-        K       = np.real(self.k1)
-        y0      = np.array([0+0j,0+0j], dtype=np.complex128)
+        nevals               =  500
+        yn_vals              =  np.logspace(-3., np.log10(350.), nevals)
+        self.z_span          =  [1e-1, 100.]
+        epstt                =  np.real(self.epsilon1ab(2,2))
+        epsmm                =  np.real(self.epsilon1ab(1,1))
+        epsee                =  np.real(self.epsilon1ab(0,0))
+        self.eps             =  epsee + epsmm + epstt
+        self._K              =  np.real(self.k1)
+        self.z_eval          =  np.logspace(np.log10(self.z_span[0]), np.log10(self.z_span[1]), nevals)
+        self.calc                 =  Calculator(self._K, yn_vals, tMin=self.z_span[0], tMax=self.z_span[1])
+       
+        y0                   = np.array([0+0j,0+0j], dtype=np.complex128)
         normfact= 0.013
        
-        solLD1 = solve_ivp(NLrhs, z_span, [0], t_eval=z_eval,
-                       args=(K, eps, 1,), method="RK45", atol=1e-10,
+        solLD1 = solve_ivp(NLrhs, self.z_span, [0], t_eval=self.z_eval,
+                       args=(self._K, self.eps, 1, self.calc), method="RK45", atol=1e-10,
                        rtol=1e-10, dense_output=True)
 
-        print(K)
-        print(eps)
         return   solLD1.y[-1][-1] * normfact
 
 
