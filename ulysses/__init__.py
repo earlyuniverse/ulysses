@@ -21,6 +21,12 @@ from ulysses.etab2RES                 import EtaB_2RES # Buggy
 from ulysses.etab2RESmix              import EtaB_2RESmix
 from ulysses.etab2RESsp               import EtaB_2RESsp
 
+#shipped with version 2
+from ulysses.etab1BE1F_Case2          import EtaB_1BE1F_Case2
+from ulysses.etab1BE1F_Case3          import EtaB_1BE1F_Case3
+from ulysses.etab1BE1F_Case4          import EtaB_1BE1F_Case4
+
+
 testpars = {
         'delta' :270,
         'a21'   :0,

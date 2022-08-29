@@ -153,7 +153,7 @@ class EtaB_1BE1F_Case3(ulysses.ULSBase):
         super().__init__(self, *args, **kwargs)
         self.calc = None
 
-    def shortname(self): return "1BE1FCase3"
+    def shortname(self): return "1BE1F_Case3"
 
     def flavourindices(self): return [1]
 

@@ -5,7 +5,9 @@ from scipy.special import zeta
 
 __doc__="""
 
-%prog -m 1DME --ordering 0 --loop -o evol.pdf  PARAMETERFILE
+%prog -m 1
+
+DME --ordering 0 --loop -o evol.pdf  PARAMETERFILE
 
 Example parameter file:
 
