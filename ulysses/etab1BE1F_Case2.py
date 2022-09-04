@@ -189,9 +189,8 @@ class EtaB_1BE1F_Case2(ulysses.ULSBase):
         solLD2 = solve_ivp(NLrhs, self.z_span, [0], t_eval=self.z_eval,
                        args=(self._K, self.eps, self.calc), method="RK45", atol=1e-10,
                        rtol=1e-10, dense_output=True)
-
-        normfact = 0.013
-        return   solLD2.y[-1][-1] * normfact
-
+        ys    = np.transpose(( solLD2.sol(self.zs)[0],  solLD2.sol(self.zs)[0]))
+        self.setEvolData(ys)
+        return self.ys[-1][-1]
 
 

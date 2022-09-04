@@ -48,11 +48,11 @@ def NLrhs(z, Nl, K, eps,  calc, highlim = 300, epsrel = 1e-10, epsabs = 1e-10):
     return -z * z * K * int * (3. / 16.)
 
 
-def Nneq(z_eval, z, y):
+def Nneq(zs, z, y):
     """Returns N_N^{eq}"""
     en = np.sqrt(z * z + y * y)
     func = 1 / (np.exp(en) + 1)
-    sol = Normalise(func, z_eval, y)
+    sol = Normalise(func, zs, y)
     return sol
 
 
@@ -63,20 +63,20 @@ def Normalise(array, y_eval, y):
     return result.ravel()
 
 
-def rhNsol(z_eval):
+def rhNsol(zs):
     """Retrives the solutions from calc, normalises f_N solutions (cases 3)
     and plots the solutions for N_N(z)"""
-    z, y = np.meshgrid(z_eval, calc.yn_)
-    Neq = Nneq(z_eval, z, y)
-    D3array = calc.solD3_.sol(z_eval)
-    solD3 = Normalise(D3array, z_eval, y)
+    z, y = np.meshgrid(zs, calc.yn_)
+    Neq = Nneq(zs, z, y)
+    D3array = calc.solD3_.sol(zs)
+    solD3 = Normalise(D3array, zs, y)
     return solD3
       
       
-def Lsol(z_span, z_eval, K, eps, method="RK45", atol=1e-10, rtol=1e-10):
+def Lsol(z_span, zs, K, eps, method="RK45", atol=1e-10, rtol=1e-10):
     """Solves differential equations for each case to get N_{l-l}(z), plots the absolute value
     against z"""
-    solLD3 = solve_ivp(NLrhs, z_span, [0], t_eval=z_eval,
+    solLD3 = solve_ivp(NLrhs, z_span, [0], t_eval=zs,
                            args=(K, eps, 3,), method=method, atol=1e-10,
                            rtol=1e-10, dense_output=True)
                            
@@ -167,7 +167,7 @@ class EtaB_1BE1F_Case3(ulysses.ULSBase):
             self._n1eq    = self.N1Eq(z)
             self._currz=z
 
-        return Lsol(self.z_span, self.z_eval,self._K, self.eps, method="RK45", atol=1e-10, rtol=1e-10)
+        return Lsol(self.z_span, self.zs,self._K, self.eps, method="RK45", atol=1e-10, rtol=1e-10)
         
     @property
     def EtaB(self):
@@ -181,15 +181,15 @@ class EtaB_1BE1F_Case3(ulysses.ULSBase):
         epsee                =  np.real(self.epsilon1ab(0,0))
         self.eps             =  epsee + epsmm + epstt
         self._K              =  np.real(self.k1)
-        self.z_eval          =  np.logspace(np.log10(self.z_span[0]), np.log10(self.z_span[1]), nevals)
+        self.zs          =  np.logspace(np.log10(self.z_span[0]), np.log10(self.z_span[1]), nevals)
         self.calc            =  Calculator(self._K, yn_vals, tMin=self.z_span[0], tMax=self.z_span[1])
         y0      = np.array([0+0j,0+0j], dtype=np.complex128)
        
-        solLD3 = solve_ivp(NLrhs, self.z_span, [0], t_eval=self.z_eval,
+        solLD3 = solve_ivp(NLrhs, self.z_span, [0], t_eval=self.zs,
                        args=(self._K, self.eps, self.calc), method="RK45", atol=1e-10,
                        rtol=1e-10, dense_output=True)
-        normfact = 0.013
-        return   solLD3.y[-1][-1] * normfact
-
+        ys    = np.transpose(( solLD3.sol(self.zs)[0],  solLD3.sol(self.zs)[0]))
+        self.setEvolData(ys)
+        return self.ys[-1][-1]
 
 
