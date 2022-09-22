@@ -29,7 +29,7 @@ from termcolor import colored
 
 def FBEqs(x, v, nphi, M1, M2, M3, eps, d1, w1, N1Req, dPBH1, WashDL2, xilog10):
 
-    M    = v[0] # PBH mass
+    M    = v[0] # PBH mass in g
     ast  = v[1] # PBH angular momentum
     rRAD = v[2] # Radiation energy density
     rPBH = v[3] # PBH       energy density
@@ -73,8 +73,10 @@ def FBEqs(x, v, nphi, M1, M2, M3, eps, d1, w1, N1Req, dPBH1, WashDL2, xilog10):
     #    Radiation + PBH + Temperature equations   #
     #----------------------------------------------#
 
-    dMdx    = - bh.kappa * FT/(M*M)/H   
-    dastdx  = - ast * bh.kappa * (GT - 2.*FT)/(M*M*M)/H
+    kappa = bh.GeV_in_g**3 # Conversion factor for PBH mass in g and GCF, Newton's constant, in GeV^-2
+
+    dMdx    = - FT * kappa/(bh.GCF**2 * M**2)/H   
+    dastdx  = - ast * (GT - 2.*FT) *kappa/(bh.GCF**2 * M**3)/H
     
     drRADdx = - (FSM/FT) * (dMdx/M) * 10**xff * rPBH
     drPBHdx = + (dMdx/M) * rPBH
