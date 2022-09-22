@@ -1,9 +1,9 @@
-######################################################################################################################################
-#                                                                                                                                    #
-#                                            Primordial Black Hole assisted leptogenesis.                                            #
-#                                         High Scale Scenario, including DL = 2 scattering                                           #
-#                                                                                                                                    #
-######################################################################################################################################
+##################################################################################
+#                                                                                #
+#                    Primordial Black Hole induced leptogenesis.                 #
+#                  High Scale Scenario, including DL = 2 scattering              #
+#                                                                                #
+##################################################################################
 
 import ulysses
 import numpy as np
@@ -13,22 +13,23 @@ import scipy.integrate as integrate
 from scipy.integrate import quad, ode, solve_ivp, odeint
 from scipy.optimize import root
 from scipy.special import zeta
+from numba import njit
 
 import ulysses.BHProp as bh #Schwarzschild and Kerr BHs library
 
 from termcolor import colored
 
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
-#                                    FLRW-Boltzmann Equations                                    #
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+#                                                     FLRW-Boltzmann Equations                                                       #
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 
-#**********************************************************#
-#           Equations before PBH evaporation               #
-#**********************************************************#
+#----------------------------------#
+#   Equations before evaporation   #
+#----------------------------------#
 
-def FBEqs(x, v, rRADi, rPBHi, nphi, M1, M2, M3, eps, d1, w1, N1Req, dPBH1, WashDL2, Mi, xilog10):
+def FBEqs(x, v, nphi, M1, M2, M3, eps, d1, w1, N1Req, dPBH1, WashDL2, xilog10):
 
-    Mt   = v[0] # Logarithm of PBH mass normalized to initial mass
+    M    = v[0] # PBH mass
     ast  = v[1] # PBH angular momentum
     rRAD = v[2] # Radiation energy density
     rPBH = v[3] # PBH       energy density
@@ -42,8 +43,7 @@ def FBEqs(x, v, rRADi, rPBHi, nphi, M1, M2, M3, eps, d1, w1, N1Req, dPBH1, WashD
     #----------------#
     #   Parameters   #
     #----------------#
-
-    M     = Mi * 10.**Mt      # PBH mass in g
+    
     M_GeV = M/bh.GeV_in_g     # PBH mass in GeV
     nPBH  = rPBH/M_GeV        # PBH number density in GeV^3
     
@@ -73,11 +73,11 @@ def FBEqs(x, v, rRADi, rPBHi, nphi, M1, M2, M3, eps, d1, w1, N1Req, dPBH1, WashD
     #    Radiation + PBH + Temperature equations   #
     #----------------------------------------------#
 
-    dMtdx   = - bh.kappa * FT/(M*M*M)/H/np.log(10.)   
+    dMdx    = - bh.kappa * FT/(M*M)/H   
     dastdx  = - ast * bh.kappa * (GT - 2.*FT)/(M*M*M)/H
     
-    drRADdx = - (FSM/FT) * (dMtdx * np.log(10.)) * 10**xff * rPBH
-    drPBHdx = + (dMtdx * np.log(10.)) * rPBH
+    drRADdx = - (FSM/FT) * (dMdx/M) * 10**xff * rPBH
+    drPBHdx = + (dMdx/M) * rPBH
     
     dTdx    = - (Tp/Del) * (1.0 - (bh.gstarS(Tp)/bh.gstar(Tp))*(drRADdx/(4.*rRAD)))
 
@@ -99,15 +99,15 @@ def FBEqs(x, v, rRADi, rPBHi, nphi, M1, M2, M3, eps, d1, w1, N1Req, dPBH1, WashD
   
     #Equations
     
-    dEqsdx = [dMtdx, dastdx, drRADdx, drPBHdx, dTdx, dN1RTdx, dN1RBdx, dNBLdx]
+    dEqsdx = [dMdx, dastdx, drRADdx, drPBHdx, dTdx, dN1RTdx, dN1RBdx, dNBLdx]
 
     return [xeq * np.log(10.) for xeq in dEqsdx]
 
-#**********************************************************#
-#            Equations after PBH evaporation               #
-#**********************************************************#
+#----------------------------------#
+#    Equations after evaporation   #
+#----------------------------------#
 
-def FBEqs_aBE(x, v, rRADi, nphi, M1,M2,M3, eps, d1, w1, N1Req, dPBH1, WashDL2):
+def FBEqs_aBE(x, v, nphi, M1,M2,M3, eps, d1, w1, N1Req, dPBH1, WashDL2):
 
     rRAD  = v[0] # Radiation energy density
     Tp    = v[1] # Plasma Temperature
@@ -163,8 +163,8 @@ def FBEqs_aBE(x, v, rRADi, nphi, M1,M2,M3, eps, d1, w1, N1Req, dPBH1, WashDL2):
 class EtaB_PBH(ulysses.ULSBase):
     """
     Primordial black hole Assisted Leptogenesis.
-    One-flavoured BE with 1 Right-handed Neutrino.
-    Including the DL=2 washout term.
+    One-flavoured BE with 1 Right-handed Neutrino. Including the DL=2 washout term.
+    See arXiv:2010.03565 and arXiv:2203.08823
     """
 
     def shortname(self): return "1BE1F_PBH"
@@ -217,7 +217,7 @@ class EtaB_PBH(ulysses.ULSBase):
         if (eps*Mi > bh.MPL): Mst = eps*Mi
         else: Mst = bh.MPL
         
-        return Mi*10.**v[0] - Mst
+        return v[0] - Mst
     
     def setParams(self, pdict):
         super().setParams(pdict)
@@ -228,17 +228,17 @@ class EtaB_PBH(ulysses.ULSBase):
     #********************************************************#
     #        Equations Before  PBH evaporation               #
     #********************************************************#
-    def RHS(self, x, y0, eps, rRadi, rPBHi, nphi, MBHi, xilog10): # x is the Log10 of the scale factor
+    def RHS(self, x, y0, eps, nphi, xilog10): # x is the Log10 of the scale factor
         
-        Tp  = y0[4]                                              # Plasma Temperature
-        TBH = 1./(8.*np.pi*bh.GCF*(MBHi*10.**y0[0]/bh.GeV_in_g)) # BH temperature
-        z   = self.M1/Tp
+        Tp   = y0[4]                 # Plasma Temperature
+        TBH  = bh.TBH(y0[0], y0[1])  # BH temperature
+        z    = self.M1/Tp
         zBH  = np.real(self.M1/TBH)
 
         from ulysses.ulsbase import my_kn2, my_kn1
     
         self._d1    = np.real(self.Gamma1 * my_kn1(z)/my_kn2(z)) # Therm-av RH decay width
-        self._dPBH1 = np.real(self.Gamma1 * self.ME(zBH))             # Therm-av RH decay width wrt to TBH -> using full greybody factors
+        self._dPBH1 = np.real(self.Gamma1 * self.ME(zBH))        # Therm-av RH decay width wrt to TBH -> using full greybody factors
         
         self._w1    = self._d1 * (0.25 * my_kn2(z) * z**2)
         
@@ -259,16 +259,15 @@ class EtaB_PBH(ulysses.ULSBase):
         # Washout term for the scattering DL = 2 term
         WashDL2 = gD2/nleq
             
-        return FBEqs(x, y0, rRadi, rPBHi, nphi, self.M1, self.M2, self.M3,
-                     eps, self._d1, self._w1, self._n1eq, self._dPBH1, np.real(WashDL2), MBHi, xilog10)
+        return FBEqs(x, y0, nphi, self.M1,self.M2,self.M3, eps, self._d1, self._w1, self._n1eq, self._dPBH1, np.real(WashDL2), xilog10)
 
     #******************************************************#
     #        Equations After PBH evaporation               #
     #******************************************************#
-    def RHS_aBE(self, x, y0, eps, rRadi, nphi, MBHi):
+    def RHS_aBE(self, x, y0, eps, nphi, MBHi, asi):
         
         Tp   = y0[1]                                   # Plasma Temperature
-        TBH  = 1./(8.*np.pi*bh.GCF*(MBHi/bh.GeV_in_g)) # BH final temperature
+        TBH  = bh.TBH(MBHi, asi) # BH final temperature
         k    = np.real(self.k1)
         z    = np.real(self.M1/Tp)
         zBH  = np.real(self.M1/TBH)
@@ -276,7 +275,7 @@ class EtaB_PBH(ulysses.ULSBase):
         from ulysses.ulsbase import my_kn2, my_kn1
    
         self._d1    = np.real(self.Gamma1 * my_kn1(z)/my_kn2(z)) # Therm-av RH decay width
-        self._dPBH1 = np.real(self.Gamma1 * self.ME(zBH))             # Therm-av RH decay width wrt to TBH -> using full greybody factors
+        self._dPBH1 = np.real(self.Gamma1 * self.ME(zBH))        # Therm-av RH decay width wrt to TBH -> using full greybody factors
         
         self._w1    = self._d1 * (0.25 * my_kn2(z) * z**2)
 
@@ -297,8 +296,7 @@ class EtaB_PBH(ulysses.ULSBase):
         # Washout term for the scattering DL = 2 term
         WashDL2 = gD2/nleq
 
-        return FBEqs_aBE(x, y0, rRadi, nphi, self.M1,self.M2, self.M3, eps,
-                         self._d1, self._w1, self._n1eq, self._dPBH1, np.real(WashDL2))
+        return FBEqs_aBE(x, y0, nphi, self.M1,self.M2,self.M3, eps, self._d1, self._w1, self._n1eq, self._dPBH1, np.real(WashDL2))
 
     #******************************************************#
     #                     Main Program                     #
@@ -338,7 +336,9 @@ class EtaB_PBH(ulysses.ULSBase):
         #                                           Solving the equations                                                   #
         #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 
-        Min     = Mi # We save the initial PBH mass.
+        Min  = Mi   # We save the initial PBH mass.
+        asin = asi  # We save the initial PBH spin
+        
         xilog10 = 0. # Fixing the initial scale factor to be 1
 
         # Defining arrays to save the solution for the different components
@@ -393,12 +393,10 @@ class EtaB_PBH(ulysses.ULSBase):
             StopM.terminal  = True
             StopM.direction = -1.
 
-            log_Mi_norm = 0. # Initial Log10(PBH mass/initial PBH mass), always fixed to 0.
-
-            y0 = [log_Mi_norm, asi, rRadi, rPBHi, Ti, N1RTi, N1RBi, NBLi] # Initial condition
+            y0 = [Mi, asi, rRadi, rPBHi, Ti, N1RTi, N1RBi, NBLi] # Initial condition
 
             # Solving Equations
-            solFBE = solve_ivp(lambda t, z: self.RHS(t, z, eps, np.real(rRadi), np.real(rPBHi), np.real(nphi), Mi, xilog10),
+            solFBE = solve_ivp(lambda t, z: self.RHS(t, z, eps, np.real(nphi), xilog10),
                                [0., xflog10], y0, method='BDF', events=StopM, rtol=1.e-7, atol=1.e-10)
 
             assert solFBE.t[-1] > 0., colored('Solution going backwards...', 'red')
@@ -406,7 +404,7 @@ class EtaB_PBH(ulysses.ULSBase):
             # Appending solutions to predefined arrays
             
             xBE    = np.append(xBE,    solFBE.t[:] + xilog10)
-            MBHBE  = np.append(MBHBE,  10.**(solFBE.y[0,:])*Mi)
+            MBHBE  = np.append(MBHBE,  solFBE.y[0,:])
             astBE  = np.append(astBE,  solFBE.y[1,:])
             RadBE  = np.append(RadBE,  solFBE.y[2,:])
             PBHBE  = np.append(PBHBE,  solFBE.y[3,:])
@@ -418,7 +416,7 @@ class EtaB_PBH(ulysses.ULSBase):
 
             # Updating the initial conditions for next iteration
 
-            Mi    = 10.**(solFBE.y[0,-1])*Mi
+            Mi    = solFBE.y[0,-1]
             asi   = solFBE.y[1,-1]
             rRadi = solFBE.y[2,-1]
             rPBHi = solFBE.y[3,-1]
@@ -457,7 +455,7 @@ class EtaB_PBH(ulysses.ULSBase):
             y0_aBE = [RadBE[-1], TBE[-1], N1RTBE[-1], N1RBBE[-1], NBLBE[-1]] 
             
             # Solving Equations
-            solFBE_aBE = solve_ivp(lambda t, z: self.RHS_aBE(t, z, eps, np.real(rRadi), np.real(nphi), np.real(Min)),
+            solFBE_aBE = solve_ivp(lambda t, z: self.RHS_aBE(t, z, eps, np.real(nphi), np.real(Min)),
                                    [xflog10, xzmax], y0_aBE, method='BDF', rtol=1.e-7, atol=1.e-15)
 
             npaf = solFBE_aBE.t.shape[0] # Dimension of solution array from Eqs solution
