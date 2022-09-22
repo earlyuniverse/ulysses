@@ -4,6 +4,7 @@ from ulysses.tools import *
 
 from ulysses.ulsbase import ULSBase
 
+
 from ulysses.etab1DME                 import EtaB_1DME
 from ulysses.etab2DME                 import EtaB_2DME
 from ulysses.etab3DME                 import EtaB_3DME
@@ -25,6 +26,8 @@ from ulysses.etab2RESsp               import EtaB_2RESsp
 from ulysses.etab1BE1F_Case2          import EtaB_1BE1F_Case2
 from ulysses.etab1BE1F_Case3          import EtaB_1BE1F_Case3
 from ulysses.etab1BE1F_Case4          import EtaB_1BE1F_Case4
+
+from ulysses.etabPBH                  import EtaB_PBH
 
 
 testpars = {
