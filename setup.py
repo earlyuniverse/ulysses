@@ -13,7 +13,9 @@ setup(
     'scipy',
     'matplotlib',
     'pymultinest',
-    'progressbar'
+    'progressbar',
+    'termcolor',
+    'tqdm'  
     # 'numba',
     # 'mpi4py'
   ],

@@ -169,6 +169,10 @@ class EtaB_PBH(ulysses.ULSBase):
 
     def shortname(self): return "1BE1F_PBH"
 
+    def flavourindices(self): return [1]
+
+    def flavourlabels(self): return ["$NBL$"]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         """
