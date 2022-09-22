@@ -162,7 +162,7 @@ def FBEqs_aBE(x, v, nphi, M1,M2,M3, eps, d1, w1, N1Req, dPBH1, WashDL2):
 
 class EtaB_PBH(ulysses.ULSBase):
     """
-    Primordial black hole Assisted Leptogenesis.
+    Primordial black hole assisted Leptogenesis.
     One-flavoured BE with 1 Right-handed Neutrino. Including the DL=2 washout term.
     See arXiv:2010.03565 and arXiv:2203.08823
     """
