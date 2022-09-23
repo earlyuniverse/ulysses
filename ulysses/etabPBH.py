@@ -71,17 +71,15 @@ def FBEqs(x, v, nphi, M1, M2, M3, eps, d1, w1, N1Req, dPBH1, WashDL2, xilog10):
 
     #----------------------------------------------#
     #    Radiation + PBH + Temperature equations   #
-    #----------------------------------------------#
+    #----------------------------------------------#   
 
-    kappa = bh.GeV_in_g**3 # Conversion factor for PBH mass in g and GCF, Newton's constant, in GeV^-2
-
-    dMdx    = - FT * kappa/(bh.GCF**2 * M**2)/H   
-    dastdx  = - ast * (GT - 2.*FT) *kappa/(bh.GCF**2 * M**3)/H
+    dM_GeVdx = - FT/(bh.GCF**2 * M_GeV**2)/H   
+    dastdx   = - ast * (GT - 2.*FT)/(bh.GCF**2 * M_GeV**3)/H
     
-    drRADdx = - (FSM/FT) * (dMdx/M) * 10**xff * rPBH
-    drPBHdx = + (dMdx/M) * rPBH
+    drRADdx  = - (FSM/FT) * (dM_GeVdx/M_GeV) * 10**xff * rPBH
+    drPBHdx  = + (dM_GeVdx/M_GeV) * rPBH
     
-    dTdx    = - (Tp/Del) * (1.0 - (bh.gstarS(Tp)/bh.gstar(Tp))*(drRADdx/(4.*rRAD)))
+    dTdx     = - (Tp/Del) * (1.0 - (bh.gstarS(Tp)/bh.gstar(Tp))*(drRADdx/(4.*rRAD)))
 
     #----------------------------------------#
     #              RH neutrinos              #
@@ -100,8 +98,10 @@ def FBEqs(x, v, nphi, M1, M2, M3, eps, d1, w1, N1Req, dPBH1, WashDL2, xilog10):
     dNBLdx = (eps1tt+eps1mm+eps1ee)*(NTH1 + NBH1) - (w1 + WashDL2)*NBL/H
   
     #Equations
+
+    kappa = bh.GeV_in_g # Conversion factor to have Mass equation rate for PBH mass in g
     
-    dEqsdx = [dMdx, dastdx, drRADdx, drPBHdx, dTdx, dN1RTdx, dN1RBdx, dNBLdx]
+    dEqsdx = [kappa * dM_GeVdx, dastdx, drRADdx, drPBHdx, dTdx, dN1RTdx, dN1RBdx, dNBLdx]
 
     return [xeq * np.log(10.) for xeq in dEqsdx]
 
@@ -461,7 +461,7 @@ class EtaB_PBH(ulysses.ULSBase):
             y0_aBE = [RadBE[-1], TBE[-1], N1RTBE[-1], N1RBBE[-1], NBLBE[-1]] 
             
             # Solving Equations
-            solFBE_aBE = solve_ivp(lambda t, z: self.RHS_aBE(t, z, eps, np.real(nphi), np.real(Min)),
+            solFBE_aBE = solve_ivp(lambda t, z: self.RHS_aBE(t, z, eps, np.real(nphi), np.real(Min), asin),
                                    [xflog10, xzmax], y0_aBE, method='BDF', rtol=1.e-7, atol=1.e-15)
 
             npaf = solFBE_aBE.t.shape[0] # Dimension of solution array from Eqs solution
