@@ -368,7 +368,7 @@ class EtaB_PBH(ulysses.ULSBase):
 
         i = 0
 
-        while Mi > bh.MPL: # We solve the equations until the PBH mass is larger than Planck Mass
+        while Mi > 1.125*bh.MPL: # We solve the equations until the PBH mass is larger than Planck Mass
 
             #----------------------------------------------------------------------#
             #     Compute BH lifetime and scale factor in which PBHs evaporate     #
