@@ -14,7 +14,6 @@ from ulysses.etab2BE1F                import EtaB_2BE1F
 from ulysses.etab2BE2F                import EtaB_2BE2F
 from ulysses.etab2BE3F                import EtaB_2BE3F
 from ulysses.etab3DMEsct              import EtaB_3DMEsct
-# from ulysses.etab3DMEscatteringRHtaur import EtaB_3DS_Scattering_RHtaur
 from ulysses.etab1BE1Fsf              import EtaB_1BE1Fsf
 
 from ulysses.etab2RES                 import EtaB_2RES # Buggy
