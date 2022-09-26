@@ -51,6 +51,5 @@ class EtaB_1BE1F(ulysses.ULSBase):
         params  = np.array([epstt,epsmm,epsee,k], dtype=np.complex128)
 
         ys      = odeintw(self.RHS, y0, self.zs, args = tuple(params))
-        print(np.shape(ys))
         self.setEvolData(ys)
         return self.ys[-1][-1]
