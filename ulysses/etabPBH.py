@@ -248,7 +248,7 @@ class EtaB_PBH(ulysses.ULSBase):
         
         self._w1    = self._d1 * (my_kn2(z) * z**2/(3. * zeta(3.)))
         
-        # Lepton equilibrium number density, normalized to initial photon density
+        # RH neutrino equilibrium number density, normalized to initial photon density
         self._n1eq  = (10**(3*(x + xilog10)) * self.M1**2 * Tp * my_kn2(z))/(np.pi**2)/nphi 
         
         # Neutrino masses squared
@@ -285,7 +285,7 @@ class EtaB_PBH(ulysses.ULSBase):
         
         self._w1    = self._d1 * (my_kn2(z) * z**2/(3. * zeta(3.)))
 
-        # Lepton equilibrium number density, normalized to initial photon density
+        # RH neutrino equilibrium number density, normalized to initial photon density
         self._n1eq  = (10**(3*x) * self.M1**2 * Tp * my_kn2(z))/(np.pi**2)/nphi
         
         # Neutrino masses squared
@@ -293,7 +293,7 @@ class EtaB_PBH(ulysses.ULSBase):
         m2sq = self.SqrtDm[1,1]**4
         m3sq = self.SqrtDm[2,2]**4
 
-        # Lepton number density in equilibrium
+        # Lepton number density in equilibrium, 2 factor corresponds to the number of degrees of freedom
         nleq = (3./4.) * 2. * (zeta(3)/np.pi**2) * Tp**3
 
         # Thermally averaged scattering 
