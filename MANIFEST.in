@@ -1,2 +1,6 @@
 include ulysses/etab1BE1Fscalefactor_*.txt
 include ulysses/timedil.txt
+include ulysses/data/g*log.txt
+include ulysses/data/Log_M.txt
+include ulysses/data/Log_z.txt
+include ulysses/data/s*log_massdep.txt

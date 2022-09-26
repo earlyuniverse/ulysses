@@ -61,6 +61,7 @@ if __name__=="__main__":
     op.add_option("--zrange",          dest="ZRANGE",      default="0.1,100,1000", help="Ranges and steps of the evolution variable (default: %default)")
     op.add_option("--inv",             dest="INVORDERING", default=False, action='store_true', help="Use inverted mass ordering (default: %default)")
     op.add_option("--loop",            dest="LOOP",        default=False, action='store_true', help="Use loop-corrected Yukawa (default: %default)")
+    op.add_option("--zcut",            dest="ZCUT",        default="1.0",  help="Set cut value for stitching in ARS model")
     opts, args = op.parse_args()
 
 
@@ -80,12 +81,13 @@ if __name__=="__main__":
     pfile, gdict = ulysses.tools.parseArgs(args)
 
     LEPTO = ulysses.selectModel(opts.MODEL,
-            zmin=zmin, zmax=zmax, zsteps=zsteps,
-            ordering=int(opts.INVORDERING),
-            loop=opts.LOOP,
-            debug=opts.DEBUG,
-            **gdict
-            )
+                                zmin=zmin, zmax=zmax, zsteps=zsteps,
+                                ordering=int(opts.INVORDERING),
+                                loop=opts.LOOP,
+                                debug=opts.DEBUG,
+                                zcut=float(opts.ZCUT),
+                                **gdict
+                                )
 
 
     # Read parameter card and very explicit checks on parameter names

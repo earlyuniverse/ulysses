@@ -194,7 +194,7 @@ class EtaB_PBH(ulysses.ULSBase):
 
         import os
         data_dir = os.path.dirname(ulysses.__file__)
-        print(data_dir)
+
         MEav_f   = os.path.join(data_dir, "timedil.txt")
         MEavTab  = np.loadtxt(MEav_f)
 

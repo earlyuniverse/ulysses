@@ -77,11 +77,13 @@ class ULSBase(object):
         self._zmin   = kwargs["zmin"]                  if kwargs.get("zmin")     is not None else 0.1
         self._zmax   = kwargs["zmax"]                  if kwargs.get("zmax")     is not None else 1000
         self._zsteps = kwargs["zsteps"]                if kwargs.get("zsteps")   is not None else 1000
-        self._currz = self.zmin
+        self._currz  = self.zmin
 
         # Model switches
         self.ordering = kwargs["ordering"]             if kwargs.get("ordering") is not None else 0
         self.loop     = kwargs["loop"]                 if kwargs.get("loop")     is not None else False
+
+        self._zcut   = kwargs["zcut"]                  if kwargs.get("zcut")     is not None else 1.0 # zcut value for ARS model
 
         self.zs=None
         self.ys=None
@@ -163,6 +165,9 @@ class ULSBase(object):
 
     @property
     def zsteps(self): return self._zsteps
+
+    @property
+    def zcut(self): return self._zcut
 
     def setEvolData(self, ys):
         self.ys = np.empty((len(self.zs), max(self.flavourindices()) + 2))
