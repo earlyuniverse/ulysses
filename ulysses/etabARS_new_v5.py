@@ -451,7 +451,7 @@ class EtaB_ARS(ulysses.ULSBase):
 
         print(self._zcut)
 
-        if dMval <= 1.e-8 and self._zcut == 1.0:
+        if dMval <= 1.e-8 or self._zcut == 1.0:
 
             ys = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr), [1.e-6, 1], y0,
                            method='BDF', rtol=1.e-7, atol=1.e-10)
