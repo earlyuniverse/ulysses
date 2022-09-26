@@ -246,7 +246,7 @@ class EtaB_PBH(ulysses.ULSBase):
         self._d1    = np.real(self.Gamma1 * my_kn1(z)/my_kn2(z)) # Therm-av RH decay width
         self._dPBH1 = np.real(self.Gamma1 * self.ME(zBH))        # Therm-av RH decay width wrt to TBH -> using full greybody factors
         
-        self._w1    = self._d1 * (0.25 * my_kn2(z) * z**2)
+        self._w1    = self._d1 * (my_kn2(z) * z**2/(3. * zeta(3.)))
         
         # Lepton equilibrium number density, normalized to initial photon density
         self._n1eq  = (10**(3*(x + xilog10)) * self.M1**2 * Tp * my_kn2(z))/(np.pi**2)/nphi 
@@ -256,8 +256,8 @@ class EtaB_PBH(ulysses.ULSBase):
         m2sq = self.SqrtDm[1,1]**4
         m3sq = self.SqrtDm[2,2]**4
 
-        # Lepton number density in equilibrium
-        nleq = (3./4.) * (zeta(3)/np.pi**2) * Tp**3
+        # Lepton number density in equilibrium, 2 factor corresponds to the number of degrees of freedom
+        nleq = (3./4.) * 2. * (zeta(3)/np.pi**2) * Tp**3
 
         # Thermally averaged scattering 
         gD2 = (3.*Tp**6/(4.*np.pi**5*self.v**4))*(m1sq + m2sq + m3sq)
@@ -283,7 +283,7 @@ class EtaB_PBH(ulysses.ULSBase):
         self._d1    = np.real(self.Gamma1 * my_kn1(z)/my_kn2(z)) # Therm-av RH decay width
         self._dPBH1 = np.real(self.Gamma1 * self.ME(zBH))        # Therm-av RH decay width wrt to TBH -> using full greybody factors
         
-        self._w1    = self._d1 * (0.25 * my_kn2(z) * z**2)
+        self._w1    = self._d1 * (my_kn2(z) * z**2/(3. * zeta(3.)))
 
         # Lepton equilibrium number density, normalized to initial photon density
         self._n1eq  = (10**(3*x) * self.M1**2 * Tp * my_kn2(z))/(np.pi**2)/nphi
@@ -294,7 +294,7 @@ class EtaB_PBH(ulysses.ULSBase):
         m3sq = self.SqrtDm[2,2]**4
 
         # Lepton number density in equilibrium
-        nleq = (3./4.) * (zeta(3)/np.pi**2) * Tp**3
+        nleq = (3./4.) * 2. * (zeta(3)/np.pi**2) * Tp**3
 
         # Thermally averaged scattering 
         gD2 = (3.*Tp**6/(4.*np.pi**5*self.v**4))*(m1sq + m2sq + m3sq)
