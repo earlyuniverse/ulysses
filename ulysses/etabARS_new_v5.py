@@ -116,11 +116,11 @@ def diagdiag(mat):
 # NOTE: the mass labelling is off. What is called M1 here is called self.M2 in EtaB
 #
 def fast_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr, funcs, use_interpolation=True):
-    
+
     if use_interpolation:
 
         G0_fun, G1_fun, G2_fun, S0_M_fun, S1_M_fun, S2_M_fun = funcs
-        
+
         G0 = G0_fun(z)
         G1 = G1_fun(z)
         G2 = G2_fun(z)
@@ -223,18 +223,7 @@ def fast_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec
                               )
 
 
-    # This is just a 3 vector and we only care about diagonal elements of the 3x3 matrices
-    eqtns = np.array([0+0j,0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
-
-    for i in range(3):
-        eqtns[8+i] = cons_2 * (M0/Tew) * (
-                - 0.5 * G0 * (F_RN_Fdagger[i][i] - Fstar_RNb_Ftrans[i][i])
-                +       G1 * F_Fdagger[i][i]* mu_mat[i][i]
-                - 0.5 * G2 * (F_RN_Fdagger[i][i] + Fstar_RNb_Ftrans[i][i]) * mu_mat[i][i]
-                + 0.5 * S0 * (Fstar_M_RN_M_Ftrans[i][i] - F_M_RNb_M_Fdagger[i][i])
-                +       S1 * F_M_M_Fdagger[i][i] * mu_mat[i][i]
-                - 0.5 * S2 * (Fstar_M_RN_M_Ftrans[i][i] + F_M_RNb_M_Fdagger[i][i]) * mu_mat[i][i]
-            )
+    eqtns = np.zeros(11, dtype=np.complex128)
 
     eqtns[0]  = RNRHS_mat[0][0]
     eqtns[1]  = RNRHS_mat[0][1]
@@ -246,14 +235,26 @@ def fast_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec
     eqtns[6]  = RNbRHS_mat[1][0]
     eqtns[7]  = RNbRHS_mat[1][1]
 
+    # This is just a 3 vector and we only care about diagonal elements of the 3x3 matrices
+    for i in range(3):
+        eqtns[8+i] = cons_2 * (M0/Tew) * (
+                - 0.5 * G0 * (F_RN_Fdagger[i][i] - Fstar_RNb_Ftrans[i][i])
+                +       G1 * F_Fdagger[i][i]* mu_mat[i][i]
+                - 0.5 * G2 * (F_RN_Fdagger[i][i] + Fstar_RNb_Ftrans[i][i]) * mu_mat[i][i]
+                + 0.5 * S0 * (Fstar_M_RN_M_Ftrans[i][i] - F_M_RNb_M_Fdagger[i][i])
+                +       S1 * F_M_M_Fdagger[i][i] * mu_mat[i][i]
+                - 0.5 * S2 * (Fstar_M_RN_M_Ftrans[i][i] + F_M_RNb_M_Fdagger[i][i]) * mu_mat[i][i]
+            )
+
+
     return eqtns
 
-def fast_averaged_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, funcs, use_interpolation=True):
-    
+def fast_averaged_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr, funcs, use_interpolation=True):
+
     if use_interpolation:
 
         G0_fun, G1_fun, G2_fun, S0_M_fun, S1_M_fun, S2_M_fun = funcs
-        
+
         G0 = G0_fun(z)
         G1 = G1_fun(z)
         G2 = G2_fun(z)
@@ -270,71 +271,91 @@ def fast_averaged_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, funcs, use_in
 
     M_mat[0][0]   = M1
     M_mat[1][1]   = M1 + deltaM
-    FdF     = Fmat.H @ Fmat
+
     deltaM2 = 2 * M1 * deltaM + deltaM * deltaM
 
     cons_1 = 0.05701803240084191
     cons_2 = 0.5480722270510788
 
-    # RHS matrices
+    # RHS matrices TODO check dtype --- complex128?
 
     RN_mat      =  np.diag([y[0], y[1]])
     RNb_mat     =  np.diag([y[2], y[3]])
     mud_mat     =  np.diag([y[4], y[5], y[6]])
 
-    chi_mat     =  -1./711. * np.matrix([[257.,  20.,  20.], [20.,  257.,  20.], [20., 20., 257. ]], dtype=np.complex128)
+    # chi_mat     =  -1./711. * np.matrix([[257.,  20.,  20.], [20.,  257.,  20.], [20., 20., 257. ]], dtype=np.complex128)
     mu_mat      =  2. * chi_mat @ mud_mat
 
 
     # matrices appearing in Eqs
+    FmatH               = np.transpose(np.conjugate(Fmat))
+    FmatT               = np.transpose(Fmat)
+    FmatC               = np.conjugate(Fmat)
+    FdF                 = np.transpose(np.conjugate(Fmat)) @ Fmat
 
-    Fdagger_mu_F        = Fmat.H @ mu_mat @ Fmat
-    M_Ftrans_Fstar_M    = M_mat @ Fmat.T @ np.conjugate(Fmat) @ M_mat
-    M_Ftrans_mu_Fstar_M = M_mat @ Fmat.T @ mu_mat @ np.conjugate(Fmat) @ M_mat
+    Fdagger_mu_F        = FmatH @ mu_mat @ Fmat
+    M_Ftrans_Fstar_M    = M_mat @ FmatT @ np.conjugate(Fmat) @ M_mat
+    M_Ftrans_mu_Fstar_M = M_mat @ FmatT @ mu_mat @ np.conjugate(Fmat) @ M_mat
 
-    Ftrans_mu_Fstar     = Fmat.T @ mu_mat @ np.conjugate(Fmat)
-    M_Fdagger_F_M       = M_mat @ Fmat.H @ Fmat @ M_mat
-    M_Fdagger_mu_F_M    = M_mat @ Fmat.H @ mu_mat @ Fmat @ M_mat
+    Ftrans_mu_Fstar     = FmatT @ mu_mat @ np.conjugate(Fmat)
+    M_Fdagger_F_M       = M_mat @ FmatH @ Fmat @ M_mat
+    M_Fdagger_mu_F_M    = M_mat @ FmatH @ mu_mat @ Fmat @ M_mat
 
-    F_RN_Fdagger        = Fmat @ RN_mat @ Fmat.H
-    Fstar_RNb_Ftrans    = np.conjugate(Fmat) @ RNb_mat @ Fmat.T
-    F_Fdagger           = Fmat @ Fmat.H
-    Fstar_M_RN_M_Ftrans = np.conjugate(Fmat) @ M_mat @ RN_mat @ M_mat @ Fmat.T
-    F_M_RNb_M_Fdagger   = Fmat @ M_mat @ RNb_mat @ M_mat @ Fmat.H
-    F_M_M_Fdagger       = Fmat @ M_mat @ M_mat @ Fmat.H
+    F_RN_Fdagger        = Fmat @ RN_mat @ FmatH
+    Fstar_RNb_Ftrans    = np.conjugate(Fmat) @ RNb_mat @ FmatT
+    F_Fdagger           = Fmat @ FmatH
+    Fstar_M_RN_M_Ftrans = np.conjugate(Fmat) @ M_mat @ RN_mat @ M_mat @ FmatT
+    F_M_RNb_M_Fdagger   = Fmat @ M_mat @ RNb_mat @ M_mat @ FmatH
+    F_M_M_Fdagger       = Fmat @ M_mat @ M_mat @ FmatH
     RNmatmId2           = RN_mat  - np.identity(2)
     RNbmatmId2          = RNb_mat - np.identity(2)
 
 
+    Lvec[0:2]   = FdF
+    Lvec[2:4]   = Fdagger_mu_F
+    Lvec[4:6]   = M_Ftrans_Fstar_M
+    Lvec[6:8]   = M_Ftrans_mu_Fstar_M
+    Lvec[8:10]  = np.conjugate(Lvec[0:2])
+    Lvec[10:12] = Ftrans_mu_Fstar
+    Lvec[12:14] = M_Fdagger_F_M
+    Lvec[14:16] = M_Fdagger_mu_F_M
+
+    Rvec[0:2]   = RNmatmId2
+    Rvec[2:4]   = RN_mat
+    Rvec[4:6]   = RNmatmId2
+    Rvec[6:8]   = RN_mat
+    Rvec[8:10]  = RNbmatmId2
+    Rvec[10:12] = RNb_mat
+    Rvec[12:14] = RNbmatmId2
+    Rvec[14:16] = RNb_mat
+
+    # Compute anticommutators
+    explicit_anticommutator_array(Lvec, Rvec, acr)
+
+    # This is expensive so cache it
+    fdyneq = f_DYNeq(M1, z, Tew, gss)
+    fyneq = f_YNeq(M1, z, Tew, gss)
 
     # ARS Equations
-
-    RNRHS_mat   = (M0/Tew) * (- 0.5 * G0 * anticommutator(FdF, RNmatmId2)
+    RNRHS_mat   = (M0/Tew) * (- 0.5 * G0 * acr[0:2]
                               + G1 * Fdagger_mu_F
-                              - 0.5 * G2 * anticommutator(Fdagger_mu_F, RN_mat)
-                              - 0.5 * S0 * anticommutator(M_Ftrans_Fstar_M, RNmatmId2)
+                              - 0.5 * G2 * acr[2:4]
+                              - 0.5 * S0 * acr[4:6]
                               - S1 * M_Ftrans_mu_Fstar_M
-                              + 0.5 * S2 * anticommutator(M_Ftrans_mu_Fstar_M, RN_mat)
-                              - (Tew/M0) * (RN_mat/f_YNeq(M1, z, Tew, gss)) * f_DYNeq(M1, z, Tew, gss)
+                              + 0.5 * S2 * acr[6:8]
+                              - (Tew/M0) * (RN_mat/ fyneq) * fdyneq
                               )
 
-    RNbRHS_mat  = (M0/Tew) * (- 0.5 * G0 * anticommutator(np.conjugate(FdF), RNbmatmId2)
+    RNbRHS_mat  = (M0/Tew) * (- 0.5 * G0 * acr[8:10]
                               - G1 * Ftrans_mu_Fstar
-                              + 0.5 * G2 * anticommutator(Ftrans_mu_Fstar, RNb_mat)
-                              - 0.5 * S0 * anticommutator(M_Fdagger_F_M,  RNbmatmId2) + S1 * M_Fdagger_mu_F_M
-                              - 0.5 * S2 * anticommutator(M_Fdagger_mu_F_M, RNb_mat)
-                              - (Tew/M0) * (RNb_mat/f_YNeq(M1, z, Tew, gss)) * f_DYNeq(M1, z, Tew, gss)
+                              + 0.5 * G2 * acr[10:12]
+                              - 0.5 * S0 * acr[12:14]
+                              + S1 * M_Fdagger_mu_F_M
+                              - 0.5 * S2 * acr[14:16]
+                              - (Tew/M0) * (RNb_mat/ fyneq) * fdyneq
                               )
 
-    muDeltaRHS  = cons_2 * (M0/Tew) * (- 0.5 * G0 * (F_RN_Fdagger - Fstar_RNb_Ftrans).diagonal()
-                                       + G1 * (diagdiag(F_Fdagger) @ np.diag(mu_mat) )
-                                       - 0.5 * G2 * (diagdiag(F_RN_Fdagger + Fstar_RNb_Ftrans) @ diagdiag(mu_mat) ).diagonal()
-                                       + 0.5 * S0 * (Fstar_M_RN_M_Ftrans - F_M_RNb_M_Fdagger).diagonal()
-                                       + S1 * (diagdiag(F_M_M_Fdagger)  @ np.diag(mu_mat) )
-                                       - 0.5 * S2 * (diagdiag(Fstar_M_RN_M_Ftrans + F_M_RNb_M_Fdagger) @ np.diag(mu_mat) ).diagonal()
-                                        )
-
-    eqtns = np.array([0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j, 0+0j], dtype=np.complex128)
+    eqtns = np.zeros(7, dtype=np.complex128)
 
     eqtns[0] = RNRHS_mat[0,0]
     eqtns[1] = RNRHS_mat[1,1]
@@ -342,10 +363,15 @@ def fast_averaged_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, funcs, use_in
     eqtns[2] = RNbRHS_mat[0,0]
     eqtns[3] = RNbRHS_mat[1,1]
 
-    eqtns[4] = muDeltaRHS[0,0]
-    eqtns[5] = muDeltaRHS[0,1]
-    eqtns[6] = muDeltaRHS[0,2]
-
+    for i in range(3):
+        eqtns[4+i] = cons_2 * (M0/Tew) * (
+                - 0.5 * G0 * (F_RN_Fdagger[i][i] - Fstar_RNb_Ftrans[i][i])
+                +       G1 * F_Fdagger[i][i]* mu_mat[i][i]
+                - 0.5 * G2 * (F_RN_Fdagger[i][i] + Fstar_RNb_Ftrans[i][i]) * mu_mat[i][i]
+                + 0.5 * S0 * (Fstar_M_RN_M_Ftrans[i][i] - F_M_RNb_M_Fdagger[i][i])
+                +       S1 * F_M_M_Fdagger[i][i] * mu_mat[i][i]
+                - 0.5 * S2 * (Fstar_M_RN_M_Ftrans[i][i] + F_M_RNb_M_Fdagger[i][i]) * mu_mat[i][i]
+            )
 
     return eqtns
 
@@ -364,14 +390,12 @@ class EtaB_ARS(ulysses.ULSBase):
     def RHS(self, z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr):
 
         funcs = []
+        return fast_RHS(         z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr, funcs, use_interpolation=False)
 
-        return fast_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr, funcs, use_interpolation=False)
-
-    def RHS_averaged(self, z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat):
+    def RHS_averaged(self, z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr):
 
         funcs = []
-
-        return fast_averaged_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, funcs, use_interpolation=False)
+        return fast_averaged_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr, funcs, use_interpolation=False)
 
     @property
     def EtaB(self):
@@ -451,7 +475,13 @@ class EtaB_ARS(ulysses.ULSBase):
 
         print(self._zcut)
 
-        if dMval <= 1.e-8 or self._zcut == 1.0:
+        # TODO is the logic for the first if statement really corrrect?
+        # if dMval <= 1.e-8:
+            # print("dMval = M3 - M2 =  %s - %s = %s   <   1e-8 therefore no stiching, regardless of zcut"%(self.M3, self.M2, dMval))
+
+        # TODO check if the upper boundary really should be == 1 always ----------------------------------------------------------------------_
+        # if dMval <= 1.e-8 or self._zcut == 1.0:
+        if self._zcut == 1.0:
 
             ys = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr), [1.e-6, 1], y0,
                            method='BDF', rtol=1.e-7, atol=1.e-10)
@@ -464,14 +494,15 @@ class EtaB_ARS(ulysses.ULSBase):
             print(self.M2, self._zcut, dMval)
             print("stitching\n")
 
-            ys_1 = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat), [1.e-6, self._zcut], y0,
+            ys_1 = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr), [1.e-6, self._zcut], y0,
                              method='BDF', rtol=1.e-7, atol=1.e-10)
 
 
             y0_2  = np.array([np.abs(ys_1.y[0,-1]),  np.abs(ys_1.y[3,-1]),  np.abs(ys_1.y[4,-1]), np.abs(ys_1.y[7,-1]),
                               np.real(ys_1.y[8,-1]), np.real(ys_1.y[9,-1]), np.real(ys_1.y[10,-1])], dtype=np.complex128)
 
-            ys = solve_ivp(lambda t, z: self.RHS_averaged(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat),
+            # TODO maybe add a comment on the logic of the zcut array being different from the non-stitched case
+            ys = solve_ivp(lambda t, z: self.RHS_averaged(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
                              [self._zcut, 1], y0_2, method='BDF', rtol=1.e-5, atol=1.e-10)
 
             muD1, muD2, muD3 = [ys.y[4,-1], ys.y[5,-1], ys.y[6,-1]]
@@ -496,18 +527,18 @@ class EtaB_ARS_INTERP(EtaB_ARS):
         #---------------------------------------------#
         #                 Integrated Rates            #
         #---------------------------------------------#
-        
+
         import os
         data_dir = os.path.dirname(ulysses.__file__)
 
         G0_f = os.path.join(data_dir, "./data/g0log.dat")
         G1_f = os.path.join(data_dir, "./data/g1log.dat")
         G2_f = os.path.join(data_dir, "./data/g2log.dat")
-    
+
         G0Tab = np.loadtxt(G0_f, skiprows=0)
         G1Tab = np.loadtxt(G1_f, skiprows=0)
         G2Tab = np.loadtxt(G2_f, skiprows=0)
-        
+
         self.G0Int_ = interpolate.splrep(G0Tab[:,0], G0Tab[:,1], s=0)
         self.G1Int_ = interpolate.splrep(G1Tab[:,0], G1Tab[:,1], s=0)
         self.G2Int_ = interpolate.splrep(G2Tab[:,0], G2Tab[:,1], s=0)
@@ -529,23 +560,23 @@ class EtaB_ARS_INTERP(EtaB_ARS):
         self.S2MInt_ = RectBivariateSpline(M1tab, z2tab, S2Mtab) # 2-D Interpolation
 
     def G0_fun(self,z): return interpolate.splev(math.log(z), self.G0Int_, der=0)
-        
+
     def G1_fun(self,z): return interpolate.splev(math.log(z), self.G1Int_, der=0)
 
     def G2_fun(self,z): return interpolate.splev(math.log(z), self.G2Int_, der=0)
 
-    
+
     def S0_M_fun(self,M, z):
-        
+
         if M < 0.1:
             M = 0.1
         elif M > 100.:
             M = 100.
-            
+
         return self.S0MInt_(np.log(M), np.log(z))[0,0]
-        
+
     def S1_M_fun(self,M, z):
-            
+
         if M < 0.1:
             M = 0.1
         elif M > 100.:
@@ -568,8 +599,8 @@ class EtaB_ARS_INTERP(EtaB_ARS):
 
         return fast_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr, funcs, use_interpolation=True)
 
-    def RHS_averaged(self, z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat):
+    def RHS_averaged(self, z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr):
 
         funcs = [self.G0_fun, self.G1_fun, self.G2_fun, self.S0_M_fun, self.S1_M_fun, self.S2_M_fun]
 
-        return fast_averaged_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, funcs, use_interpolation=True)
+        return fast_averaged_RHS(z, y, Fmat, M1, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr, funcs, use_interpolation=True)
