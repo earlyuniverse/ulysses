@@ -473,12 +473,13 @@ class EtaB_ARS(ulysses.ULSBase):
             if zosc < 0.1: print(colored("Warning: Dimensionless oscillation time smaller than 0.1. Code might become slow. \n", 'red'))
 
             ys = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
-                           [1.e-6, 1], y0, method='BDF', rtol=1.e-7, atol=1.e-10)
+                           [1.e-6, 1], y0, method='BDF', rtol=1.e-5, atol=1.e-10)
 
             muD1, muD2, muD3 = [ys.y[8,-1], ys.y[9,-1], ys.y[10,-1]]
 
 
         else:
+            
             if zosc > 0.1:
 
                 ys = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
@@ -491,7 +492,7 @@ class EtaB_ARS(ulysses.ULSBase):
                 print(colored("Warning: Performing stitching of the solutions at zcut = {}. \n".format(self._zcut), 'red'))
                 
                 ys_1 = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
-                                 [1.e-6, self._zcut], y0, method='BDF', rtol=1.e-7, atol=1.e-10)
+                                 [1.e-6, self._zcut], y0, method='BDF', rtol=1.e-5, atol=1.e-5)
 
 
                 y0_2  = np.array([np.abs(ys_1.y[0,-1]),  np.abs(ys_1.y[3,-1]),  np.abs(ys_1.y[4,-1]), np.abs(ys_1.y[7,-1]),
