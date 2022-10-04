@@ -274,14 +274,11 @@ def fast_averaged_RHS(z, y, Fmat, M2, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_
     cons_1 = 0.05701803240084191
     cons_2 = 0.5480722270510788
 
-    # RHS matrices TODO check dtype --- complex128?
-
     RN_mat      =  np.diag([y[0], y[1]])
     RNb_mat     =  np.diag([y[2], y[3]])
     mud_mat     =  np.diag([y[4], y[5], y[6]])
 
     mu_mat      =  2. * chi_mat @ mud_mat
-
 
     # matrices appearing in Eqs
     FmatH               = np.transpose(np.conjugate(Fmat))
@@ -466,8 +463,6 @@ class EtaB_ARS(ulysses.ULSBase):
         #Dimensionless oscillation time, see 2109.10908, Eq 6.
         zosc = np.cbrt(12.*Tew**3/(deltaM2 * M0)) 
 
-        print(self._zcut, "{:.2E}".format(dMval), zosc)
-
         if self._zcut == 1.0:
 
             if zosc < 0.1: print(colored("Warning: Dimensionless oscillation time smaller than 0.1. Code might become slow. \n", 'red'))
@@ -494,11 +489,14 @@ class EtaB_ARS(ulysses.ULSBase):
                 ys_1 = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
                                  [1.e-6, self._zcut], y0, method='BDF', rtol=1.e-5, atol=1.e-5)
 
-
+                #
+                # For the stitching case, we ignore the evolution of the off-diagonal terms in the RN and RNb matrices.
+                # Thus, we only take the solutions related to RN11, RN22, RNb11, RNb22 for the averaged equations
+                #
                 y0_2  = np.array([np.abs(ys_1.y[0,-1]),  np.abs(ys_1.y[3,-1]),  np.abs(ys_1.y[4,-1]), np.abs(ys_1.y[7,-1]),
                                   np.real(ys_1.y[8,-1]), np.real(ys_1.y[9,-1]), np.real(ys_1.y[10,-1])], dtype=np.complex128)
 
-                # TODO maybe add a comment on the logic of the zcut array being different from the non-stitched case
+                
                 ys = solve_ivp(lambda t, z: self.RHS_averaged(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
                                [self._zcut, 1], y0_2, method='BDF', rtol=1.e-5, atol=1.e-10)
 
