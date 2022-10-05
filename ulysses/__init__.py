@@ -25,8 +25,8 @@ from ulysses.etab1BE1F_Case2          import EtaB_1BE1F_Case2
 from ulysses.etab1BE1F_Case3          import EtaB_1BE1F_Case3
 from ulysses.etab1BE1F_Case4          import EtaB_1BE1F_Case4
 
-from ulysses.etabARS_new_v5           import EtaB_ARS
-from ulysses.etabARS_new_v5           import EtaB_ARS_INTERP
+from ulysses.etabARS_new_v6           import EtaB_ARS
+from ulysses.etabARS_new_v6           import EtaB_ARS_INTERP
 
 from ulysses.etabPBH                  import EtaB_PBH
 

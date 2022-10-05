@@ -183,7 +183,7 @@ class EtaB_1BE1F_Case2(ulysses.ULSBase):
         self._K              =  np.real(self.k1)
         self.z_eval          =  np.logspace(np.log10(self.z_span[0]), np.log10(self.z_span[1]), nevals)
         self.calc            =  Calculator(self._K, yn_vals, tMin=self.z_span[0], tMax=self.z_span[1])
-       
+#       y0 here sets the initial conditions for RHN and B-L asymmetry respectively
         y0                   = np.array([0+0j,0+0j], dtype=np.complex128)
        
         solLD2 = solve_ivp(NLrhs, self.z_span, [0], t_eval=self.z_eval,

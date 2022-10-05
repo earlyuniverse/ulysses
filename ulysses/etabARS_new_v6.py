@@ -441,6 +441,7 @@ class EtaB_ARS(ulysses.ULSBase):
             print(colored("Warning: This set of parameters is in the strong washout regime for lepton asymmetries. \n", 'red'))
 
         dMval = self.M3 - self.M2
+       
 
         params  = np.array([Fmat[0, 0], Fmat[0, 1], Fmat[1, 0], Fmat[1, 1], Fmat[2, 0], Fmat[2, 1], self.M2, dMval, Tew, gss, M0],
                            dtype=np.complex128)
