@@ -57,9 +57,15 @@ def getBuiltInModels():
      """
      Return as dict of short name a and class.
      """
-     classes    = [cls                for cls in ulysses.ULSBase.__subclasses__()]
-     shortnames = [cls.shortname(cls) for cls in ulysses.ULSBase.__subclasses__()]
+#     classes    = [cls                for cls in ulysses.ULSBase.__subclasses__()]
+#     shortnames = [cls.shortname(cls) for cls in ulysses.ULSBase.__subclasses__()]
+     def all_subclasses(cls):
+        return set(cls.__subclasses__()).union(
+            [s for c in cls.__subclasses__() for s in all_subclasses(c)])
+     classes    =  all_subclasses(ulysses.ULSBase)
+     shortnames =  [ cls.shortname(cls) for cls in classes]
      return {n : c for n, c in zip(shortnames, classes) if n!=""}
+
 
 def selectModel(model, **kwargs):
     """

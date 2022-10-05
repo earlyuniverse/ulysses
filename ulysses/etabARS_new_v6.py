@@ -526,11 +526,13 @@ class EtaB_ARS_INTERP(EtaB_ARS):
 
         import os
         data_dir = os.path.dirname(ulysses.__file__)
-
+      
         G0_f = os.path.join(data_dir, "./data/g0log.dat")
         G1_f = os.path.join(data_dir, "./data/g1log.dat")
         G2_f = os.path.join(data_dir, "./data/g2log.dat")
-
+        
+#        print(G0_f)
+#        exit()
         G0Tab = np.loadtxt(G0_f, skiprows=0)
         G1Tab = np.loadtxt(G1_f, skiprows=0)
         G2Tab = np.loadtxt(G2_f, skiprows=0)
