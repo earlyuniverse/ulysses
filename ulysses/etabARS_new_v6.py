@@ -369,7 +369,7 @@ def fast_averaged_RHS(z, y, Fmat, M2, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_
     return eqtns
 
 
-class EtaB_BE_ARS(ulysses.ULSBase):
+class EtaB_ARS(ulysses.ULSBase):
     """
     add description of where to find BEs
     """
@@ -509,7 +509,7 @@ class EtaB_BE_ARS(ulysses.ULSBase):
 
         return etaB
 
-class EtaB_BE_ARS_INTERP(EtaB_ARS):
+class EtaB_ARS_INTERP(EtaB_ARS):
 
     def shortname(self): return "BEARS_INTERP"
 
