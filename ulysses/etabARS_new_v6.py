@@ -498,27 +498,25 @@ class EtaB_ARS(ulysses.ULSBase):
                                   np.real(ys_1.y[8,-1]), np.real(ys_1.y[9,-1]), np.real(ys_1.y[10,-1])], dtype=np.complex128)
 
                 
-#                ys = solve_ivp(lambda t, z: self.RHS_averaged(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
-#                               [self._zcut, 1], y0_2, method='BDF', rtol=1.e-5, atol=1.e-10)
-#
-#                muD1, muD2, muD3 = [ys.y[4,-1], ys.y[5,-1], ys.y[6,-1]]
-#
-#        YB_sol  = np.abs(muD1 + muD2 + muD3)
-#        YB  = f_convertYBLtoYB(f_convertmutoY(YB_sol, gss))
-#        etaB= YB/ToYb
-#         return etaB
-
-                solARS = solve_ivp(lambda t, z: self.RHS_averaged(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
+                ys = solve_ivp(lambda t, z: self.RHS_averaged(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
                                [self._zcut, 1], y0_2, method='BDF', rtol=1.e-5, atol=1.e-10)
-                               
-               ys      = [solARS.y[4,-1], solARS.y[5,-1], solARS.y[6,-1]]
-            
-        YB_sol  = np.abs(ys[0] + ys[1] + ys[2])
-        YB  = f_convertYBLtoYB(f_convertmutoY(YB_sol, gss))
-        self.setEvolData(ys)
-        etaB= YB/ToYb
 
-        return self.etaB
+                muD1, muD2, muD3 = [ys.y[4,-1], ys.y[5,-1], ys.y[6,-1]]
+
+        YB_sol  = np.abs(muD1 + muD2 + muD3)
+        YB  = f_convertYBLtoYB(f_convertmutoY(YB_sol, gss))
+        etaB= YB/ToYb
+         return etaB
+
+#                solARS = solve_ivp(lambda t, z: self.RHS_averaged(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr), [self._zcut, 1], y0_2, method='BDF', rtol=1.e-5, atol=1.e-10)
+#                               
+#                ys     = [solARS.y[4,-1], solARS.y[5,-1], solARS.y[6,-1]]
+#            
+#        YB_sol  = np.abs(ys[0] + ys[1] + ys[2])
+#        YB  = f_convertYBLtoYB(f_convertmutoY(YB_sol, gss))
+#        self.setEvolData(ys)
+#        etaB= YB/ToYb
+#        return etaB
 
 class EtaB_ARS_INTERP(EtaB_ARS):
 
