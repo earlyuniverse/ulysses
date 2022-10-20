@@ -45,7 +45,7 @@ def NLrhs(z, Nl, K, eps,  calc, highlim = 300, epsrel = 1e-10, epsabs = 1e-10):
     Nn = calc.solD3_.sol(z) / Neq
     integral1 = quad(ynintegral, llowerlim, highlim, args=(z, Nl, eps, Nn,  calc), epsabs=epsabs, epsrel=epsrel)
     int = integral1[0]
-    return -z * z * K * int * (3. / 16.)
+    return -z * z * K * int * 1/(4*zeta(3))#(3. / 16.)
 
 
 def Nneq(zs, z, y):
