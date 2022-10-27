@@ -504,7 +504,7 @@ class EtaB_ARS(ulysses.ULSBase):
                 solARS = solve_ivp(lambda t, z: self.RHS_averaged(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
                                [self._zcut, 1], y0_2, method='BDF', rtol=1.e-5, atol=1.e-10)
 
-                t, muD1, muD2, muD3 = [ys.t, solARS.y[4], solARS.y[5], solARS.y[6]]
+                t, muD1, muD2, muD3 = [solARS.t, solARS.y[4], solARS.y[5], solARS.y[6]]
                 
                 
         YB_sol  = np.abs(muD1[-1] + muD2[-1] + muD3[-1])
