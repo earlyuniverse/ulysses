@@ -104,8 +104,8 @@ class Calculator(object):
     def D3Nintegrand(self, yn, z):
         """Returns the integrand of rhn evolution for Case 3"""
         en = math.sqrt(z * z + yn * yn)
-        alpha = 0.5*(math.exp((en-yn)/2)-math.exp(-(en-yn)/2))
-        beta = 0.5*(math.exp((en+yn)/2)-math.exp(-(en+yn)/2))
+        alpha = np.sinh((en-yn)/2)#0.5*(math.exp((en-yn)/2)-math.exp(-(en-yn)/2))
+        beta = np.sinh((en+yn)/2)#0.5*(math.exp((en+yn)/2)-math.exp(-(en+yn)/2))
 
         return (yn/en) * (1. / (math.exp(en) + 1.)) * math.log(alpha / beta)
         
@@ -190,6 +190,10 @@ class EtaB_1BE1F_Case3(ulysses.ULSBase):
                        rtol=1e-10, dense_output=True)
         ys    = np.transpose(( solLD3.sol(self.zs)[0],  solLD3.sol(self.zs)[0]))
         self.setEvolData(ys)
+        
+        #Gives the number of RHNs per comoving volume N_N(z)        
+        N_N = self.zs, self.calc.solD3_.sol(self.zs).ravel()
+        
         return self.ys[-1][-1]
 
 
