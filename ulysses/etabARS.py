@@ -511,7 +511,7 @@ class EtaB_ARS(ulysses.ULSBase):
         plt.plot(t, np.abs(muD1), label=r"$\mu_1$")
         plt.plot(t, np.abs(muD2), label=r"$\mu_2$")
         plt.plot(t, np.abs(muD3), label=r"$\mu_3$")
-        plt.xlabel(r"$z$", fontsize=16)
+        plt.xlabel(r"$x$", fontsize=16)#x=T_{ew}/T
         plt.legend(loc='lower right', fontsize=16)
         plt.ylabel(r"$|\mu|$",  fontsize=16)
         plt.show()
