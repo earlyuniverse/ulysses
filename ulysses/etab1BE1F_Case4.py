@@ -40,7 +40,7 @@ def NLrhs(z, Nl, K, eps, calc, highlim = 300, epsrel = 1e-10, epsabs = 1e-10):
     Nn = None
     integral1 = quad(ynintegral, llowerlim, highlim, args=(z, Nl, eps, Nn,  calc), epsabs=epsabs, epsrel=epsrel)
     int = integral1[0]
-    return -z * z * K * int * (3 / 16)
+    return -z * z * K * int * 1/(4*zeta(3)) #(3 / 16)
 
 
 def Nneq(zs, z, y):
@@ -53,7 +53,7 @@ def Nneq(zs, z, y):
 
 def Normalise(array, y_eval, y):
     """Integrates inputted array over normalised yn phase space"""
-    integrand = np.multiply(array, y * y * (3 / 8))
+    integrand = np.multiply(array, y * y /(2*zeta(3)))
     result = simpson(integrand, x=y_eval, axis=0)
     return result.ravel()
 
@@ -184,7 +184,7 @@ class EtaB_1BE1F_Case4(ulysses.ULSBase):
         #Define fixed quantities for BEs
         nevals               =  500
         yn_vals              =  np.logspace(-3., np.log10(350.), nevals)
-        self.z_span          =  [1e-1, 100.]
+        self.z_span          =  [1e-1, 50.]
         epstt                =  np.real(self.epsilon1ab(2,2))
         epsmm                =  np.real(self.epsilon1ab(1,1))
         epsee                =  np.real(self.epsilon1ab(0,0))
@@ -200,5 +200,12 @@ class EtaB_1BE1F_Case4(ulysses.ULSBase):
                        rtol=1e-10, dense_output=True)
         ys    = np.transpose(( solLD4.sol(self.zs)[0],  solLD4.sol(self.zs)[0]))
         self.setEvolData(ys)
+        
+        #Gives the number of RHNs per comoving volume N_N(z)        
+        z, y    = np.meshgrid(self.zs, self.calc.yn_)
+        D4array = self.calc.solD4_.sol(self.zs)
+        N_N     = self.zs, Normalise(D4array, self.zs, y)
+        
+        
         return self.ys[-1][-1]
 

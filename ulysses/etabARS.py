@@ -504,14 +504,14 @@ class EtaB_ARS(ulysses.ULSBase):
                 solARS = solve_ivp(lambda t, z: self.RHS_averaged(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
                                [self._zcut, 1], y0_2, method='BDF', rtol=1.e-5, atol=1.e-10)
 
-                t, muD1, muD2, muD3 = [ys.t, solARS.y[4], solARS.y[5], solARS.y[6]]
+                t, muD1, muD2, muD3 = [solARS.t, solARS.y[4], solARS.y[5], solARS.y[6]]
                 
                 
         YB_sol  = np.abs(muD1[-1] + muD2[-1] + muD3[-1])
         plt.plot(t, np.abs(muD1), label=r"$\mu_1$")
         plt.plot(t, np.abs(muD2), label=r"$\mu_2$")
         plt.plot(t, np.abs(muD3), label=r"$\mu_3$")
-        plt.xlabel(r"$z$", fontsize=16)
+        plt.xlabel(r"$x$", fontsize=16)#x=T_{ew}/T
         plt.legend(loc='lower right', fontsize=16)
         plt.ylabel(r"$|\mu|$",  fontsize=16)
         plt.show()
