@@ -517,8 +517,7 @@ class EtaB_ARS(ulysses.ULSBase):
         plt.show()
         YB  = f_convertYBLtoYB(f_convertmutoY(YB_sol, gss))
         etaB= YB/ToYb
-        
-
+    
         return etaB
 
 
