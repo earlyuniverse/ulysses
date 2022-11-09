@@ -465,50 +465,50 @@ class EtaB_ARS(ulysses.ULSBase):
         #Dimensionless oscillation time, see 2109.10908, Eq 6.
         zosc = np.cbrt(12.*Tew**3/(deltaM2 * M0)) 
 
-        # if zosc > 0.1, oscillations start late so the full integration [1e-6,1] can be performed without problems
-        if zosc > 0.1:
-        
-            print(colored("Info: zosc = {}".format(zosc), 'red'))
+        if self._zcut == 1.0:
+
+            if zosc < 0.1: print(colored("Warning: Dimensionless oscillation time smaller than 0.1. Code might become slow. \n", 'red'))
 
             ys = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
-                           [1.e-6, 1], y0, method='BDF', rtol=1e-7, atol=1.e-10)
-            
+                           [1.e-6, 1], y0, method='BDF', rtol=1.e-5, atol=1.e-10)
+
             t, muD1, muD2, muD3 = [ys.t,ys.y[8], ys.y[9], ys.y[10]]
-        
-        # if zosc < 0.1, oscillations start early. The numerical integration could be slow. The default behaviour is that the full integration is performed
-        # unless the user provides a zcut  value (this is the point i the z-integration where the stitching occurs and the off diagonal terms are ignored)
-        # see below for more details
+            
+
         else:
-
-            print(colored("Info: zosc = {}, stitching occurs at {}.".format(zosc,self._zcut), 'red'))
             
-            if self._zcut == 1:
-            
-                    print(colored("Info: zcut is at default value 1, consider inputting  0.5 < zcut < 1 if integration is slow.".format(zosc,self._zcut), 'red'))
+            if zosc > 0.1:
 
-            ys_1 = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
+                ys = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
+                               [1.e-6, 1], y0, method='BDF', rtol=1.e-7, atol=1.e-10)
+
+                t, muD1, muD2, muD3 = [ys.t, ys.y[8], ys.y[9], ys.y[10]]
+
+            else:
+
+                print(colored("Warning: Performing stitching of the solutions at zcut = {}. \n".format(self._zcut), 'red'))
+                
+                ys_1 = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
                                  [1.e-6, self._zcut], y0, method='BDF', rtol=1.e-5, atol=1.e-5)
-            
-            t_1, muD1_1, muD2_1, muD3_1 = [ys_1.t,ys_1.y[8], ys_1.y[9], ys_1.y[10]]
 
-                #  this is where the stitch occurs if the user provides a zcut
+                #
                 # For the stitching case, we ignore the evolution of the off-diagonal terms in the RN and RNb matrices.
                 # Thus, we only take the solutions related to RN11, RN22, RNb11, RNb22 for the averaged equations
-
-            y0_2  = np.array([np.abs(ys_1.y[0,-1]),  np.abs(ys_1.y[3,-1]),  np.abs(ys_1.y[4,-1]), np.abs(ys_1.y[7,-1]),
+                #
+                y0_2  = np.array([np.abs(ys_1.y[0,-1]),  np.abs(ys_1.y[3,-1]),  np.abs(ys_1.y[4,-1]), np.abs(ys_1.y[7,-1]),
                                   np.real(ys_1.y[8,-1]), np.real(ys_1.y[9,-1]), np.real(ys_1.y[10,-1])], dtype=np.complex128)
 
                 
 
-            solARS = solve_ivp(lambda t, z: self.RHS_averaged(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr), [self._zcut, 1], y0_2, method='BDF', rtol=1.e-5, atol=1.e-10)
 
-            t_2, muD1_2, muD2_2, muD3_2 = [solARS.t, solARS.y[4], solARS.y[5], solARS.y[6]]
-            t,   muD1,    muD2, muD3 = [np.concatenate((t_1,t_2), axis=0), np.concatenate((muD1_1, muD1_2) , axis=0), np.concatenate((muD2_1, muD2_2), axis=0), np.concatenate((muD3_1, muD3_2), axis=0)]
+                solARS = solve_ivp(lambda t, z: self.RHS_averaged(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
+                               [self._zcut, 1], y0_2, method='BDF', rtol=1.e-5, atol=1.e-10)
+
+                t, muD1, muD2, muD3 = [solARS.t, solARS.y[4], solARS.y[5], solARS.y[6]]
+                
                 
         YB_sol  = np.abs(muD1[-1] + muD2[-1] + muD3[-1])
-        
         plt.plot(t, np.abs(muD1), label=r"$\mu_1$")
-
         plt.plot(t, np.abs(muD2), label=r"$\mu_2$")
         plt.plot(t, np.abs(muD3), label=r"$\mu_3$")
         plt.xlabel(r"$x$", fontsize=16)#x=T_{ew}/T
