@@ -1,0 +1,149 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* The ATLASCone plugin is enabled */
+#undef ENABLE_PLUGIN_ATLASCONE
+
+/* The CDFCones plugin is enabled */
+#undef ENABLE_PLUGIN_CDFCONES
+
+/* The CMSIterativeCone plugin is enabled */
+#undef ENABLE_PLUGIN_CMSITERATIVECONE
+
+/* The D0RunICone plugin is enabled */
+#undef ENABLE_PLUGIN_D0RUNICONE
+
+/* The D0RunIICone plugin is enabled */
+#undef ENABLE_PLUGIN_D0RUNIICONE
+
+/* The EECambridge plugin is enabled */
+#undef ENABLE_PLUGIN_EECAMBRIDGE
+
+/* The GridJet plugin is enabled */
+#undef ENABLE_PLUGIN_GRIDJET
+
+/* The Jade plugin is enabled */
+#undef ENABLE_PLUGIN_JADE
+
+/* The NestedDefs plugin is enabled */
+#undef ENABLE_PLUGIN_NESTEDDEFS
+
+/* The PxCone plugin is enabled */
+#undef ENABLE_PLUGIN_PXCONE
+
+/* The SISCone plugin is enabled */
+#undef ENABLE_PLUGIN_SISCONE
+
+/* The TrackJet plugin is enabled */
+#undef ENABLE_PLUGIN_TRACKJET
+
+/* compile the deprecated parts of the interface using auto-ptr */
+#undef HAVE_AUTO_PTR_INTERFACE
+
+/* compiler supports c++14 deprecated keyword */
+#undef HAVE_CXX14_DEPRECATED
+
+/* defined if demangling is enabled at configure time and is supported through
+   the GNU C++ ABI */
+#undef HAVE_DEMANGLING_SUPPORT
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <execinfo.h> header file. */
+#undef HAVE_EXECINFO_H
+
+/* compiler supports the "explicit" keyword for operators */
+#undef HAVE_EXPLICIT_FOR_OPERATORS
+
+/* Define to 1 if you have the <gmp.h> header file. */
+#undef HAVE_GMP_H
+
+/* compiler supports GNU c++ deprecated attribute */
+#undef HAVE_GNUCXX_DEPRECATED
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
+
+/* defined if limited thread-safety has been enabled */
+#undef HAVE_LIMITED_THREAD_SAFETY
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <mpfr.h> header file. */
+#undef HAVE_MPFR_H
+
+/* compiler supports the "override" keyword */
+#undef HAVE_OVERRIDE
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* defined if thread-safety has been enabled */
+#undef HAVE_THREAD_SAFETY
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
+#undef LT_OBJDIR
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Version number of package */
+#undef VERSION
+
+/* Major version of this package */
+#undef VERSION_MAJOR
+
+/* Minor version of this package */
+#undef VERSION_MINOR
+
+/* Version of the package under the form XYYZZ (instead of X.Y.Z) */
+#undef VERSION_NUMBER
+
+/* Patch version of this package */
+#undef VERSION_PATCHLEVEL
+
+/* Pre-release version of this package */
+#undef VERSION_PRERELEASE

@@ -1,0 +1,34 @@
+Requirements to be tested:
+
+Histo1D:
+ * Uniform bin booking
+ * Non-uniform contiguous bin booking
+ * Non-contiguous bin booking
+ * Correct mean and error values
+ * Correct negative weight handling
+ * Handling bins with zero/negative-weights
+ * +-*/ histos with exactly equal binnings
+
+Profile1D:
+ * Bookings as for Histo1D
+ * Correct mean and error values - stdErr and stdDev
+ * Correct negative weight handling
+ * Handling bins with zero/negative-weights
+ * Combining with correct stats
+
+Number/Counter:
+ * Exists!
+
+File format:
+ * Writing all data types
+ * Reading and combining data types from Python
+
+Python:
+ * Interface fully functional
+
+
+Later:
+
+Histo1D:
+ * +-*/ histos with compatible but not equal binnings
+ * +-*/ histos with incompatible binnings

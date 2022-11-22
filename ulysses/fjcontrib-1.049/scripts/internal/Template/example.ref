@@ -1,0 +1,11 @@
+# This file is used by make check. It should be replaced with the
+# output from 
+#
+#    ./example < YOUR_CHECK_INPUT
+# 
+# YOUR_CHECK_INPUT is to be specified in the "check:" entry of the
+# Makefile and should be included in the distribution.
+#
+# The top-level part of fjconfig includes some sample data files in
+# its data/ directory to help with your checks. These are
+# automatically distributed with fjcontrib.

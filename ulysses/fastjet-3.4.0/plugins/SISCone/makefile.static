@@ -1,0 +1,53 @@
+
+# common fastjet definitions
+include ../../makefile.static
+
+
+CXXSRC = SISConeBasePlugin.cc SISConePlugin.cc SISConeSphericalPlugin.cc
+OBJS = $(patsubst %.cc,%.o,$(CXXSRC)) 
+
+MAKESUBDIR = siscone_config siscone_src
+SUBDIR = siscone/siscone
+SUBDIR_CONFIG = siscone
+
+# fastjet includes
+FASTJET_INCLUDE = -I../../include
+INCLUDE += $(FASTJET_INCLUDE)
+
+# scones includes
+INCLUDE += -I$(SUBDIR_CONFIG)
+
+all: libSISConePlugin.a
+
+libSISConePlugin.a: $(MAKESUBDIR) $(OBJS)
+	ar cru libSISConePlugin.a $(OBJS) $(SUBDIR)/*.o
+	ranlib libSISConePlugin.a
+
+siscone_config:
+	@cd $(SUBDIR_CONFIG) && $(MAKE) -f makefile.static config
+
+siscone_src:
+	@cd $(SUBDIR) && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+
+clean:
+	rm -f $(OBJS)
+	@cd $(SUBDIR) && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+
+distclean: clean
+	rm -f libSISConePlugin.a *~
+
+# NB: only use "relative" includes here (others are too subject
+#     to change according to the system one is on...)
+depend:
+	makedepend  -f makefile.static $(FASTJET_INCLUDE) -I. -Isiscone/src --   -- $(CXXSRC)
+
+# DO NOT DELETE
+
+SISConePlugin.o: ../../include/fastjet/ClusterSequence.hh
+SISConePlugin.o: ../../include/fastjet/internal/DynamicNearestNeighbours.hh
+SISConePlugin.o: ../../include/fastjet/internal/numconsts.hh
+SISConePlugin.o: ../../include/fastjet/internal/base.hh
+SISConePlugin.o: ../../include/fastjet/PseudoJet.hh
+SISConePlugin.o: ../../include/fastjet/Error.hh
+SISConePlugin.o: ../../include/fastjet/JetDefinition.hh
+SISConePlugin.o: fastjet/SISConePlugin.hh

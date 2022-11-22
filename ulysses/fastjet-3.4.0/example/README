@@ -1,0 +1,16 @@
+List of the examples enclosed:
+
+01-basic.cc          basic usage example
+02-jetdef.cc         further usage of JetDefinition
+03-plugin.cc         illustrates the usage of (the SISCone) plugin
+04-constituents.cc   shows how a PseudoJet accesses its underlying ClusterSequence
+05-eplus_eminus.cc   illustrates the usage of the e+e- algorithms and exclusive jets
+06-area.cc           illustrates the usage of jet areas
+07-subtraction.cc    shows how to estimate the background and subtract it from the jets
+08-selector.cc       illustrates the usage of Selector
+09-user_info.cc      shows how to implement and retrieve extra user info about input particles
+10-subjets.cc        shows how to extract information about subjets
+11-filter.cc         shows how to implement and use various filters
+12-boosted_higgs.cc  shows how to implement boosted Higgs tagging using jet substructure
+13-boosted_top.cc    shows how to implement boosted top tagging using jet substructure
+14-groomers.cc       shows how to use various groomers (filtering, trimming, pruning) in a unified manner

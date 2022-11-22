@@ -1,0 +1,35 @@
+# common fastjet definitions
+include ../../makefile.static
+
+CXXSRC = JadePlugin.cc 
+OBJS = $(patsubst %.cc,%.o,$(CXXSRC)) 
+
+# fastjet includes
+FASTJET_INCLUDE = -I../../include
+INCLUDE += $(FASTJET_INCLUDE)
+
+all: libJadePlugin.a
+
+libJadePlugin.a: $(OBJS)
+	ar cru libJadePlugin.a $(OBJS)
+	ranlib libJadePlugin.a
+
+clean:
+	rm -f $(OBJS)
+
+distclean: clean
+	rm -f libJadePlugin.a *~
+
+# NB: only use "relative" includes here (others are too subject
+#     to change according to the system one is on...)
+depend:
+	makedepend  -f Makefile $(FASTJET_INCLUDE) -I. -I./fastjet --   -- $(CXXSRC)
+# DO NOT DELETE
+
+JadePlugin.o: ../../include/fastjet/ClusterSequence.hh
+JadePlugin.o: ../../include/fastjet/internal/DynamicNearestNeighbours.hh
+JadePlugin.o: ../../include/fastjet/internal/numconsts.hh
+JadePlugin.o: ../../include/fastjet/internal/base.hh
+JadePlugin.o: ../../include/fastjet/PseudoJet.hh
+JadePlugin.o: ../../include/fastjet/Error.hh
+JadePlugin.o: ../../include/fastjet/JetDefinition.hh fastjet/JadePlugin.hh

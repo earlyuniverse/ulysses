@@ -1,0 +1,33 @@
+1.2.1 (2016-05-31): Small fixes to documentation and comments
+1.2.0 (2016-03-29): Added an implementation based on the NNFJN2Tiled
+                    (and similar) classes in FastJet, bringing
+                    sizable speed improvements.  It is introduced
+                    through a "Strategy" argument and requires
+                    FastJet>=3.2.0 ["Native" clustering used for older
+                    versions or to recover the previous behavior].
+                    Please use fastjet::NestedDefsPlugin whenever
+                    pre-clustering is needed. 
+                    (Thanks to Nikola Whallon for feedback, tests
+                    and contributions to early-stages developments)
+1.1.1 (2014-06-02): Added VariableRPlugin.cc/.hh to conform to recommended
+                    FastJet naming structure.  Old VariableR.hh header preserved
+                    for backwards compatibility.
+1.1.0 (2014-04-18): New version incorporates optimized code from David Krohn,
+                    which should be faster than the old version.  The AKTVR and
+                    CAVR interfaces are the same as v1.0 (with identical
+                    results). An additional VariableRPlugin interface is
+                    available, which is now recommended.  This new interface
+                    offers the possibility of setting a min_r > 0 as well as
+                    using kT preclustering for speed gains.
+                    
+1.0.1 (2013-02-23): Fixed memory management and potential dependency issue
+                    (thanks FJ authors)
+1.0.0 (2013-02-22): New release using FastJet contrib framework.  All of the
+                    code has been merged into the VariableR.hh and VariableR.cc
+                    files (whereas previously there were separate files for AKT,
+                    CA, and the CoreJetAlgorithm classes).  The example program
+                    runs both AKTVR and CAVR.
+
+Previous version available from:
+   http://jthaler.net/jets/VRPlugins.tar.gz
+ 

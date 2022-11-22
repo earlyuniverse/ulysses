@@ -1,0 +1,217 @@
+This file contains the history of SISCone releases. For each one,
+we give a short summary of the important changes from the previous
+version. If you want to see a more detailed list of changes, please
+read the ChangeLog file.
+
+SISCone version 3.0.5 (April 24 2020)
+=====================
+
+* Minor release, fixed signed/unsigned warning in bitshift operations
+  (version to be included in FastJet>=3.3.4)
+
+SISCone version 3.0.4 (October 1 2018)
+=====================
+
+* Minor release, improved shared library handling by fixing
+  inter-dependencies. (version to be included in FastJet>=3.3.2)
+
+SISCone version 3.0.3 (August 3 2016)
+=====================
+
+* Minor release, installing config.h to include flags decided at
+  configure time. (version to be included in FastJet>=3.2.1)
+
+SISCone version 3.0.2 (March 16 2016)
+=====================
+
+* Minor release, fixing a bug due to an array being used uninitialised
+  (no impact on results). Also replaced auto_ptr by unique_ptr when
+  supported by compiler (version to be included in FastJet>=3.2.0)
+
+SISCone version 3.0.1 (February 29 2016)
+=====================
+
+* Minor release, fixing a bug due to a rounding issue that occurs the
+  theta range in (rare) specific configurations where theta=pi in the
+  split-merge procedure for spherical SISCone
+
+SISCone version 3.0.0 (September 9 2014)
+=====================
+
+* Added the option of running SISCone with progressive removal,
+  corresponding to the following algorithm:
+
+    1. search for stable cones
+    2. declare the hardest stable cone a jet and remove its particles
+       from the list of remaining particles
+    3. if there are some remaining particles, go back to 1.
+
+  Use Csiscone::compute_jets_progressive_removal(...) for this version
+  of SISCone
+
+  The scale used to determine which is the hardest stable cone can be
+  chosen amongst the same options as the scale used for the
+  split--merge step [SM_pttilde by default for the pp version of
+  SISCone, SM_Etilde for the spherical version].  Alternatively, a
+  user-defined scale choice can be provided using set_user_scale(...).
+
+  Version to be included in FastJet>=3.1.0
+
+SISCone version 2.0.6 (April 9 2013)
+=====================
+* Minor release fixing an issue concerning the installation of
+  configuration headers and bringing small updates in the autotools
+  build system (version to be included in FastJet>=3.0.4)
+
+SISCone version 2.0.5 (January 17 2012)
+=====================
+* Minor release bringing minor improvements to the build system
+  (version to be included in FastJet>=3.0.2)
+
+SISCone version 2.0.4 (November 25 2011)
+=====================
+* Minor release to remove a few gcc warnings when compiled with
+  high warning level (-ansi -pedantic -Wextra -Wshadow)
+  (version to be included in FastJet>=3.0.1)
+
+SISCone version 2.0.3 (October 5 2011)
+=====================
+* Minor release to fix a badly documented Etilde variable in the
+  spherical version of SISCone and to remove a few gcc warnings
+  (version to be included in FastJet 3.x)
+
+SISCone version 2.0.2 (May 2011)
+=====================
+* minor modifications to the build system
+  (version to be included in FastJet 3.x)
+
+SISCone version 2.0.1 (May 2009)
+=====================
+* enabled shared libraries by default
+  [that was the source of a bug in fastJet]
+* replaced _R with _radius to fix build problems on old OSX systems 
+* fixed some syntax inconsistencies in Makefile.am's
+
+
+SISCone version 2.0.0 (Apr 2009)
+=====================
+* Added a spherical version of SISCone for use in e+e- collisions
+  This typically works in the same way as the pp version of SISCone
+  with the following remarks:
+   - the classes fot the spherical versions of SISCone are prefixed by
+     'CSph' instead of 'C' (e.g. CSphMomentum CSphSISCone)
+   - the cone radius is defined as its half opening angle (particle
+     distances are also defined through the angle they define, or,
+     equivalently, as distances on the surface of a unit sphere)
+   - For ordering the protojets during the split--merge, we use
+     E_tilde defined as
+                              /      |p_i X p_J|^2  \
+	    \sum_{i\in J} E_i | 1 + --------------- |
+	                      \      |p_i|^2 E_J^2  /
+     Note that the computation of the overlap uses the "plain" energy
+
+* Added a flag (Csiscone::use_pt_weighted_splitting) to modify the
+  split part of the split-merge procedure in such a way that a shared
+  particle i is assigned the one of the overlapping jets j=1,2 that
+  has the smaller value of DeltaR_{ij}/p_{tj}. This produces more
+  circular jets.
+
+* fixed a bug in the computation of the rapidity range in the
+  split-merge step
+
+* the protocones list now contains the full 4-momentum information
+  (rather than just eta and phi)
+
+* fixed bugs in example/test.cpp
+
+
+SISCone version 1.3.3 (Aug 2008)
+=====================
+* added bugfix for g++-4.3 (missing headers for "exit")
+
+
+SISCone version 1.3.2 (Mar 2008)
+=====================
+* VERSION and PROGRAM (or PACKAGE_NAME) are no longer accessible
+  directly because of potential conflicts with other packages. 
+  You should use siscone_version() and siscone_package_name()
+  instead. (Thanks to Rolf Seuster)
+* allow the users to set their own default compilation flags.
+
+
+SISCone version 1.3.1 (Mar 2008)
+=====================
+* fixed some compilation issues under windows
+
+
+SISCone version 1.3.0 (Nov 2007)
+=====================
+
+* The main update in this new release is the switch to
+  'autotools'. This means that instead of using the (static) Makefile
+  build process, you can now use the "standard ./configure; make; make
+  install" approach. See the INSTALL file for details.
+
+* added a 'siscone_area' example of how jet areas work within SISCone.
+
+
+SISCone version 1.2.0 (Jun 2007)
+=====================
+
+* 10-15% speed increase by introducing a tiling in the eta-phi plane
+  allowing for better overlap checking in the split--merge. This can
+  turn into a bigger effect for area computations.
+
+* implementing a 'jet area' class to compute active and/or passive
+  areas.
+
+* in examples:
+  - fix bug in the cmdline parsing (there was a segfault with
+    unrecognised long options),
+  - add "passes information" to the verbose output of the main siscone
+    program,
+  - solve problems with the 'time' example.
+
+
+SISCone version 1.1.1 (Mar 2007)
+=====================
+
+* The major upgrade is the use of pttilde (p-scheme pt) instead
+  of mt in the split--merge process. Indeed, we have noticed 
+  that mt can lead to IR usafety in the case of two back-to-back 
+  narrow-decay-width unstable particles (e.g. a pair of Higgs bosons).
+  See http://projects.hepforge.org/siscone/sm_issue.html for details.
+
+  Note that SISCone 1.1.1 allows the user to specify its choice for
+  the split-merge variable (we highly recommand the default choice)
+
+* The number of passes is now set to infinity (0) by default
+
+* Small minor changes in the 'siscone' command-line options
+
+
+SISCone version 1.1.0 (Mar 2007)
+=====================
+
+* dealt with colinearity issues
+
+* dealt with cocircularity situations (and related rounding errors)
+
+* use mt instead of pt in the split-merge 
+  pt lead to some IR unsafety for events with momentum conservation
+
+* move all references to HEPForge
+
+* Important note: some typos have been fixed. As a consequence, some
+  end-user members have been affected:
+   - The contents of the jets is accessed through 'Cjet::contents'
+     instead of 'Cjet::content'
+   - The function called to save the jet contents to disk is 
+     'Csplit_merge::save_contents' instead of 'Csplit_merge::save_content'
+     Note that 'Csiscone::save_contents' is also valid.
+
+
+SISCone version 1.0.0 (Jan 2007)
+=====================
+
+This is the first stable release of siscone. 

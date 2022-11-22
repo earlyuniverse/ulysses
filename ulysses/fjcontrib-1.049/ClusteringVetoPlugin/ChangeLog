@@ -1,0 +1,8 @@
+2015-05-04 <mstoll>
+	Version 1.0.0: final fixes before release
+2015-04-23 <mstoll>
+	use NNH, renamed to ClusteringVetoPlugin
+2015-03-23 <mstoll>
+	first submit
+2015-02-02 <spliew>
+	Initial creation based on previous code and parts of the VariableR plugin

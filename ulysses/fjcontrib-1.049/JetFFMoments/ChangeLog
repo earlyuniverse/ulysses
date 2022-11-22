@@ -1,0 +1,138 @@
+2013-02-07  Matteo Cacciari <cacciari@lpthe.jussieu.fr>
+
+	* VERSION
+	Release of version 1.0.0
+
+2013-02-06  Gavin SALAM  <salam@tycho.lpthe.jussieu.fr> + Matteo
+
+	* Makefile: 
+	fixed to match latest set of changes in build system.
+
+	* VERSION
+	release of test 0.99.1
+
+2013-02-01  Gavin SALAM  <salam@tycho.lpthe.jussieu.fr>
+
+	* JetFFMoments.hh: 
+	fixed friend-related issue that appeared with g++ 4.4.6 
+
+2013-02-01  Gavin Salam  <gavin.salam@cern.ch>
+
+	* NEWS: 
+	* VERSION: 
+	release of test 0.99
+
+	* Makefile:
+	now uses ../.Makefile.inc (if it exists) to get default variables
+
+2013-01-31  Gavin Salam  <gavin.salam@cern.ch>
+
+	* TODO:
+	removed it now that things are in place
+
+	* imported all the code into the hepforge fastjet-contrib svn +
+	adapted a couple of things to work with the hepforge version of
+	the config structure.
+
+2013-01-29  Gavin Salam  <gavin.salam@cern.ch>
+
+	* JetFFMoments.cc: 
+	modified some equation numbers to correspond to current paper version.
+
+2013-01-29  Gregory Soyez  <soyez@fastjet.fr>
+
+	* example.out:
+	updated to reflect the last change in the computation of the
+	improved subtraction
+
+	* JetFFMoments.{cc,hh}:
+	for improved subtraction, use the method that computed rN
+	explicitly from the jets in the range and then uses sigmaN from
+	the bge.
+
+2013-01-29  Gavin Salam  <gavin.salam@cern.ch>
+
+	* JetFFMoments.hh|cc:
+	added an arXiv reference; replaced "unfolding" with "improved_sub"
+	for all internal variables and error messages
+
+2013-01-29  Gregory Soyez  <soyez@fastjet.fr> + Gavin
+
+	* JetFFMoments.cc:
+	  supported -ve moments for FJ versions prior to 3.1 (by adding a
+	  local copy of the BackgroundJetScalarPtDensity class).
+
+	* example.cc:
+	  use the full specification of set_improved_subtraction(...) so
+	  we are compatible with FJ<3.1
+
+	* JetFFMoments.cc:
+	* JetFFMoments.hh:
+	  progress towards cleaning the class:
+	  . added the option to retreive the info when calling operator()
+	  . replaced unfolding with improved_subtraction
+	  . with FJ-3.1 a call with just mu uses improved subtraction
+	    (jets are obtained from _bge->jets_used())
+	  . for FJ<3.1 improved subtraction is set by providing mu and
+	    adidtional info to cluster the jets.
+
+	* example.cc:
+	  updated to reflect the changes to the main class
+
+2012-12-17  Gregory Soyez  <soyez@fastjet.fr>
+
+	* Makefile (distclean):
+	added the missing .a extension to the name of the library to be
+	removed
+
+
+2012-12-15  Gavin SALAM  <salam@lpthe.jussieu.fr> + Matteo
+
+	* JetFFMoments.cc|hh:
+	negative n now allowed only for FJ version >= 3.1.0 (in both
+	constructors).
+
+	added alternative form for improved subtraction for testing + a
+	bunch more output in the info class.
+
+2012-12-14  Gavin SALAM  <salam@lpthe.jussieu.fr> + Matteo
+
+	* Makefile: 
+	added make depend target and sorted out dependencies
+
+	* JetFFMoments.hh: 
+	* example.cc: 
+	renamed set_unfolding -> set_info_for_unfolding
+	and the internal variable _pt_den -> _norm
+	+ worked on comments
+	+ added "info" about all the parameters of the extraction
+	  (e.g. correlation coefficient), etc.
+
+2012-12-10  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* JetFFMoments.hh:
+	added a couple of comments on the comments + a TODO file
+
+2012-12-06  Gregory Soyez  <soyez@fastjet.fr>
+
+	* Makefile:
+	  . added the check and distclean targets
+	  . fixed a few minor  details (installed headers, ...)
+
+2012-11-30  Matteo Cacciari <cacciari@lpthe.jussieu.fr>
+
+        * renaming JetFragmentationFunctionMoments -> JetFFMoments
+        * changed path to input data file
+
+2012-09-25  Gavin SALAM  <salam@lpthe.jussieu.fr> + Matteo
+
+	* JetFragmentationFunctionMoments.cc|hh:
+	* example.cc:
+	switch from n to N
+
+	* Makefile (#FASTJETCONFIG):
+	removed explicit path for fastjet-config
+
+
+2012-XX-XX 
+	* initial development!

@@ -1,0 +1,93 @@
+CC          = g++
+OUT         = siscone
+OUT_AREA    = area
+OUT_TEST    = test
+OUT_TIMES   = times
+OUT_SAMPLE  = sample
+OUT_SPHERE  = spherical
+CFLAGS      = -I.. -Wall -g -O3 -ffast-math
+
+LDFLAGS     = -lm -L../siscone -lsiscone -L../siscone/spherical -lsiscone_spherical #-lprofiler -lpthread -ltcmalloc
+ifeq ($(shell whoami),salam)
+  # needed for Gavin to include tcmalloc
+  LDFLAGS += -L/ada1/lpthe/salam/software/local/lib
+endif
+
+OBJS_MAIN   = options.o main.o
+OBJS_AREA   = options.o area.o
+OBJS_TEST   = test.o
+OBJS_TIMES  = times.o
+OBJS_SAMPLE = sample.o
+OBJS_SPHERE = spherical.o
+
+OBJS_ALL = options.o main.o area.o sample.o test.o times.o spherical.o
+SRCS = $(patsubst %.o,%.cpp,$(OBJS_ALL))
+
+
+%.o: %.cpp %.h
+	$(CC) -c $(CFLAGS) $<
+
+%.o: %.cpp
+	$(CC) -c $(CFLAGS) $<
+
+all: main area sample test times spherical
+
+main: $(OBJS_MAIN)
+	$(CC) -o $(OUT) $(OBJS_MAIN) $(LDFLAGS)
+
+area: $(OBJS_AREA)
+	$(CC) -o $(OUT_AREA) $(OBJS_AREA) $(LDFLAGS)
+
+test: $(OBJS_TEST)
+	$(CC) -o $(OUT_TEST) $(OBJS_TEST) $(LDFLAGS)
+
+times: $(OBJS_TIMES)
+	$(CC) -o $(OUT_TIMES) $(OBJS_TIMES) $(LDFLAGS)
+
+sample: $(OBJS_SAMPLE)
+	$(CC) -o $(OUT_SAMPLE) $(OBJS_SAMPLE) $(LDFLAGS)
+
+spherical: $(OBJS_SPHERE)
+	$(CC) -o $(OUT_SPHERE) $(OBJS_SPHERE) $(LDFLAGS)
+
+.PHONY: clean
+
+clean:
+	rm -f *.o *~
+
+
+depend:
+	makedepend -I.. -Y -f makefile.static --   -- $(SRCS)
+# DO NOT DELETE
+
+options.o: options.h ../siscone/siscone.h ../siscone/protocones.h
+options.o: ../siscone/momentum.h ../siscone/reference.h ../siscone/geom_2d.h
+options.o: ../siscone/defines.h ../siscone/vicinity.h ../siscone/quadtree.h
+options.o: ../siscone/hash.h ../siscone/split_merge.h
+main.o: ../siscone/momentum.h ../siscone/reference.h ../siscone/geom_2d.h
+main.o: ../siscone/defines.h ../siscone/siscone.h ../siscone/protocones.h
+main.o: ../siscone/momentum.h ../siscone/vicinity.h ../siscone/quadtree.h
+main.o: ../siscone/hash.h ../siscone/split_merge.h options.h
+area.o: ../siscone/momentum.h ../siscone/reference.h ../siscone/geom_2d.h
+area.o: ../siscone/defines.h ../siscone/siscone.h ../siscone/protocones.h
+area.o: ../siscone/momentum.h ../siscone/vicinity.h ../siscone/quadtree.h
+area.o: ../siscone/hash.h ../siscone/split_merge.h ../siscone/area.h
+area.o: ../siscone/siscone.h options.h
+sample.o: ../siscone/momentum.h ../siscone/reference.h ../siscone/geom_2d.h
+sample.o: ../siscone/defines.h ../siscone/siscone.h ../siscone/protocones.h
+sample.o: ../siscone/momentum.h ../siscone/vicinity.h ../siscone/quadtree.h
+sample.o: ../siscone/hash.h ../siscone/split_merge.h
+test.o: ../siscone/momentum.h ../siscone/reference.h ../siscone/geom_2d.h
+test.o: ../siscone/defines.h ../siscone/siscone.h ../siscone/protocones.h
+test.o: ../siscone/momentum.h ../siscone/vicinity.h ../siscone/quadtree.h
+test.o: ../siscone/hash.h ../siscone/split_merge.h
+times.o: ../siscone/momentum.h ../siscone/reference.h ../siscone/geom_2d.h
+times.o: ../siscone/defines.h ../siscone/siscone.h ../siscone/protocones.h
+times.o: ../siscone/momentum.h ../siscone/vicinity.h ../siscone/quadtree.h
+times.o: ../siscone/hash.h ../siscone/split_merge.h
+spherical.o: ../siscone/spherical/momentum.h ../siscone/reference.h
+spherical.o: ../siscone/geom_2d.h ../siscone/defines.h ../siscone/defines.h
+spherical.o: ../siscone/spherical/siscone.h ../siscone/protocones.h
+spherical.o: ../siscone/momentum.h ../siscone/reference.h
+spherical.o: ../siscone/vicinity.h ../siscone/quadtree.h ../siscone/hash.h
+spherical.o: ../siscone/split_merge.h

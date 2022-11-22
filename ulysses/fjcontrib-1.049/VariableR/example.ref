@@ -1,0 +1,71 @@
+# read an event with 354 particles
+#--------------------------------------------------------------------------
+#                         FastJet release 3.2.0-devel
+#                 M. Cacciari, G.P. Salam and G. Soyez                  
+#     A software package for jet finding and analysis at colliders      
+#                           http://fastjet.fr                           
+#	                                                                      
+# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
+#                                                                       
+# FastJet is provided without warranty under the terms of the GNU GPLv2.
+# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
+# and 3rd party plugin jet algorithms. See COPYING file for details.
+#--------------------------------------------------------------------------
+# Ran Variable R (0903.0392), AKT, rho=2000.0, min_r=0.0, max_r=2.0, strategy=Best
+Printing inclusive jets with pt > 5 GeV
+---------------------------------------
+jet #   rapidity        phi         pt          m          e n constituents
+    0     -0.881      2.908    991.422    222.818   1436.367       65
+    1      0.095      6.046    986.931    461.292   1094.380      121
+    2     -3.376      0.863     18.189     32.359    543.629       45
+    3      3.487      5.797      8.210     17.192    311.682       34
+    4     -4.586      3.971      7.090     15.267    825.609       28
+    5      5.824      3.590      7.032     12.730   2459.371       22
+
+# Ran Variable R (0903.0392), CA, rho=2000.0, min_r=0.0, max_r=2.0, strategy=Best
+Printing inclusive jets with pt > 5 GeV
+---------------------------------------
+jet #   rapidity        phi         pt          m          e n constituents
+    0     -0.876      2.915    990.767    187.190   1420.188       58
+    1      0.086      6.046    984.618    434.657   1080.312      103
+    2     -2.301      0.993     17.150     19.523    131.047       39
+    3      2.421      5.294      9.652     20.340    127.684       35
+    4     -4.548      1.813      7.785      9.217    570.017       22
+    5      5.726      3.628      6.924     12.983   2256.767       21
+    6     -4.505      4.802      6.596     16.142    788.616       28
+
+# Ran Variable R (0903.0392), AKT, rho=2000.0, min_r=0.4, max_r=2.0, with precluster, strategy=Best
+Printing inclusive jets with pt > 5 GeV
+---------------------------------------
+jet #   rapidity        phi         pt          m          e n constituents
+    0     -0.881      2.907    991.435    225.793   1437.746       68
+    1      0.096      6.045    986.968    460.724   1094.229      121
+    2     -3.391      0.854     17.828     33.757    567.489       46
+    3      3.536      5.855      8.089     15.905    306.543       31
+    4     -4.651      3.961      6.808     13.699    800.780       26
+    5      5.904      3.612      6.735     11.543   2449.325       21
+
+# Ran Variable R (0903.0392), AKT, rho=2000.0, min_r=0.4, max_r=2.0, strategy=Best
+Printing inclusive jets with pt > 5 GeV
+---------------------------------------
+jet #   rapidity        phi         pt          m          e n constituents
+    0     -0.881      2.908    991.422    222.818   1436.367       65
+    1      0.095      6.046    986.931    461.292   1094.380      121
+    2     -3.376      0.863     18.189     32.359    543.629       45
+    3      3.487      5.797      8.210     17.192    311.682       34
+    4     -4.586      3.971      7.090     15.267    825.609       28
+    5      5.824      3.590      7.032     12.730   2459.371       22
+
+# Ran Variable R (0903.0392), GenKT(p=-0.5), rho=2000.0, min_r=0.4, max_r=2.0, strategy=Best
+Printing inclusive jets with pt > 5 GeV
+---------------------------------------
+jet #   rapidity        phi         pt          m          e n constituents
+    0     -0.881      2.908    991.422    222.818   1436.367       65
+    1      0.095      6.046    986.931    461.292   1094.380      121
+    2     -3.208      0.702     16.658     25.928    381.653       40
+    3      3.407      5.842      7.882     14.301    246.597       30
+    4      5.627      3.643      7.650     16.535   2531.455       26
+    5     -4.681      4.291      6.710     10.160    656.977       22
+    6     -4.708      2.153      5.233      5.719    429.710       13
+

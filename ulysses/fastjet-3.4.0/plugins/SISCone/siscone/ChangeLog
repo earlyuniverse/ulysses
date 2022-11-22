@@ -1,0 +1,1706 @@
+2020-04-24  Gregory Soyez  <soyez@fastjet.fr>
+
+	Release of SISCone 3.0.5
+
+2020-04-24  Gregory Soyez  <soyez@fastjet.fr>
+	* AUTHORS:
+	* CHECKLIST:
+	* ChangeLog:
+	* Doxyfile:
+	* NEWS:
+	* configure.ac:
+	updated version number to 3.0.5 + started the release process
+
+	* doc/html/usage.html:
+	* doc/html/download.html:
+	* doc/html/index.html:
+	* doc/html/perfs.html:
+	* doc/html/algorithm.html:
+	* doc/html/sm_issue.html:
+	updated Gavin's email address + set version number to 3.0.5
+
+	* AUTHORS:
+	Updated Gavin's affiliation
+
+2020-04-22  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/spherical/geom_2d.h:
+	* siscone/geom_2d.h:
+	replaced 1 by 1u in bitshift operation to avoid a potential
+	sign/unsigned issue (reported by Andrii Verbyitskyi)
+
+2018-10-01  Gregory Soyez  <soyez@fastjet.fr>
+
+	* configure.ac:
+	* Doxyfile:
+	* doc/html/*.html:
+	changed version to 3.0.5-devel
+
+2018-10-01  Gregory Soyez  <soyez@fastjet.fr>
+
+	Release of SISCone 3.0.4
+
+	* NEWS:
+	set the proper release date
+
+2018-09-26  Gregory Soyez  <soyez@fastjet.fr>
+
+	* NEWS:
+	fixed typos (FJ release number, ...)
+
+	* configure.ac:
+	* Doxyfile:
+	* doc/html/*.html:
+	changed version to 3.0.4
+
+	* NEWS:
+	prepared for the release of SISCone 3.0.4
+
+	* siscone/spherical/Makefile.am:
+	added libsiscone as a dependence of libsiscone_spherical
+
+2018-09-19  Gregory Soyez  <soyez@fastjet.fr>
+
+	* BUGS:
+	updated email addresses (mostly testing the new HEPforge system)
+
+2016-08-03  Gregory Soyez  <soyez@fastjet.fr>
+
+	* configure.ac:
+	* Doxyfile:
+	* doc/html/*.html:
+	changed version to 3.0.4-devel
+
+2016-08-03  Gregory Soyez  <soyez@fastjet.fr>
+
+	Release of SISCone 3.0.3
+
+	* doc/html/index.html.html:
+	* doc/html/download.html:
+	updated documentation with 3.0.3 release info
+
+	* NEWS:
+	prepared release notes for SISCone 3.0.3
+
+	* configure.ac:
+	* Doxyfile:
+	* doc/html/*.html:
+	changed version to 3.0.3
+
+	* setversion.sh:
+	updated script so that the version is properly set in
+	configure.ac, Doxyfile and the doc
+
+2016-05-23  Gregory Soyez  <soyez@fastjet.fr>
+
+	* examples/Makefile.am:
+	replaced top_builddir by .. [consistency with the same trick
+	already used in the spherical source code
+
+	* siscone/Makefile.am:
+	* siscone/spherical/split_merge.h:
+	same sort of fix as in the "spherical" case to make sure that the
+	config.h file is correctly found in a VPATH build
+
+2016-05-22  Gregory Soyez  <soyez@fastjet.fr>
+
+	* examples/Makefile.am:
+	added the top_builddir to the list of includes so that
+	siscone/config.h is found on a vpath build
+
+	* siscone/spherical/split_merge.h:
+	included <siscone/config.h> instead of "../config.h". This makes
+	life eassier for a vpath build
+
+2016-05-19  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/siscone.cpp:
+	* siscone/spherical/siscone.cpp:
+	remove unneeded commented out code
+
+2016-03-29  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/split_merge.h:
+	* siscone/spherical/split_merge.h:
+	used SISCONE_USES_UNIQUE_PTR_AS_AUTO_PTR from config.h
+
+	* configure.ac:
+	put (SISCONE_)USES_UNIQUE_PTR_AS_AUTO_PTR in config.h
+
+	* siscone/siscone.{h,cpp}:
+	* siscone/spherical/siscone.{h,cpp}:
+	* siscone/defines.h:
+	PACKAGE_NAME -> SISCONE_PACKAGE_NAME
+	VERSION -> SISCONE_VERSION
+
+	* siscone/Makefile.am:
+	included config.h in the list of distributed headers.
+
+	* configure.ac:
+	* Makefile.am:
+	* m4/ax_config_header_h.m4:        *** ADDED ***
+	prefixed the entries in config.h by SISCONE_ to avoid conflicts
+	with other packages if we want to include it in a header file.
+
+2016-03-16  Gregory Soyez  <soyez@fastjet.fr>
+
+	* configure.ac:
+	* Doxyfile:
+	* siscone/siscone.cpp:
+	* siscone/spherical/siscone.cpp:
+	bumped version number to 3.0.3-devel
+
+2016-03-16  Gregory Soyez  <soyez@fastjet.fr>
+
+	Release of SISCone 3.0.2
+
+	* NEWS:
+	tweaked as suggested by Gavin
+
+	* doc/html/usage.html:
+	* doc/html/index.html:
+	backported a change done on the Hepforge pages
+
+	* doc/html/algorithm.html:
+	* doc/html/index.html:
+	* doc/html/sm_issue.html:
+	* doc/html/download.html:
+	* doc/html/perfs.html:
+	* doc/html/usage.html:
+	set version number to 3.0.2; updated a few links and mention the
+	new release
+
+	* Doxyfile:
+	* siscone/siscone.cpp:
+	* siscone/spherical/siscone.cpp:
+	* configure.ac:
+	set version number to 3.0.2
+
+	* NEWS:
+	drafted for v3.0.2
+
+2016-03-10  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/split_merge.h:
+	* siscone/spherical/split_merge.h:
+	switched the auto_ptr into unique_ptr when
+	SISCONE_USES_UNIQUE_PTR_AS_AUTO_PTR is defined
+
+	* configure.ac:
+	fine-tuned the configure test for auto-ptr deprecation [for god
+	knows what reason, -Werror does not turn -Wdeprecated-declarations
+	into errors for gcc-5.2.1... so I replaced it with
+	-Werror=deprecated-declarations which does]
+
+	* configure.ac:
+	added a series of tests to check if the compiler considers
+	auto_ptr as deprecated and, if yes, supports unique_ptr
+
+2016-03-03  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/spherical/siscone.cpp:
+	* siscone/siscone.cpp:
+	restored the original _banner_ostr stream format flags after
+	printing out the banner
+
+	* siscone/spherical/split_merge.cpp:
+	* siscone/split_merge.cpp:
+	removed unnecessary (dead) code at the end of get_sm_var2()
+
+	* siscone/spherical/split_merge.h:
+	* siscone/spherical/split_merge.cpp:
+	* siscone/split_merge.h:
+	* siscone/split_merge.cpp:
+	initialised pass to CJET_INEXISTENT_PASS by default
+
+	* siscone/vicinity.cpp:
+	initialised ve_list before calling set_particle_list
+
+2016-02-29  Gregory Soyez  <soyez@fastjet.fr>
+
+	* doc/html/download.html:
+	updated link to html browsing og the svn repo
+
+	* doc/html/usage.html:
+	updated a couple of links to the FJ doxygen pages
+
+	* configure.ac:
+	* siscone/siscone.cpp:
+	* siscone/spherical/siscone.cpp:
+	* Doxyfile:
+	switched version number over to 3.0.2-devel
+
+2016-02-29  Gregory Soyez  <soyez@fastjet.fr>
+
+	Release of SISCone 3.0.1
+
+	* NEWS:
+        * CHECKLIST:
+        * Doxyfile:
+        * configure.ac:
+        * doc/html/*.html:
+        * siscone/siscone.cpp:
+        * siscone/spherical/siscone.cpp:
+	prepared for the release of SISCone 3.0.1
+
+2016-02-24  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/spherical/geom_2d.h:
+	get_theta_cell(...): fixed rounding issue for theta==pi
+	[Bug reported by Andrii Verbytskyi, see
+	2016-02-SphericalSISCone-throws in the FastJet issue tracker]
+
+	* siscone/spherical/geom_2d.cpp:
+	add_particle(...): made sure the full phi range is included for
+	theta=0 or theta=pi
+
+	* siscone/spherical/geom_2d.h:
+	fixed typo in comment:
+
+	* siscone/spherical/split_merge.cpp:
+	* siscone/split_merge.cpp:
+	fixed bad variale in debugging outpout and added debugging info
+
+
+2014-09-10  Gregory Soyez  <soyez@fastjet.fr>
+
+	* Doxyfile:
+	* configure.ac:
+	* siscone/siscone.cpp:
+	* siscone/spherical/siscone.cpp:
+	set version number to 3.0.1-devel
+
+2014-09-09  Gregory Soyez  <soyez@fastjet.fr>
+
+	* SISCone 3.0.0
+
+	* doc/html/usage.html:
+	* doc/html/perfs.html:
+	added a brief discussion about the algogithm complexity.
+
+2014-09-09  Gavin Salam  <gavin.salam@cern.ch>
+
+	* NEWS:
+	* doc/html/index.html:
+	* doc/html/usage.html:
+	small phrasing changes
+
+2014-09-09  Gregory Soyez  <soyez@fastjet.fr>
+
+	* configure.ac:
+	* NEWS:
+	* siscone/siscone.cpp:
+	* siscone/spherical/siscone.cpp:
+	* Doxyfile:
+	preparing for the release of SISCone 3.0.0
+
+	* doc/html/*.html:
+	changed the version number to 3.0.0
+	included the release information
+	updated Gavin's email address
+
+	* doc/html/usage.html:
+	added a description of SISCone with progressive removal
+
+	* Doxyfile:
+	Updated for more recent versions of doxygen [ran doxygen -u from
+	doxygen 1.8.8]
+
+2014-09-04  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/split_merge.cpp:
+	* siscone/spherical/split_merge.cpp:
+	in progressive removal mode, set the 'pass' index associated to
+	each jet to the index of the iteration at which it has been
+	obtained
+
+	* siscone/siscone.h:
+	* siscone/siscone.cpp:
+	* siscone/spherical/siscone.h:
+	* siscone/spherical/siscone.cpp:
+	put the duplicated code for initialisation in a spearate method
+
+	* siscone/split_merge.cpp:
+	fixed a bug introduced in a recent commit: jet_candidate.sm_var2
+	was not assigned prolperly for non-user-defined scales
+
+	* siscone/spherical/split_merge.cpp:
+	* siscone/spherical/split_merge.h:
+	propagated recent modifications of SISCone to the spherical
+	version:
+	  . reworked some comments (including the misplaced one about
+	    collinear-safety)
+	  . default for SM_var2_hardest_cut_off changed from -1 to
+	    -numeric_limits<double>::max() [largely redundant]
+	  . added support for user-defined scale when run in
+	    "progressive-removal mode"
+
+	* siscone/split_merge.h:
+	  . removed temporary comments at the top of the file
+	  . added a dummy virtual dtor to Csplit_merge::Cuser_scale_base
+
+2014-09-04  Gavin SALAM  <gavin.salam@cern.ch> + Gregory
+
+	* siscone/split_merge.cpp: 
+	SM_var2_hardest_cutoff no longer applied to PR case.
+
+	Modified sm_var2 in (PR) _user_scale case to now be the signed
+	square of the scale variable (to properly handle negative values
+	of the scale).
+
+	default for SM_var2_hardest_cut_off changed from -1 to
+	-numeric_limits<double>::max(); (this change is largely redundant,
+	given that SM_var2_hardest_cutoff is no longer used for PR, while
+	the SM case only allows default scale choices, which are all
+	positive definite).
+
+	replaced <math.h> with <cmath>;
+
+	* siscone/split_merge.h:
+	default Cuser_scale_base::is_larger(...) now uses cached values of
+	scale in Cjet.
+
+	small fixes to a number of comments, including misplaced warning
+	about collinear unsafety.
+
+	* siscone/siscone.h:
+	small changes to comments to clarify situation of an unused
+	variable in progressive removal
+
+2014-09-04  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/split_merge.cpp:
+	* siscone/siscone/split_merge.h:
+	added material to support user-defined scale choices in
+	progressive-removal mode.
+
+	One needs to overload the Csplit_merge::Cuser_scale_base class and
+	pass a pointer to the split-merge using set_user_scale().
+
+2014-09-03  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/spherical/siscone.h:
+	* siscone/spherical/siscone.cpp:
+	* siscone/spherical/split_merge.h:
+	* siscone/spherical/split_merge.cpp:
+	ported "siscone with progressive removal" to the spherical
+	coordinates version
+
+	* siscone/siscone.h:
+	fixed typo in variable name
+
+	* siscone/split_merge.cpp:
+	imposed the SM_var2_hardest_cut_off in the progressive case too
+	+ made sure at least one candidate jet was found
+
+	* siscone/siscone.h:
+	* siscone/siscone.cpp:
+	added compute_jets_progressive_removal(...) which implements a
+	"progressive removal" version of SISCone. This successively
+	computes stable cones and removes the hardest stable cone as a jet
+	until no particles are left or no stable cones are found.
+
+	Question: what do we do with 'protocones_list'? [for the time
+	being, it's left empty]
+
+	* siscone/split_merge.h:
+	* siscone/split_merge.cpp:
+	added 'add_hardest_protocones_to_jets' which computes the hardest
+	of the stable cones passed as arguments, declares it as a jet and
+	removes its content from the remaining list of particles. This
+	should be used instead of add_protocones()+perform() if one wants a
+	progressive-removal version of SISCone.
+
+2013-04-09  Gregory Soyez  <soyez@fastjet.fr>
+
+	* doc/html/index.html:
+	  fixed trivial typo (developper -> developer)
+
+	* switched version number to 2.0.7-devel
+
+2013-04-09  Gregory Soyez  <soyez@fastjet.fr>
+
+	* Release of SISCone 2.0.6
+
+ 	* NEWS, doc/html/index.html
+	  set the release date to April 9th
+
+	* Doxyfile
+	  Set version number to 2.0.6
+
+2013-04-08  Gregory Soyez  <soyez@fastjet.fr>
+
+	* doc/html/*.html:
+	* configure.ac:
+	  switched version number to 2.0.6
+
+	* NEWS:
+	  preparing for SISCone 2.0.6
+
+	* setversion.sh: minor fix (used bash instead of sh)
+
+	* CHECKLIST:   *** ADDED ***
+	  helper checklist for the release process
+
+2013-04-06  Gavin Salam  <gavin.salam@cern.ch>
+
+	* configure.ac: 
+	  updated minimal required autotools version to 2.63
+
+2013-02-05  Gavin Salam  <gavin.salam@cern.ch>
+
+	* autogen.sh: tried to be more tolerant of different libtool
+	  versions (some take --version, others -V). Still have problems
+	  on OS X 10.8 with macports , but autoreconf works fine.
+
+	* configure.ac: 
+	  replaced AM_CONFIG_HEADER with with AC_CONFIG_HEADERS, following
+	  error with autoconf 2.69 on OS X 10.8 with macports.
+
+2013-02-04  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/Makefile.am:
+	  do not install config.h
+
+	* siscone/spherical/Makefile.am:
+	  fixed directory for headers installation for the spherical
+	  version of SISCone
+
+2012-01-17  Gregory Soyez  <soyez@fastjet.fr>
+
+	* NEWS:
+	  SISCone 2.0.5
+
+	* NEWS:
+	* configure.ac:
+	* Doxyfile:
+	  prepared for the release of SISCone 2.0.5
+
+	* siscone/spherical/Makefile.qm:
+	  used $(includedir) instead of $(prefix)/include
+
+2012-01-13  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/Makefile.am:
+	  used $(includedir) instead of $(prefix)/include
+
+2011-11-25  Gregory Soyez  <soyez@fastjet.fr>
+
+	* NEWS:
+	  SISCone 2.0.4
+
+	* NEWS:
+	  updated in preparation for the 2.0.4 release
+
+	* doc/html/home.png:             *** ADDED ***
+	* doc/html/usage.html:
+	* siscone/siscone_error.h:
+	* doc/html/index.html:
+	  fixed typos; updated html links.
+
+	* configure.ac:
+	* Doxyfile:
+	* doc/html/*.html:
+	  updated the version number to 2.0.4 and the release information
+
+	* siscone/spherical/siscone.cpp:
+	* siscone/spherical/siscone.h:
+	* siscone/siscone.cpp:
+	* siscone/siscone.h:
+	  allowed to redirect the banner to a different stream than cout
+
+2011-11-16  Gregory Soyez  <soyez@fastjet.fr>
+
+	* examples/test.cpp:
+	  cast a vector size (of type size_t) onto unsigned int to avoid a
+	  compiler warning (on either 32 or 64-bit machines)
+
+2011-11-15  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* AUTHORS: 
+	  updated my address. 
+
+2011-11-15  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/protocones.cpp (is_inside, proceed_with_stability):
+	* siscone/spherical/split_merge.cpp (init):
+	* siscone/split_merge.cpp (init):
+	* siscone/siscone_error.h:
+	* siscone/area.cpp (compute*_areas):
+	  renamed or commented out a few local variables and method
+	  arguments to avoid shadowing class members (gcc -Wshadow)
+
+	* examples/spherical.cpp:
+	* examples/sample.cpp:
+	  removed unused argc, argv parameters
+
+	* examples/spherical.cpp:
+	* examples/sample.cpp:
+	* examples/times.cpp:
+	* examples/test.cpp:
+	* examples/area.cpp:
+	* examples/main.cpp:
+	* siscone/spherical/split_merge.cpp (save_contents, show):
+	* siscone/split_merge.cpp (save_contents, show):
+	* siscone/quadtree.cpp (save, save_leaves):
+	  got rid of a few format warnings by replacing %le and %lf by %e
+	  and %f (the l prefix applying to int and unsigned int) + a couple
+	  of signed/unsigned mismatches (%d -> %u)
+
+	* configure.ac:
+	  switched version number to 2.0.4-devel
+
+2011-10-05  Gregory Soyez  <soyez@fastjet.fr>
+
+	* NEWS:
+	  SISCone 2.0.3
+
+	* AUTHORS:
+	  updated addresses and phone numbers
+
+	* configure.ac:
+	* Doxyfile:
+	* doc/html/*.html:
+	  updated the version number and the release information
+
+	* Doxyfile:
+	  removed the treeview
+
+	* siscone/reference.cpp:
+	  removed redundant operator + (following a gcc warning)
+	  Checked with FastJet's regression check that it was indeed not
+	  used
+
+	* siscone/spherical/protocones.cpp:
+	  removed an unused variable
+
+2011-08-09  Gregory Soyez  <soyez@fastjet.fr>
+
+	* siscone/spherical/split_merge.h:
+	  fixed the description of E_tilde. It was
+             sum of E_i [ 1 + sin^2(theta_iJ) ]
+	  but in practice we used
+             sum of E_i [ 1 +|p_i x p_J|^2/(|p_i|^2 E_J^2)]
+  	  as mentioned further down in the ChangeLog (that avoids
+	  potential issues when a protojet has a zero 3-momentum)
+
+2011-05-17  Gregory Soyez  <soyez@fastjet.fr>
+
+	* configure.ac, Doxyfile & NEWS:
+	  SISCone 2.0.2
+
+2010-10-27  Gregory Soyez  <soyez@cern.ch>
+
+	* siscone/makefile.static:
+	  recursed make clean in the spherical dir
+
+	* siscone/spherical/makefile.static:
+	  included main siscone header directory
+
+	* siscone/siscone.cpp, siscone/spherical/siscone.cpp:
+	  The config.h header should be present from autoheader in the
+	  autotools build and from the sed command in the main
+	  makefile.static for build using the static makefiles.
+
+2009-05-29  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* configure.ac & NEWS: 
+	  SISCone 2.0.1
+
+2009-05-28  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* Doxyfile (PROJECT_NUMBER): 
+	  doc/html/*.html:
+	  switched the version number to 2.0.1
+
+	* INSTALL (Notes): 
+	  fixed the comment on the static/shared default build
+
+	* configure.ac: 
+	  enabled shared libs by defaut (following a long discussion
+	  regarding static vs. shared libraries, we finally decided to
+	  make a minimal modification compared to the previous release,
+	  i.e. keep shared libraries on)
+
+2009-05-25  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* configure.ac: 
+	  switched back to static libraries
+
+	* siscone/Makefile.am:
+	  examples/Makefile.am:
+	  siscone/spherical/Makefile.am:
+	  replace a few ${var} by $(var) to be more compatible 
+	  with Makefile rules
+
+
+2009-05-01  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* siscone/spherical/hash.cpp (siscone_spherical): 
+          renamed _R into _radius (problem with some Mac systems).  
+	  Note: some of the comments were mentioning R2 as a parameter
+	  rather than R, so this has been fixed at the same time.
+
+	* configure.ac:
+	  build shared libs by default
+	  This is a bug-fix for FastJet that now uses shared libs by
+	  default too
+	
+	* configure.ac & Doxyfile:
+	  switched version number to 2.0.1-devel
+
+2009-04-17  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* NEWS & configure.ac: 
+	  SISCone 2.0.0
+
+	* doc/html/index.html: 
+	  Doxyfile:
+	  configure.ac:
+	  switched the version number to 2.0.0
+
+2009-03-17  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* siscone/split_merge.cpp (siscone): 
+          moved the computation of the rapidity limits AFTER the 
+	  exclusion of the particles with pz>=E
+	
+
+2009-03-12  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* configure.ac: 
+	  switched version to 2.0-devel
+
+	* NEWS: 
+	  updated to include the new things in the upcoming release
+
+	* Doxyfile:
+	  updated together with an additional bunch of doxygen-compliant
+	  comments in the source files
+
+	
+2008-08-06  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* siscone/siscone.cpp (siscone): 
+	  make sure that the full 4-vector information is included in the
+	  protocones list.
+
+	
+2008-07-29  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* siscone/siscone.cpp: 
+	  siscone/spherical/siscone.cpp: 
+	  check that the config.h file is available.
+	  Otherwise, use fixed values for PACKAGE and VERSION.
+	
+
+2008-07-23  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* siscone/spherical/siscone.h (siscone_spherical): 
+	  set E_tilde as the default SM variable.
+
+	* siscone/spherical/split_merge.{h,cpp} (siscone_spherical): 
+
+	  addressed the issue of IRC safety related to the choice of the
+	  split-merge ordering variable. We kept E (an unsafe choice) for
+	  its simplicity and added E_tilde defined as
+	
+                              /      |p_i X p_J|^2  \
+	    \sum_{i\in J} E_i | 1 + --------------- |
+	                      \      |p_i|^2 E_J^2  /
+
+	  The use of E_J instead of p_J in the denominator prevents the
+	  case where jets have zero momentum (e.g. monster jets with
+	  momentum conservation)
+	
+	  Note that this variable is only used for the ordering; the
+	  computation of the overlap is always using the energy.
+	 
+	
+2008-07-18  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* siscone/siscone.cpp (siscone)
+	  siscone/spherical/siscone.cpp (siscone_spherical): 
+	  package_name() returns PACKAGE_NAME, not VERSION!
+
+	* siscone/spherical/Makefile.am: 
+	  added a path for siscone/config.h to be correctly included
+
+	* siscone/Makefile.am:
+	  prevent config.h from being shipped with the distribution
+	
+
+2008-07-07  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* siscone/spherical/split_merge.cpp (siscone_spherical): 
+	  transformed the pt2 cut-off on particles into an 
+	  energy (squared) cut-off.
+	
+
+2008-07-07  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* Spherical version included in the main trunk
+	  (see below for details)
+
+	* Copied the 'spherical branch' into the siscone/spherical
+          folder.
+	  Copied the sample program into the example folder.
+	  Imported the ChangeLog from the branch
+	  
+	  Steps remaining in the main trunk: (. = todo, - = done)
+           - updating the makefiles
+	   - deleted the "defines.h" file in the subdir
+	     the main one is used.
+           - tested (make distcheck + sample running)
+
+          Questions:
+           - do we also copy the unchanged files? (It will mess a bit the
+             filenames but they concerns material hidden to the end-user,
+             so I'd keep them in the trunk
+             It concerns circulator, reference, ranlux and siscone_error.
+           - do we remove the quadtree in the spherical dir? 
+	     (I'd say 'yes', not done currently)
+           - keep the "unused" files in the branch? (area, quadtree, ...)
+
+
+2008-07-02  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+        * started the process of merging the spherical version of SISCone
+          into the main trunk. The new version will be inserted in the
+          "siscone/spherical" directory. We shall put it under the
+          'siscone_spherical' namespace and rename the relevant classes
+          using a 'CSph' prefic instead of the 'C' prefix used in the main
+          trunk.
+          Steps to be done in the branch: (. = todo, - = done)
+           - move the relevant files in a 'siscone/spherical' directory
+           - add a siscone/Makefile.am in the branch (+small updates)
+           - change the namespace
+           - rename the classes and update the names in the code
+             Note that some of the classes have been kept from the main
+             version (e.g. everything in reference.h, siscone_error.h +
+             isolated classes like circulator, two_vector). This should
+             not affect the end-user.
+           - in the examples, move the main sample into a 'spherical' one
+           - test on the branch
+          DONE.
+	
+2008-06-16  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+        * siscone/vicinity.cpp (siscone): revised the normalisation of the
+          cocircular range.
+
+        * siscone/split_merge.cpp (siscone): recomputed the norm of
+          the result of a collinear merging. This is required as
+          the norm is used in stable-cone search and not recomputed
+          automatically.
+
+        * siscone/protocones.cpp (siscone): normalised directions
+          used to determine the angles. This might well be the reason
+          of the co-circular problem.
+
+        * siscone/geom_2d.cpp (siscone): removed an unused variable
+
+
+2008-06-14  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+        * Note: this version passed ~3e8 safety tests (including arcs,
+                soft particles, reordering and single/multi-pass).
+
+        * siscone/vicinity.cpp (siscone): added cocirc-tests
+          WARNING: this is a naive adaptation from the cylindrical case.
+
+        * siscone/momentum.h (siscone): reverted most of the last
+          modification: since the simple computation using a cos()
+          requires the computation of the norm (not its squared because
+          the sign of the cos matters) it is most complicated than the one
+          with the tangent. Note that we're free of the problem mentionned
+          below as the only place where it can happen is in the
+          computation of the vicinity and there we compute distances
+          internally rather than calling is_closer.
+          Finally, we've added a is_closer_safe with the computation
+          using te cosine.
+
+2008-06-13  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+        * siscone/vicinity.cpp (siscone):
+          pre-added co-circularity management
+
+        * siscone/momentum.h (siscone):
+          replaced the tangent used in distances comparison by
+          a cosine (the tangent is more precise at small R but
+          we'll probably never get down to that small values of R).
+          The reason for the replacement is that it gives wrong
+          results for vicinity computation for 2R>pi/2.
+          This present computation is also faster (no x-product).
+
+          All calls to that function have been updated too.
+
+
+2008-06-12  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+        * Description: this is the first complete adaptation to the
+          SISCone jet-search using spherical coordinatee.
+          This branch is motivated by potential applications to
+          cosmic-rays and follows a request by Yvonne Küssel
+          <Yvonne.Kuessel@gmx.de>
+
+        * Summary of modifications:
+          - use the distance on a sphere instead of the eta-phi one This
+            is the most important change and comes with
+            modifications... well...  ... everywhere. Most of the infos
+            about the distance are in the momentum.{h,cpp} files.  There
+            are other important pieces when computing the candidate
+            centres (in vicinity.cpp). And the theta_phi range (previously
+            eta_phi!)  in geom2d.cpp has also been relooked.
+          - The spit--merge(SM) uses the energy instead of pttilde by
+            default for the ordering
+          - The final jets ae ordered in E instead of pt.
+          - we don't remove particles with infinite rapidity (both in SC
+            search and SM)
+          - for the cone consistency tests, we use |px|+|py|+|pz| instead
+            of |px|+|py|
+          - we have removed the cut on soft particles in
+            Csplit_merge::merge_collinear_and_remove_soft() since it was
+            mainly used for area speed up.
+          - Csplit_merge::use_pt_weighted_splitting is replaced by
+            Csplit_merge::use_E_weighted_splitting when it is defined, the
+            weight is of course 1/E^2 instead of 1/pt^2
+          - To emphasise the fact that this is not the main SISCone trunk,
+            we've added one sentence in the header of every file and a
+            WARNING in the SISCone banner.
+
+        * Still to be done
+          - implement co-circularity (currently the range is set to 0)
+          - in the split--merge, check the precision of the collinearity
+            test?
+
+        * Other points to think about
+          - for the split of 2 protojets, we're currently making many
+            calls to a full distance computation. This can surely be
+            improved when no weighting is asked...
+          - completely remove the quadtree?
+          - remove the area support?
+          - remove the Ctheta_phi range?
+            or improve it (the cell initialisation assume a square shape,
+            not a circle, but already with a square, the geometry is
+            rather involved)
+
+        * Final word: still need a whole bunch of tests (noticeably IRC
+          safety, speed). Note that the stable-cone search has been
+          checked "graphically".
+
+
+2008-05-20  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* siscone/hash.cpp (siscone): 
+	  Adapted the size of the hash to scale like Nn(=N^2R^2) instead
+	  of N^2. This allows to save a fair amount of memory.
+	
+
+2008-05-16  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* siscone/defines.h
+	  siscone/hash.{h,cpp} (siscone)
+	  siscone/protocones.{h,cpp} (siscone):
+	  siscone/siscone.{h,cpp} (siscone):
+	  add some debug information about the occupancy of the hash
+	  when DEBUG_STABLE_CONES is defined
+
+	* examples/test.cpp: update the code to use Csiscone directly
+	  instead of separate calls to stable cone search and split--merge
+	  stage. This should be less confusing for end-users.
+
+2008-05-15  Gregory Soyez  <gsoyez@quark.phy.bnl.gov>
+
+	* configure.ac: 
+	  in the last CXXFLAGS fix, the default has been set at a wrong
+	  place (practically, CXXFLAGS was set to the system default value
+	  -O2 -g and thus not replaced with our local default).
+	  This is fixed now.
+
+2008-03-24  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+        * configure.ac:
+          fix CXXFLAGS in such a way as to allow the user to set their own
+          default.
+
+	
+2008-03-17  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* siscone/defines.h:
+	  siscone/siscone.h/cpp
+	  examples/option.cpp
+	  BUGS:
+	  Because of potentil conflicts with other packages, the 
+	  tags defined in config.h are no longer included in 
+	  defines.h but only in SISCone source files. 
+	  As a practical consequence, the program name and version 
+	  number are now accessed through siscone_package_name() and
+	  siscone_version() both defined in siscone.h and inside
+	  the siscone namespace. See examples/options.cpp for 
+	  an example.
+	  This solves the corresponding bug reported by Seuster.
+	
+
+2008-03-15  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* BUGS: 
+	  added entry related to PACKAGE/VERSION/etc reported by Seuster. 
+
+2008-03-12  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* siscone/split_merge.h/cpp (siscone):
+
+	  This is a non-negligible modification: we have added the
+	  possibility to modify the way particles are split during the
+	  split-merge step. 
+	  Assume one has to split protojets 1 and 2. The standard split
+	  associates a common particle j to the closest centre
+	  i.e. compares the distances D_{1j} vs. D_{2j}. 
+	  Now, by calling Csplit_merge::set_pt_weighted_splitting(true),
+	  it is possible to perform the splitting according to the anti-kt
+	  distance i.e. comparing D_{1j}/k_{t1} vs. D_{2j}/k_{t2}.
+	  This new option should allow to produce more
+	  rigid (soft-resilient) jets.
+	  Note that the default is to use the standard distance comparison
+	  so backward compatibility is not broken.
+
+	
+2008-03-11  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* siscone/area.cpp (siscone): 
+	  the jet+area finding now really returns the number of jets 
+	  as does the standard clustering
+
+	* siscone/area.cpp (siscone): 
+	  don't include ghosts in stable-cone search when only the 
+	  passive area is requested.
+	  This is a huge speed improvement as the execution time (when
+	  only passive area is requested) is now (with Ntot = N+Nghosts)
+	    O(N^2 log(N) +  Ntot^2)
+	  instead of
+	    O(Ntot^2 log(Ntot) +  Ntot^2)
+
+	* configure.ac: 
+	  switched the main trunk to SISCone-1.4.0-devel
+	
+
+2008-03-07  Gavin SALAM  <salam@lpthe.jussieu.fr>
+
+	* configure.ac: 
+	  switched version to 1.3.1
+
+2008-01-17  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* configure.ac: 
+	  switched version number over to 1.3.1-devel
+
+2008-01-15  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* siscone/geom_2d.h (M_PI): 
+	  added definition of M_PI if needed (VC compilation)
+
+	* siscone/protocones.cpp (siscone): 
+	  added the algorithm header (VC compilation)
+
+2007-11-12  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* NEWS & configure.ac:
+	  SISCone 1.3.0
+	
+
+2007-11-10  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* configure.ac: 
+	* examples/Makefile.am: 
+	* examples/events/Makefile.am: 
+          made sure some sample events were included in the dist
+	
+2007-11-07  Gavin SALAM  <salam@lpthe.jussieu.fr>
+
+	* configure.ac: 
+	  switched +="" to A=A"" to eliminate an error on mac
+
+2007-10-24  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* examples/options.cpp: fix a missing "siscone/" in header include
+
+	* examples/Makefile.am: fix a problem with make distcheck
+
+	* configure.ac: the --enable-shared cmd-line option is already
+	  handled by libtool. We just need to add AM_DISABLE_SHARED to
+	  disable the shared lib by default (can still be changed by using
+	  --enable-shared)
+	  Also, we set the minimal version of autoconf to 2.57.
+
+	* examples/Makefile.am: do not install anything (just build
+	  examples locally)
+
+	* examples/main.cpp (main): print a more specific error message
+	  when the event file cannot be opened
+
+	
+2007-10-03  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* siscone/defines.h: read available information from config.h
+
+	* In examples, include headers from the 'siscone' folder
+
+	* Move the src folder into a new 'siscone' folder
+
+	
+2007-10-02  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* add configure script for the build process. This comes with a
+	  bunch of new files: autogen.sh, configure.ac, and a Makefile.am
+	  in each directory. See the INSTALL files for more details
+
+	* replace each Makefile by makefile.static
+	  Makefile-based build is now made through 
+	    make -f makefile.static
+
+	* examples/area.cpp: add a sample program for SISCone jet area
+	  computation
+
+	
+2007-06-24  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/defines.h: SISCone 1.2.0
+	
+
+2007-06-15  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+
+	* src/geom_2d.h/cpp: use a 32x32 eta-phi-plane tiling. The range
+	  is then defined by two binary fields. This allows easy overlap
+	  test and merging. For protojets splitting, the new ranges are
+	  built by adding particles one-by-one.
+
+	* src/split_merge.cpp (siscone): 
+	  - align code with the modifications in geom_2d.h/cpp
+	  - the output of save_contents has slightly been improved
+
+	* src/area.h/cpp: add methods to compute only the active or passive
+	  area
+
+	* examples/main.cpp: add pass-by-pass statistics in the verbose
+	  output
+
+	* examples/options.cpp: fix bug when passing an unknown long
+	  option to getopt_long
+
+
+2007-06-02  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* examples/sample.cpp: add a few lines to show how one can browse
+	  the output jets of compute_jets.
+
+	* examples/times.cpp: only save runtime using the siscone class
+	  instead of a separate determination.
+	
+2007-05-09  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* src/split_merge.cpp: 
+	  soft_pt2_cutoff -> stable_cone_soft_pt2_cutoff
+	  fixed infinite loop for non-zero stable_cone_soft_pt2_cutoff
+
+2007-05-09  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/split_merge.cpp|h:
+	  When building the list of particles to be passed to stable-cone
+	  search, allow to remove particles below a pt2 threshold
+	  soft_pt2_cutoff.
+
+2007-04-27  Gavin SALAM  <salam@lpthe.jussieu.fr>
+
+	* src/geom_2d.cpp: 
+	  corrected bugs in range_union -- now passes test that 1000
+	  events are identical to what we had previously.
+
+2007-04-26  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/split_merge.cpp (siscone): add range support to the
+	  split--merge. When computing overlap, we first check that the
+	  two ranges overlap. In splitting, ranges are set to the parent
+	  ranges. In merging, range is set as the union of the parent
+	  ranges.
+
+	* src/split_merge.h: add a range variable to the Cjet class
+
+	* src/geom_2d.cpp/h (siscone): add the Ceta_phi_range to handle
+	  covering ranges in the ete-phi plane. This goes with a function
+	  to test overlap and another to compute union.
+
+	* src/momentum.h: Move geometry tools into geom_2d.h (new file)
+	
+
+2007-04-24  Gavin SALAM  <salam@lpthe.jussieu.fr> + Matteo
+
+	* src/defines.h (VERSION): 
+	  updated version number to 1.1.2-devel 
+
+	* src/split_merge.cpp (include): 
+	  moved test on SM_var2_hardest_cut_off to beginning of loop, to
+	  ensure that we don't get a first jet that's below the cutoff.
+	
+2007-04-20  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/split_merge.h: remove the "protected" attribute for
+	  'SM_var2_hardest_cut_off' for easier inclusion in fastjet. Note
+	  however that the 'protected' declaration in the previous version
+	  was used to prevent from dangerous usage of the variable. This
+	  is still applicable now!
+
+2007-04-18  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/area.cpp: Add a parameter '_hard_only' which allow to
+	  compute only the hard jets area (without the purely ghosted
+	  ones.
+
+	* src/split_merge.h/cpp: Add a cut-off on the SM_var of the
+	  hardest protojet. This is useful for computation of the area of
+	  the hard jets without computing the purel ghosted ones. Note
+	  that this cut-off is colinear-unsafe so has to be used with
+	  great care.
+	
+2007-04-13  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/area.cpp: add Carea, the class to compute jet area
+
+2007-03-16  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* SISCone 1.1.1 (tags/siscone-1.1.1)
+
+2007-03-15  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* doc/html/usage.html: update the html doc for the recent
+	  modifications of the split-merge algorithm.
+
+	* src/split_merge.cpp: improve the recomputation method when two
+	  jets are very close in the ordering when SM var is set to SM_Et
+
+2007-03-15  Gavin SALAM  <salam@lpthe.jussieu.fr>
+
+	* src/split_merge.cpp: 
+	  modified fix to multiple-pass bug, in hope of being minimally
+	  sensitive to rounding errors
+	
+2007-03-15  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/siscone.h: set the default number of passes to 0
+
+	* examples/main.cpp: adding two command line parameters to the 
+	  siscone application:
+	  - npass controls the number of passes (0 by default)
+	  - sm    controls the choice for the split--merge variable
+
+2007-03-14  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/momentum.h: add Et (inline) member function
+
+	* src/siscone.h: remove backward-compatibility computation members to
+	  make things more clear.
+
+	* src/split_merge.cpp: 
+	  - fix multiple-pass bug
+	  - add Et SM variable management
+
+2007-03-14  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* src/split_merge.cpp: 
+	  put an assert for zero-size jets (common sign of a bug...);
+	  ensured that "recomputed" protocones (with full momentum) also
+	  have their eta-phi recalculated.
+
+2007-03-12  Gavin SALAM  <salam@lpthe.jussieu.fr>
+
+	* src/split_merge.cpp: 
+	  added some more debugging output.
+	
+2007-03-10  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* src/split_merge.cpp: 
+	  fixed some typos and a bug in the EPSILON_SPLITMERGE case for
+	  pt-tilde.
+
+2007-03-09  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/siscone.h: The default value for the SM variable is set to
+	  pttilde
+
+	* src/split_merge.h/cpp: Update the split--merge procedure so that
+	  it takes into account the choice for the split--merge
+	  variable. Among the four choices, (pt_tilde, mt, pt and Et),
+	  pt_tilde is the default (mt and pt can lead to IR unsafety). Et
+	  is not yet implemented. We strongly advise to keep default value.
+	
+2007-03-09  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* src/siscone.h|cpp: 
+	* src/split_merge.h|cpp: 
+	  introduced an enum, Esplit_merge_scale (naming convention in
+	  analogy with the leading "C" for classes), which contains values
+	  SM_pt, SM_Et, SM_mt, SM_pttilde, and put in routines that take
+	  the enum (as well as leaving in old ones)
+	
+2007-03-06  Gavin SALAM  <salam@lpthe.jussieu.fr>
+
+	* src/split_merge.cpp: 
+	  added transverse mass to info printed out about protojets with
+	  the debug mode on (helpful in investigating limiting IR cases)
+
+2007-03-02  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* SISCone 1.1.0 (tags/siscone-1.1.0)
+
+2007-03-02  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* src/split_merge.cpp: 
+	  transformed a quiet error on illegal f values into a throw.
+
+	* src/siscone.cpp: 
+	  throw an error on illegal R values.
+
+2007-03-01  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* src/split_merge.cpp|h:
+	  added a new member variable, most_ambiguous_split, which records
+	  the degree of ambiguity of the most ambiguous decision about
+	  attributing a particle to one or other jet during a split step.
+	  Useful for testing purposes.
+	
+2007-03-01  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/split_merge.cpp: set the full momentum
+	  information on stable cones when we add them 
+	  to the protojet list
+
+	* src/siscone.h,cpp: add comments concerning the 
+	  split_merge_on_transverse_mass parameter
+
+	* src/defines.h (VERSION): set to 1.1.0beta
+
+	* src/split_merge.cpp (siscone): 
+	  - set ptmin as a real pt cut-off (independent on the 
+	    choice of variable for the SM)
+	  - code cleaned (involves other files e.g. defines.h 
+	    momentum.h/cpp, siscone.h/cpp)
+
+	* set the website to the HEPForge one in headers
+
+	* replaced 'content' by 'contents' everywhere
+	  WARNING: it implies Cjet::contents and 
+	                      Csplit_merge::save_contents
+
+	* src/quadtree.cpp (siscone): replace 'childs' with 'children'
+
+	
+2007-02-21  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/protocones.cpp (siscone): 
+	  - remove all functions that are no longer necessary and replace
+	    them by their new version. This includes the computatin of the
+	    cone content, its re-computation, the check for co-circularity
+	    and the test for stable cones in the co-circular situations.
+	  - add a few comments of potentially tricky points.
+	  - remove "cout" statements.
+	  - remove 'largest_cocircular_range' which is no longer used
+
+	* src/vicinity.h: 
+	  - "largest_cocircular_range" removed.  
+	  - quadtree related stuff removed. As a consequence,
+	    'build_from_list' is renamed 'build'. The usage of the
+	    quadtree can now only be used in
+	    'Cstable_cone::proceed_with_stability' hence, the USE_QUADTREE
+	    define has been renamed USE_QUADTREE_FOR_STABILITY_TEST.
+	  - Comments aligned to make the code clearer.
+
+	* src/momentum.h: Add mass() and mass2() member functions to
+	  Cmomentum().
+	  Put inline functions in the header rather than in the source 
+	  file.
+
+	* add C++ mark ("// -*- C++ -*-") in the headers where it was 
+	  missing
+
+2007-02-20  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* src/split_merge.cpp: 
+	  enhanced check on infinite rapidities to include also
+	  meaningless rapidities.
+
+	* src/split_merge.cpp|h: 
+	* src/siscone.cpp: 
+	  sorted out an issue on multi-pass runs caused by earlier fix for
+	  transverse mass ordering.
+	
+2007-02-20 [am-pm] Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* src/split_merge.cpp: 
+	  fixed a bug that appeared once split_merge_on_transverse_mass
+	  got moved into the Csplit_merge_ptcomparison class
+
+	* src/protocones.cpp|h: 
+	  introduced compute_cone_contents_nodist(), which calculates the
+	  initial cone contents by circulating around all in/out
+	  operations and collecting the net result --- this avoids any
+	  distance calculations and so removes a potential source of
+	  rounding error. (Any remaining rounding error is dealt with by
+	  cocircularity tests).
+
+	* src/defines.h
+	  added more info about the meaning of the different EPSILON
+	  scales.
+	
+2007-02-19 [evening] Gavin Salam  <salam@lpthe.jussieu.fr>
+	
+	* src/defines.h: 
+	  introduced const bool split_merge_on_transverse_mass, which
+	  determines whether the split merge occurs on transverse mass
+	  instead of pt -- the latter turns out to be IR unsafe in
+	  mom-conserving events for moderately large values of R (R>1)
+	
+	* src/split_merge.cpp: 
+	  implemented the split-merge ordering on transverse masses,
+	  including the limit of there being small differences.
+	
+	* src/momentum.h: 
+	  introduced perpmass2() which returns the transverse mass,
+	  pt^2+m^2
+
+	
+2007-02-19 [pm] Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	NB: seg-faults are being seen sporadically when fastjet writes its
+	description & need to be understood (but very rare and valgrind
+	gives nothing on small numbers of events...)
+
+	* src/defines.h: 
+	  added optional #define EPSILON_SPLITMERGE, which if defined,
+	  sets a threshold for pt differences below which the ordering is
+	  determined from the explicit particle content...
+
+	* src/split_merge.cpp|h: 
+	  trying to introduce more "exact" pt comparison in split merge to
+	  deal with multiple scales -- this involves a new
+	  Csplit_merge_ptcomparison class which allows the set to carry
+	  out comparisons while making use of knowledge about the particle
+	  momenta inside the split_merge class.
+
+	* src/circulator.h: 
+	  added != and == comparison operators.
+
+	* src/protocones.h|cpp: 
+	  added Cstable_cones::test_cone_cocircular_p3() for carrying out
+	  a p^3 check of stability -- NB seems a bit slower for small p,
+	  but obviously much better for large p... Tests of 2*10^5
+	  particles show no errors, longer tests to be done later...
+
+2007-02-19 [am, early pm] Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* src/vicinity.h|cpp: 
+	  introduced the Cvicinity_inclusion class to allow one to carry
+	  out checks both on the inclusion in the cone and in its
+	  "cocircular" border. Made corresponding changes elsewhere.
+	
+	* src/protocones.h|cpp: 
+	  wrote new_cocircular_check() and ran a certain number of tests
+	  on it; currently it is this one that is being called from
+	  update_cone(), but it still uses the original 2^p routine for
+	  actually checking the cone status.
+
+	* src/[elsewhere]
+	  added a lot of (now commented) debugging statements to help fix
+	  bugs in the new_cocircular_check().
+	
+2007-02-18 [pm - later] Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* src/circulator.h:  *** ADDED ***
+	  class for a circulator, used below.
+
+	* src/protocones.(h|cpp): 
+	  wrote prepare_cocircular_lists(), and checked that it's working
+	  sensibly on some simple test events; also added code for
+	  esetablishing the largest cocircular range among the children of
+	  the current parent (should be used later to establish a more
+	  reliable in/out status).
+
+	  NB: the call to this function has added another 1-2% slowdown,
+	  and we're now about 3-4% slower than before starting this
+	  morning. But this should be the last of the changes that adds
+	  significant extra time use?
+
+	* src/vicinity.(h|cpp): 
+	  support code for the protocones modification
+	
+2007-02-18 [pm]  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* src/defines.h: 
+	  changed default EPSILON values to reflect what will be needed
+	  with the new approach.
+	
+	* src/vicinity.cpp: 
+	  carried out the calculation of cocircular_range inside the
+	  append_to_vicinity member function; the extra
+	  calculations/storage etc lead to a 2-3% slow-down for the
+	  standard fastjet (354 particle) test event with R=1.
+
+	* src/momentum.h: 
+	  added a small 2-vector class, needed as a shorthand in
+	  vicinity.cpp, plus various small utility routines.
+
+	* src/vicinity.h: 
+	  introduced cocircular_range and cocircular (list) as members of
+	  Cvicinity_elm
+
+	* src/momentum.h: 
+	  introduced phi_in_range, dphi and abs_dphi inline functions.
+	
+2007-02-18 [am] Gavin Salam  <salam@lpthe.jussieu.fr> 
+
+	* src/vicinity.cpp (include): 
+	  switched to twopi from defines.h instead of the pi2 class member
+
+	* src/siscone_error.(cpp|h):  *** ADDED ***
+	  this is a simple class for throwing errors.
+
+	* src/protocones.cpp: 
+	  caused test_cone cocircular to throw errors when it receives
+	  more than 32 points
+
+	  carried out replacement client -> candidate
+
+	* src/defines.h: 
+	  introduced definition of twopi, which is used in many place (only
+	  some usage instances have been replaced for now).
+
+
+2007-02-16  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/defines.h: consider the limit on cocircularity and
+	  collinearity as different ones. This introduces the
+	  EPSILON_COCIRCULAR definition.
+
+	* src/protocones.cpp (siscone): 
+	  1. the list of cocircular situations already encountered is
+	     maintained with a pair of references (the cone contents and
+	     its border) instead of its coordinates.
+	  2. we have improved the recomputation of the cone contents by
+	     dynamically tracking he particles inside of the cone. This
+	     adds a list of included particles in Cvicinity as well as a
+	     pointer to elements of that list in vicinity elements.
+
+2007-02-15  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/protocones.cpp: Code has been restructured to clearly
+	  separate the cocircular case
+	
+	* dealt woth cocircularity and 2\pi periodicity and added 
+	  an inline fction
+
+2007-02-14  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* src/reference.cpp (siscone): ensures that the reference is not
+	  zero
+
+	* src/protocones.cpp (siscone): Fix a bug with the interference
+	  between the recomputation of jets and the update of cocircular
+	  points
+	
+	* src/protocones.cpp (siscone): add tests for recomputation of the
+	  cone content for the case of cocircular points
+	
+	* src/protocones.cpp (siscone): when testing the threshold for
+	  recomputation of te cone content, we add a test putting
+	  automatically the cone to 0 when it is empty.
+
+2007-02-13  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* We add a test of cocircularity: when more the p>2 particles are
+	  found on the same circle, we branch to a different test of cone
+	  stability. This new part of the algorithm tests all possible
+	  inclusions/exclusions of the particles along the circle in a
+	  2^p-type algorithm. Note that findling large values of p is
+	  highly improbable !
+
+2007-02-12  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* when traversing the centre list (in stable cones search), we
+	  start with the centre which is the most separated from its
+	  neighbours. This allows to minimize the possibility that we
+	  miscomputed the computation of the initial cone content due to
+	  possible rounding errors when two centres are too close.
+
+2007-02-12  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* in collinear merging, take care of the periodicity in phi
+
+	* put the threshold for collinear merging in defines.h
+	  (EPSILON_COLLINEAR)
+	
+2007-02-12  Gregory Soyez  <g.soyez@ulg.ac.be>
+
+	* undo the previous modification and use another approach to deal
+	  with collinear particles: we keep the p_remain list as it was
+	  before (see revision 84). Instead, after computing p_remain, we
+	  compute p_uncol which is obtained from p_remain by merging
+	  collinear particles. In the siscone main loop, we then use
+	  p_uncol instead of p_remain for the search for stable
+	  cones. Note that with this modification, the 'parent_index'
+	  field of Cmomentum is back to its original definition as a
+	  'int'.
+
+2007-02-12  Gregory Soyez <g.soyez@ulg.ac.be>
+
+	* remove initialisation of parent_index in momentum.cpp and
+	  vicinity.cpp This is allowed because of the Npass loop in
+	  siscone. Indeed, parent_index is only used internally in
+	  split_merge and init at the very beginning of the loop by a call
+	  to init_pleft 
+
+	* replaced "int parent_index" by "vector<int> parent_index" and
+	  align the code in split_merge.cpp
+
+	* add a few lines off code in split_merge.cpp to account for
+	  collinear particles.
+
+	* Note concerning the previous update: the change has been
+	  validated and is no longer considered as temporary
+
+2007-02-12  Gregory Soyez <g.soyez@ulg.ac.be>
+
+	* Changed the test for recomputation of cone content in Cstable_cones
+	  see defines.h for details
+	  (this change may be temporary)
+
+2007-02-10  Gregory Soyez <g.soyez@ulg.ac.be>
+
+	* fixed doxygen documentation issues:
+	   - undocumented or renamed parameters
+	   - include various links into a custom html footer
+	
+2007-01-25  Gregory Soyez <g.soyez@ulg.ac.be>
+
+	* fixed memory leak for Cvicinity::ve_list 
+	  in Cvicinity::set_particle_list()
+	
+2007-01-23  Gavin SALAM  <salam@lpthe.jussieu.fr>
+
+	* added _ptmin argument to Csiscone::recompute_jets(...)
+
+2007-01-22  Gregory Soyez <g.soyez@ulg.ac.be>
+
+	* add ptmin threshold on protojets during split-merge
+	* modify example program to allow for the --ptmin option
+
+2007-01-20  Gregory Soyez <g.soyez@ulg.ac.be>
+
+	* fix typo mistake in split_merge.cpp
+
+2007-01-18  Gregory Soyez <g.soyez@ulg.ac.be>
+
+	* insert a header on top of each source files to give brief information
+	  about its content, the SISCone project and copyright
+	
+2007-01-03  Gregory Soyez <g.soyez@ulg.ac.be>
+
+	* remove the usage of the quadtree in stable cones detection.
+	  Usage of the quadtree in vicinity list creation and final stability
+	  tests can be switched on buy defining USE_QUADTREE in defines.h.
+	  This step was not fully achieved in the last update.
+
+2006-12-28  Gregory Soyez <g.soyez@ulg.ac.be>
+	
+	* remove the usage of the quadtree in stable cones detection.
+	  Usage of the quadtree in vicinity list creation and final stability
+	  tests can be switched on by defining USE_QUADTREE in defines.h
+
+2006-12-28  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+        * commented out various "template std::vector<...>" lines to solve
+	  compilation problem on Macs.
+	
+	* modified the make depend targets so that they do not include 
+	  "standard" include files (which differ from one system to
+	  another). 
+
+	* fixed log(_Np) bug pointed out by Matteo; fixed program name in
+	  defines.h 
+
+2006-12-28  Gregory Soyez <g.soyez@ulg.ac.be>
+
+	* replace variables with name being "underscore" followed by
+	  a single letter by longer names since they lead to compilation
+	  problems under Mac. In practice, we renamed _N with _Np in hash.cpp/h
+	  and _R by _radius in protocones.cpp/h and siscone.cpp/h
+	
+2006-12-27  Gregory Soyez <g.soyez@ulg.ac.be>
+
+        * arranged for "make dist" to create a file with the same version
+	  name in the directory and the tar file; made the tar-file
+	  read-only (to avoid involuntarily overwrite); removed svn file
+	  from the examples/events subdirectory.
+	
+2006-12-26  Gregory Soyez <g.soyez@ulg.ac.be>
+
+	* updated the 'dist' target in the Makefile: include mem_check
+	  with the correct path and build archive so that it unpacks into
+	  a siscone-1.0-beta directory
+
+	* fix typos in INSTALL
+
+2006-12-26  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+        * Changed banner so that first char is # (to allow the rest of the
+	  line to be considered a comment by things like gnuplot).	
+	
+	* moved scones -> siscone (and sorted out various "ignores")
+	
+	* Reordered changelog so that later stuff appears first (I think
+	  this is standard? Makes it easier to see what's been happening
+	  recently...)
+
+	* Tidying up: moved jets.gri and mem_check into the examples
+	  directory; added -f to "rm" command in make clean to avoid
+	  errors; modified siscones->siscone in a couple of places in
+	  doc.
+
+	* Brought the README and INSTALL files up to date
+
+	* set some svn:ignore property so as to ignore .dat files (to
+	  reduce "noise" with svn status).
+
+	* added #!/bin/bash to head of examples/mem_check
+	
+2006-12-22  Gregory Soyez <g.soyez@ulg.ac.be>
+
+	* rename scones namespace into siscone
+
+	* put ranlux stuff into the namespace (we don't want to
+	  pollute the gobal namespace
+
+	* add doc/devel as directory for developer's documentation
+	  (using Doxygen)
+
+	* scones.h/cpp is renamed siscone.h/cpp
+
+	* creation of an 'examples' directory for various programs
+	  only the library libsiscone.a is left in the src dir
+	  Malefiles are modified accordingly
+
+
+2006-12-21  Gavin Salam  <salam@lpthe.jussieu.fr>
+
+	* added the MERGE_IDENTICAL_PROTOCONES_DEFAULT_TRUE define to
+	  allow one to make MERGE_IDENTICAL_PROTOCONES to be set true by
+	  default if need be. (This makes it a bit easier to make a quick
+	  modification to run a test).
+
+	* changed some of the related comments
+
+        * replaced occurrences of "extensive" with "multipass"
+	
+	* Added the ChangeLog file!
+
+	
+2006-12-21 START OF CHANGELOG
+	

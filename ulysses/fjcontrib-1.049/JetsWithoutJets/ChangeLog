@@ -1,0 +1,78 @@
+2014-02-21 Daniele Bertolini <danbert>
+
+	* example_basic_usage.cc
+	
+	- changed order in which functions are presented 
+
+        * NEWS
+	* VERSION
+
+	- Release of version 1.0.0
+
+
+2014-02-18 Daniele Bertolini <danbert>
+
+	* EventStorage.hh
+	* EventStorage.cc
+
+	- new separate header/source files for storage classes (ParticleStorage,EventStorage, and LocalStorage)
+	- fixed a bug in ParticleStorage about initialization of variables
+	
+	* example_basic_usage.cc
+	* example_advanced_usage.cc
+   
+   	- example file split into two. One showing usage of basic functions, the other showing more advanced functions 
+
+	* readme
+
+	- updated
+
+	* NEWS
+	* VERSION
+
+	- 1.0-beta5
+
+
+2014-01-12 Daniele Bertolini <danbert>
+
+	* JetsWithoutJets.hh
+	* JetsWithoutJets.cc
+   
+   	- added storeMass bool flag to choose whether mass of neighbors should be stored or not.
+
+	* readme
+
+	- updated with storeMass flag information
+
+	* NEWS
+	* VERSION
+
+	- 1.0-beta4
+
+
+2013-12-10 Daniele Bertolini <danbert>
+
+	* JetsWithoutJets.hh
+	* JetsWithoutJets.cc
+   
+   	- changed namespace to jwj
+	- changed names of few functions and improved comments
+	- added new classes EventStorage and ParticleStorage to cache information about single particles
+	- JWJStorage has been renamed LocalStorage. Now this is managed by EventStorage and can be naturally used by all implemented functions
+	- implemented suggestions from the FastJet authors about avoiding mutables, and returning const refs for large vectors in MultiplePtCutValues and MultipleRValues classes
+
+	* example.cc
+
+	- updated with the possibility of using a single EventStorage for multiple JetLikeEventShape
+
+	* readme
+
+	- updated with information about new classes and EventStorage use
+
+	* NEWS
+	* VERSION
+
+	- 1.0-beta3
+
+2013-08-26 <jthaler>
+  	Initial creation based on Daniele's private code.

@@ -1,0 +1,19 @@
+# an example config with a dark tower in the cone alg.
+# Run it with 
+#
+# ../fastjet_timing_plugins -siscone -r 0.7 -incl 0 -npass 1 < cone-darktower.dat
+#
+# and see that particle 3 is not included, whereas if you run it with
+# multiple passes (0 == infty)
+#
+# ../fastjet_timing_plugins -siscone -r 0.7 -incl 0 -npass 0 < cone-darktower.dat
+#
+# the dark tower is clustered.
+#
+# For ease of understanding, the event in rap, phi, pt is the following
+#   -0.3 0 500
+#    0.0 0 100
+#    0.6 0 110
+ 5.000000000000000e+02  0.000000000000000e+00 -1.522601467235713e+02  5.226692570644302e+02
+ 1.000000000000000e+02  0.000000000000000e+00  0.000000000000000e+00  1.000000000000000e+02
+ 1.100000000000000e+02  0.000000000000000e+00  7.003189403630654e+01  1.304011740066494e+02

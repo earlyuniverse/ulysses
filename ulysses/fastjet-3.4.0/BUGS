@@ -1,0 +1,105 @@
+Known bugs
+----------
+
+1. For N log(N) strategies requiring CGAL, in CGAL versions 3.7, 3.8,
+   and 3.9-beta1, in rare case of near degeneracies, the program may
+   abort with the following error message:
+
+     terminate called after throwing an instance of
+     'CGAL::Assertion_exception'
+        what():  CGAL ERROR: assertion violation!
+     Expr: false
+     File: .../include/CGAL/Triangulation_2.h
+
+   This is due to an excessively conservative check in versions 3.7,
+   3.8, and 3.9-beta1 of CGAL that has been fixed in CGAL-3.9. Note
+   also that versions<=3.6.1 do not show that behaviour. If you
+   encounter this problem, please switch to an appropriate version of
+   CGAL. [Thanks to the CGAL development team and to Olivier Devillers
+   in particular for the quick fix.]
+
+2. With JetMedianBackgroundEstimator, the computation of sigma()
+   implicitly assumes that all jets have the same area. The fact that
+   they don't introduces a bias at the level of a couple of tens of
+   percent. GridMedianBackgroundEstimator should not suffer from this
+   problem. Thanks to Christopher Young for bringing this to our
+   attention. 
+
+----------------------------------------------------------------------
+Other issues to be aware of
+---------------------------
+
+1. Some algorithms can have ambiguities in the clustering steps and we
+   do not guarantee that different internal clustering strategies (or
+   different fastjet versions) will always resolve the ambiguities
+   identically. This issue doesn't arise with normal particle inputs.
+
+   However:
+
+   - Some (older) versions of Pythia 6 sometimes produce massive
+     particles with pt=0; phi is then ill-defined, while the rapidity
+     is finite and we make no guarantees about how we treat the
+     particle.
+  
+   - inputs that lie on a perfect grid in rapidity-phi (e.g. one
+     interpretation of a calorimeter) cause many interparticle
+     distances to be identical. In the kt, Cambridge/Aachen and anti-kt
+     algorithms, many dij can therefore also be identical. The choice
+     of which dij to take is then ambiguous and what fastjet actually
+     does may depend on: the compiler, the machine architecture
+     (because of rounding errors), the fastjet version and the
+     clustering strategy.
+  
+     Physically this issue should not change the jets
+     much. Nevertheless, one might choose to break any degeneracy
+     explicity, e.g. using information from the location of energy
+     deposits in each calorimeter tower, so that the inputs are not on
+     a perfect grid.
+
+2. For some of the plugins (listed below), the result of the clustering
+   depends on how "sort" treats equal entities. Since this is
+   supposedly undefined, FastJet has no control over the different
+   results that one may obtain using those plugins.
+  
+   - The ATLAS-Cone plugin: At the beginning of the stable-cone search,
+     the input particles are sorted in Et. In that sort, particles with
+     an Et difference below 0.001 are considered as having the same Et
+     (see line 80 of Jet.hh), resulting in the undefined behaviour
+     mentioned above.
+  
+     A consequence of this is that, if 2 input particles have too
+     similar an Et, the stable cone search will consider them in an
+     undefined order. If the 2 resulting stable cones are too close
+     (deta<0.05, dphi<0.05) one will be accepted and the other
+     rejected. Which one depends on the ordering and is thus
+     undefined. If the 2 stable cones do not have the same constituents
+     this could affect the result of the clustering.
+  
+   - In the TrackJet plugin, input particles are sorted in Et. If two
+     particles have the same Et (within machine precision), the order
+     in which they will be considered is undefined. Note however that to
+     have exactly the same pt, the particles are very likely to be
+     back-to-back. In that case, only the order of the clustering will
+     be affected but not the final jets.
+  
+   Relative to the original code, we have replaced the use of 'sort'
+   with 'stable_sort' so that in case of such a degeneracy the order
+   will be the same as that of the original particles and no
+   random behaviour is to be expected. Note however that the issue
+   could still arise if one changes the ordering of the input
+   particles.
+
+3. Copy of ClusterSequenceArea (and the other CS area-related classes)
+   is not fully implemented.
+
+----------------------------------------------------------------------
+Probably solved
+---------------
+
+1. Compilation issues have been reported under windows with the VC7.1
+   compiler. We have incorporated fixes proposed by Ivan Belyaev for
+   this, but do not have access to an appropriate machine to test it
+   ourselves. (NB: it in any case works with cygwin).
+
+
+

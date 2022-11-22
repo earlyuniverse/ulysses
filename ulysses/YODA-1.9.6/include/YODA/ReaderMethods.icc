@@ -1,0 +1,79 @@
+// This file contains boilerplate code for static reader functions in all
+// classes inheriting from Reader. These methods just forward to the methods on
+// the Reader base class, but code duplication can't be avoided without a
+// preprocessor hack like this, AFAIK.
+
+/// @name Reading multiple analysis objects into arbitrary collections.
+//@{
+
+// template <typename RANGE>
+// static typename std::enable_if<CIterable<RANGE>::value>::type
+// read(std::ostream& stream, const RANGE& aos) {
+//   create().write(stream, std::begin(aos), std::end(aos));
+// }
+
+// template <typename RANGE>
+// static typename std::enable_if<CIterable<RANGE>::value>::type
+// write(const std::string& filename, const RANGE& aos) {
+//   create().write(filename, std::begin(aos), std::end(aos));
+// }
+
+
+
+/// @brief Read in a collection of objects @a objs from output stream @a stream.
+///
+/// This version fills (actually, appends to) a variable supplied container
+/// Note: SFINAE is used to check for a void push_back(const AnalysisObject*) method
+template<typename CONT>
+static typename std::enable_if<YODA::Pushable<CONT,AnalysisObject*>::value>::type
+read(std::istream& stream, CONT& aos) {
+  create().read(stream, aos);
+}
+
+// /// @brief Read in a collection of objects @a objs from output stream @a stream.
+// ///
+// /// This version fills (actually, appends to) a supplied vector, avoiding copying,
+// /// and is hence CPU efficient.
+// ///
+// static void read(std::istream& stream, std::vector<AnalysisObject*>& aos) {
+//   create().read(stream, aos);
+// }
+
+/// @brief Read in a collection of objects from output stream @a stream.
+///
+/// This version returns a vector by value, involving copying, and is hence less
+/// CPU efficient than the alternative version where a vector is filled by reference.
+static std::vector<AnalysisObject*> read(std::istream& stream) {
+  return create().read(stream);
+}
+
+
+/// @brief Read in a collection of objects @a objs from file @a filename.
+///
+///
+/// This version fills (actually, appends to) a variable supplied container
+/// Note: SFINAE is used to check for a void push_back(const AnalysisObject*) method
+template<typename CONT>
+static typename std::enable_if<YODA::Pushable<CONT,AnalysisObject*>::value>::type
+read(const std::string& filename, CONT& aos) {
+  return create().read(filename, aos);
+}
+
+// /// @brief Read in a collection of objects @a objs from file @a filename.
+// ///
+// /// This version fills (actually, appends to) a supplied vector, avoiding copying,
+// /// and is hence CPU efficient.
+// ///
+// static void read(const std::string& filename, std::vector<AnalysisObject*>& aos) {
+//   return create().read(filename, aos);
+// }
+
+/// @brief Read in a collection of objects from output stream @a stream.
+///
+/// This version returns a vector by value, involving copying, and is hence less
+/// CPU efficient than the alternative version where a vector is filled by reference.
+static std::vector<AnalysisObject*> read(const std::string& filename) {
+  return create().read(filename);
+}
+
+//@}

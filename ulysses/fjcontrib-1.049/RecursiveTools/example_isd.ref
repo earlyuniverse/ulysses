@@ -1,0 +1,66 @@
+# read an event with 354 particles
+#--------------------------------------------------------------------------
+#                         FastJet release 3.2.0
+#                 M. Cacciari, G.P. Salam and G. Soyez                  
+#     A software package for jet finding and analysis at colliders      
+#                           http://fastjet.fr                           
+#	                                                                      
+# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
+#                                                                       
+# FastJet is provided without warranty under the terms of the GNU GPLv2.
+# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
+# and 3rd party plugin jet algorithms. See COPYING file for details.
+#--------------------------------------------------------------------------
+---------------------------------------------------
+Iterated Soft Drop
+---------------------------------------------------
+
+Computing with:
+     IteratedSoftDrop with beta =-1, symmetry_cut=0.002, R0=0.5 and no angular_cut
+     IteratedSoftDrop with beta =-1, symmetry_cut=0.002, R0=0.5 and no angular_cut
+
+---------------------------------------------------
+Processing Jet 0
+---------------------------------------------------
+
+Jet pT: 982.342 GeV
+
+Soft Drop Multiplicity (pt_R measure, beta=-1, z_cut=0.002):
+3
+
+Symmetry Factors (pt_R measure, beta=-1, z_cut=0.002):
+0.0294298 0.154333 0.42512 
+
+Soft Drop Angularities (pt_R measure, beta=-1, z_cut=0.002):
+  alpha = 0,   kappa = 0 :  3
+  alpha = 0,   kappa = 2 :  0.205411
+  alpha = 0.5, kappa = 1 :  0.0541032
+  alpha = 1,   kappa = 1 :  0.0071635
+  alpha = 2,   kappa = 1 :  0.000333819
+
+Symmetry Factors (E_theta measure, beta=-1, z_cut=0.002):
+0.0286322 0.156129 
+
+---------------------------------------------------
+Processing Jet 1
+---------------------------------------------------
+
+Jet pT: 899.993 GeV
+
+Soft Drop Multiplicity (pt_R measure, beta=-1, z_cut=0.002):
+4
+
+Symmetry Factors (pt_R measure, beta=-1, z_cut=0.002):
+0.00357435 0.0033004 0.00518061 0.235041 
+
+Soft Drop Angularities (pt_R measure, beta=-1, z_cut=0.002):
+  alpha = 0,   kappa = 0 :  4
+  alpha = 0,   kappa = 2 :  0.0552947
+  alpha = 0.5, kappa = 1 :  0.0307531
+  alpha = 1,   kappa = 1 :  0.00657501
+  alpha = 2,   kappa = 1 :  0.00151741
+
+Symmetry Factors (E_theta measure, beta=-1, z_cut=0.002):
+0.00367919 0.00338026 0.00506002 0.235347 
+

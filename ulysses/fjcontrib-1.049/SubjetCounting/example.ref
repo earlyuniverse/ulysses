@@ -1,0 +1,108 @@
+# read an event with 354 particles
+#--------------------------------------------------------------------------
+#                         FastJet release 3.0.3
+#                 M. Cacciari, G.P. Salam and G. Soyez                  
+#     A software package for jet finding and analysis at colliders      
+#                           http://fastjet.fr                           
+#                                                                       
+# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
+#								      	   
+# FastJet is provided without warranty under the terms of the GNU GPLv2.
+# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
+# and 3rd party plugin jet algorithms. See COPYING file for details.
+#--------------------------------------------------------------------------
+Event has a total of 23 anti-Kt jets with jet radius 1.50
+Going to compute n_Kt and n_CA for each such jet (with two different sets of parameters for each observable)
+n_Kt(jet 1; f_Kt = 0.06, pt_cut = 40.0 GeV) = 1
+n_Kt(jet 1; f_Kt = 0.12, pt_cut = 50.0 GeV) = 1
+n_CA(jet 1; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 1
+n_CA(jet 1; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 1
+n_Kt(jet 2; f_Kt = 0.06, pt_cut = 40.0 GeV) = 2
+n_Kt(jet 2; f_Kt = 0.12, pt_cut = 50.0 GeV) = 1
+n_CA(jet 2; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 1
+n_CA(jet 2; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 1
+n_Kt(jet 3; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 3; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 3; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 3; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 4; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 4; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 4; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 4; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 5; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 5; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 5; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 5; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 6; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 6; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 6; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 6; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 7; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 7; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 7; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 7; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 8; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 8; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 8; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 8; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 9; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 9; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 9; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 9; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 10; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 10; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 10; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 10; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 11; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 11; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 11; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 11; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 12; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 12; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 12; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 12; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 13; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 13; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 13; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 13; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 14; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 14; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 14; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 14; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 15; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 15; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 15; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 15; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 16; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 16; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 16; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 16; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 17; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 17; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 17; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 17; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 18; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 18; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 18; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 18; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 19; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 19; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 19; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 19; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 20; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 20; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 20; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 20; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 21; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 21; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 21; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 21; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 22; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 22; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 22; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 22; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0
+n_Kt(jet 23; f_Kt = 0.06, pt_cut = 40.0 GeV) = 0
+n_Kt(jet 23; f_Kt = 0.12, pt_cut = 50.0 GeV) = 0
+n_CA(jet 23; mass_cut_off = 30.0, ycut = 0.10, R_min = 0.15, pt_cut = 40.0 GeV) = 0
+n_CA(jet 23; mass_cut_off = 50.0, ycut = 0.15, R_min = 0.15, pt_cut = 50.0 GeV) = 0

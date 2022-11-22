@@ -1,0 +1,37 @@
+# common fastjet definitions
+include ../../makefile.static
+
+CXXSRC = NestedDefsPlugin.cc 
+OBJS = $(patsubst %.cc,%.o,$(CXXSRC)) 
+
+# fastjet includes
+FASTJET_INCLUDE = -I../../include
+INCLUDE += $(FASTJET_INCLUDE)
+
+all: libNestedDefsPlugin.a
+
+libNestedDefsPlugin.a: $(OBJS)
+	ar cru libNestedDefsPlugin.a $(OBJS)
+	ranlib libNestedDefsPlugin.a
+
+clean:
+	rm -f $(OBJS)
+
+distclean: clean
+	rm -f libNestedDefsPlugin.a *~
+
+# NB: only use "relative" includes here (others are too subject
+#     to change according to the system one is on...)
+depend:
+	makedepend  -f makefile.static $(FASTJET_INCLUDE) -I. -I./fastjet --   -- $(CXXSRC)
+
+# DO NOT DELETE
+
+NestedDefsPlugin.o: ../../include/fastjet/ClusterSequence.hh
+NestedDefsPlugin.o: ../../include/fastjet/internal/DynamicNearestNeighbours.hh
+NestedDefsPlugin.o: ../../include/fastjet/internal/numconsts.hh
+NestedDefsPlugin.o: ../../include/fastjet/internal/base.hh
+NestedDefsPlugin.o: ../../include/fastjet/PseudoJet.hh
+NestedDefsPlugin.o: ../../include/fastjet/Error.hh
+NestedDefsPlugin.o: ../../include/fastjet/JetDefinition.hh
+NestedDefsPlugin.o: fastjet/NestedDefsPlugin.hh

@@ -1,0 +1,63 @@
+------------------------------------------------------------------------
+LundPlane FastJet contrib
+------------------------------------------------------------------------
+
+The LundPlane FastJet contrib provides tools necessary to construct
+the Lund Plane of a jet.
+
+It is based on arXiv:1807.04758 by Frederic Dreyer, Gavin Salam, and
+Gregory Soyez.
+
+Azimuthal-angle definitions are taken from arXiv:2103.16526, by
+Alexander Karlberg, Gavin Salam, Ludovic Scyboz and Rob Verheyen, and
+arXiv:2111.01161 by the authors above and Keith Hamilton.
+
+It provides the following C++ classes:
+
+- LundDeclustering
+  Contains the declustering variables associated with a node on
+  the Lund plane.
+
+- LundGenerator
+  A tool to generate a vector of LundDeclustering for a given jet
+  corresponding to its primary Lund plane.
+
+- RecursiveLundEEGenerator
+  A recursive tool to extract declusterings for a given jet in
+  e+e- collisions, i.e. its full Lund structure down to a user-given
+  depth
+
+- LundWithSecondary
+  A tool to generate primary, and secondary, lund planes of a jet
+  according to the definition given as input.
+
+- SecondaryLund, SecondaryLund_{mMDT|dotmMDT|Mass}
+  Provides a definition for the leading emission.
+
+There are four C++ examples which can be compiled with
+
+> make example example_secondary example_dpsi_collinear example_dpsi_slice
+
+The example program can be run using 
+> ./example < ../data/single-event.dat
+
+and will output the primary lund plane declusterings as well as
+generating a jets.json file, which can be read by a python script:
+
+> python3 ./example.py
+
+Some python classes to assist with reading and processing the json file
+are provided in the read_lund_json.py module.
+
+The example_secondary program outputs both the primary and secondary
+Lund plane declusterings to screen, and can be run with:
+
+> ./example_secondary < ../data/single-event.dat
+
+The example_dpsi_collinear and example_dpsi_slice programs compute the
+contribution to the collinear azimuthal delta_psi observable from
+2103.16526, and to the slice observable delta_psi_slice from 2111.01161,
+respectively. They can be run with
+
+> ./example_dpsi_collinear < ../data/single-ee-event.dat
+> ./example_dpsi_slice < ../data/single-ee-event.dat

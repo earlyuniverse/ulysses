@@ -1,0 +1,5 @@
+See html docmentation in doc/html or developer's doxygen documentation
+in doc/devel/html (you may need to run doxygen for the latter to be
+present).
+
+For installation instructions see the INSTALL file.

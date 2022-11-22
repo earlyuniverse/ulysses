@@ -1,0 +1,13 @@
+2021/12/06: release of version 2.0.1
+- fixed some compilation warnings (signed/unsigned)
+- fixed up missing info in AUTHORS
+- fixed commented python example lines
+2021/11/08: release of version 2.0.0
+- Recursive e+e- generator with spin-correlation observables
+  with the RecursiveLundEEGenerator 
+- See example_dpsi_collinear.cc (implements analysis of arXiv:2103.16526) 
+- and example_dpsi_slice.cc (implements analysis of arXiv:2111.01161) 
+2020/02/23: release of version 1.0.3
+- fixes issue with C++98 compatibility
+2018/10/29: release of version 1.0.2
+2018/08/30: release of version 1.0.1

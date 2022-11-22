@@ -1,0 +1,34 @@
+SUBDIRS   = siscone examples
+DISTFILES = AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README TODO Doxyfile \
+makefile.static siscone/makefile.static examples/makefile.static \
+configure.ac Makefile.am siscone/Makefile.am examples/Makefile.am \
+config.h.in siscone/*.cpp siscone/*.h \
+examples/events/*.dat examples/mem_check examples/*.h examples/*.cpp
+VERSION   = `head -1 configure.ac | sed -e"s/AC_INIT(\[SISCone\], \[//;s/\])//"`
+TARDIR    = siscone-$(VERSION)
+
+all: config $(SUBDIRS)
+
+.PHONY: clean $(SUBDIRS)
+
+clean: $(SUBDIRS)
+	rm *~
+
+depend: $(SUBDIRS)
+
+config:
+	@echo "Creating the configuration file"
+	sed -e "s/#undef PACKAGE_NAME/#define PACKAGE_NAME \"SISCone\"/;s/#undef VERSION/#define VERSION \"$(VERSION)\"/" config.h.in > siscone/config.h
+
+siscone:
+	@cd siscone && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+
+examples:
+	@cd examples && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+
+dist:
+	mkdir $(TARDIR)
+	cp -R -t $(TARDIR) --parents $(DISTFILES)
+	tar -czf $(TARDIR)_noautoconf.tar.gz $(TARDIR)
+#	chmod a-w $(TARDIR).tar.gz
+	rm -Rf $(TARDIR) 

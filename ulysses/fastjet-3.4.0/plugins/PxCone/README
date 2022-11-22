@@ -1,0 +1,42 @@
+This directory contains the pxcone code (written by Luis Del Pozo,
+David Ward and Michael H. Seymour) together with a plugin (written by
+M. Cacciari and G. Salam) for using it within fastjet.
+
+While permission has been granted for pxcone to be distributed with
+fastjet, this was under the condition that it be made clear that pxcone
+is _not_ a supported product.
+
+Distribution permission is specified below and a list of changes from
+the original code can be found in the header of pxcone.f
+
+Compiling
+---------
+Just type "make"
+
+Using it
+--------
+See the example program in ../../examples/plugins/
+
+======================================================================
+Authorship and distribution permission:
+======================================================================
+
+From: Mike Seymour <Michael.Seymour@cern.ch>
+Subject: Re: PxCone licence
+Date: Wed, 9 Nov 2011 15:15:08 +0000
+To: Gavin Salam <gavin.salam@cern.ch>
+
+Dear Gavin,
+As an author of the PxCone code, and having checked that this is 
+acceptable with the other authors of PxCone (Luis Del Pozo and his then 
+PhD supervisor David Ward), I hereby grant you the right to distribute 
+PxCone together with FastJet under a GPL (v2) license.
+Many thanks for dealing with this,
+Mike.
+
+
+Michael H. Seymour.
+Professor of Particle Physics, University of Manchester
+Schuster: 6-10; +44 161 306 6480
+
+

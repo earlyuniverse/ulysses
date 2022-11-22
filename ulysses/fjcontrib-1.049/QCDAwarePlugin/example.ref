@@ -1,0 +1,397 @@
+# read an event with 354 particles
+using QCDAwarePlugin jet algorithm with R = 0.4 and anti-kt distance measure
+#--------------------------------------------------------------------------
+#                         FastJet release 3.1.0
+#                 M. Cacciari, G.P. Salam and G. Soyez                  
+#     A software package for jet finding and analysis at colliders      
+#                           http://fastjet.fr                           
+#	                                                                      
+# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
+#                                                                       
+# FastJet is provided without warranty under the terms of the GNU GPLv2.
+# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
+# and 3rd party plugin jet algorithms. See COPYING file for details.
+#--------------------------------------------------------------------------
+parton jet 0 pt eta phi e label:
+981.157 -0.867767 2.90531 1374.63 3
+parton jet 1 pt eta phi e label:
+895.426 0.222153 6.02991 918.097 -3
+parton jet 2 pt eta phi e label:
+63.3742 -1.19795 6.10284 114.859 21
+parton jet 3 pt eta phi e label:
+5.72893 -0.961594 5.73794 8.68356 21
+parton jet 4 pt eta phi e label:
+5.48498 0.345878 0.89497 6.03399 -3
+parton jet 5 pt eta phi e label:
+4.25433 -0.121221 6.24162 4.46524 21
+parton jet 6 pt eta phi e label:
+4.00121 0.306343 0.329662 4.26443 3
+parton jet 7 pt eta phi e label:
+3.77135 -1.17406 0.484916 6.9671 3
+parton jet 8 pt eta phi e label:
+3.74658 -2.60337 0.918013 25.4616 2
+parton jet 9 pt eta phi e label:
+2.99242 0.715259 0.636797 3.82688 2
+parton jet 10 pt eta phi e label:
+2.89588 -2.58823 1.38413 19.3773 -3
+parton jet 11 pt eta phi e label:
+2.62458 -1.66881 3.94987 7.33685 -2
+parton jet 12 pt eta phi e label:
+2.33372 -4.85243 1.71293 149.432 2
+parton jet 13 pt eta phi e label:
+2.2256 -4.27742 1.12626 80.2055 1
+parton jet 14 pt eta phi e label:
+2.19976 -1.74673 4.3114 6.50194 3
+parton jet 15 pt eta phi e label:
+1.85609 -2.64133 0.0196876 13.089 1
+parton jet 16 pt eta phi e label:
+1.71302 -2.03657 3.81457 6.74204 1
+parton jet 17 pt eta phi e label:
+1.6534 8.26736 4.50034 3219.7 21
+parton jet 18 pt eta phi e label:
+1.6442 -2.03352 0.686561 6.39073 1
+parton jet 19 pt eta phi e label:
+1.61388 -1.64887 1.22332 4.4552 -1
+parton jet 20 pt eta phi e label:
+1.56475 3.6372 5.09398 29.7407 3
+parton jet 21 pt eta phi e label:
+1.55657 -5.34265 4.10048 162.717 -3
+parton jet 22 pt eta phi e label:
+1.46715 5.76701 3.59086 234.44 21
+parton jet 23 pt eta phi e label:
+1.44585 3.68706 0.143097 28.9322 -2
+parton jet 24 pt eta phi e label:
+1.43094 4.8765 0.502934 93.8583 -3
+parton jet 25 pt eta phi e label:
+1.42449 0.451636 0.481494 1.91574 21
+parton jet 26 pt eta phi e label:
+1.38336 -5.11568 3.66057 115.268 2
+parton jet 27 pt eta phi e label:
+1.35417 2.523 4.85027 8.5033 1
+parton jet 28 pt eta phi e label:
+1.34496 -4.72343 6.25684 75.6963 21
+parton jet 29 pt eta phi e label:
+1.34048 -0.450903 2.76161 1.48522 1
+parton jet 30 pt eta phi e label:
+1.32286 -4.99141 5.38457 97.3394 3
+parton jet 31 pt eta phi e label:
+1.29531 -0.982762 5.00061 2.051 2
+parton jet 32 pt eta phi e label:
+1.29086 2.00163 1.12161 5.09477 -2
+parton jet 33 pt eta phi e label:
+1.26881 0.407659 3.69495 1.38277 21
+parton jet 34 pt eta phi e label:
+1.26261 4.95557 4.3612 89.6269 -3
+parton jet 35 pt eta phi e label:
+1.24448 -4.47182 4.54189 54.4628 -2
+parton jet 36 pt eta phi e label:
+1.24342 1.66337 3.86527 3.4169 -3
+parton jet 37 pt eta phi e label:
+1.20412 -2.2743 1.53105 6.00181 1
+parton jet 38 pt eta phi e label:
+1.17699 -2.11358 3.0917 4.94407 3
+parton jet 39 pt eta phi e label:
+1.16808 -1.07531 1.25762 1.94928 21
+parton jet 40 pt eta phi e label:
+1.15482 5.84074 4.31085 198.652 -3
+parton jet 41 pt eta phi e label:
+1.10764 -1.13065 3.92422 1.89949 -1
+parton jet 42 pt eta phi e label:
+1.08886 -4.84665 2.3023 69.3181 21
+parton jet 43 pt eta phi e label:
+1.06192 2.98232 5.74531 10.5046 -1
+parton jet 44 pt eta phi e label:
+1.06182 6.77509 3.0517 464.948 1
+parton jet 45 pt eta phi e label:
+1.05347 -0.13435 3.64779 1.07212 21
+parton jet 46 pt eta phi e label:
+1.03215 -4.5288 0.355635 47.8275 21
+parton jet 47 pt eta phi e label:
+0.97261 1.55144 4.85314 2.41708 -1
+parton jet 48 pt eta phi e label:
+0.901496 -8.00115 1.88792 1345.21 21
+parton jet 49 pt eta phi e label:
+0.892394 1.31185 1.19544 1.95796 1
+parton jet 50 pt eta phi e label:
+0.87427 -2.29328 6.25798 4.4154 21
+parton jet 51 pt eta phi e label:
+0.871296 -3.59312 0.752879 15.8468 2
+parton jet 52 pt eta phi e label:
+0.818047 -1.76843 1.1306 2.47128 2
+parton jet 53 pt eta phi e label:
+0.790301 1.89665 4.51638 2.73728 -1
+parton jet 54 pt eta phi e label:
+0.739475 -2.08306 2.08443 3.01472 21
+parton jet 55 pt eta phi e label:
+0.714683 2.33236 5.62772 3.85373 -2
+parton jet 56 pt eta phi e label:
+0.710001 3.86016 5.50039 16.861 -2
+parton jet 57 pt eta phi e label:
+0.692811 -4.9041 4.46088 46.7127 -1
+parton jet 58 pt eta phi e label:
+0.670613 5.35658 2.78166 71.0862 2
+parton jet 59 pt eta phi e label:
+0.650171 -5.25175 2.71093 62.0624 21
+parton jet 60 pt eta phi e label:
+0.643621 5.71773 2.70646 97.9007 -3
+parton jet 61 pt eta phi e label:
+0.639751 -4.34723 1.5594 24.7206 -2
+parton jet 62 pt eta phi e label:
+0.636302 6.8526 3.56308 301.082 -1
+parton jet 63 pt eta phi e label:
+0.629931 -1.50287 0.530093 1.50955 1
+parton jet 64 pt eta phi e label:
+0.621588 -2.57581 2.06316 4.11046 -2
+parton jet 65 pt eta phi e label:
+0.615667 -2.67712 5.81871 4.5038 -3
+parton jet 66 pt eta phi e label:
+0.602895 4.14265 6.26176 18.9892 -3
+parton jet 67 pt eta phi e label:
+0.581887 7.50047 2.6379 526.284 -2
+parton jet 68 pt eta phi e label:
+0.553038 4.25711 0.536774 19.5286 -1
+parton jet 69 pt eta phi e label:
+0.518018 -0.0966173 0.446438 0.520438 3
+parton jet 70 pt eta phi e label:
+0.492266 1.82727 1.61103 1.56977 -1
+parton jet 71 pt eta phi e label:
+0.484367 1.38111 4.26807 1.03404 3
+parton jet 72 pt eta phi e label:
+0.475848 0.847964 6.03196 0.677214 -1
+parton jet 73 pt eta phi e label:
+0.474544 -1.38286 5.41668 1.01499 -2
+parton jet 74 pt eta phi e label:
+0.473573 -1.69398 1.85784 1.34147 -3
+parton jet 75 pt eta phi e label:
+0.471892 1.45413 0.204703 1.07425 1
+parton jet 76 pt eta phi e label:
+0.464965 -2.47841 3.93164 2.79221 3
+parton jet 77 pt eta phi e label:
+0.463175 5.81945 5.08761 77.9966 21
+parton jet 78 pt eta phi e label:
+0.463036 -3.85889 5.07878 10.9928 2
+parton jet 79 pt eta phi e label:
+0.461653 2.42593 0.479476 2.63854 3
+parton jet 80 pt eta phi e label:
+0.461349 -1.356 3.17806 0.964759 2
+parton jet 81 pt eta phi e label:
+0.458139 -4.21675 3.3271 15.5379 1
+parton jet 82 pt eta phi e label:
+0.450669 -7.43909 2.63892 383.341 -1
+parton jet 83 pt eta phi e label:
+0.419904 5.49745 4.5967 51.2524 21
+parton jet 84 pt eta phi e label:
+0.40205 -7.27381 0.168378 289.884 2
+parton jet 85 pt eta phi e label:
+0.397475 4.00972 2.13619 10.9612 2
+parton jet 86 pt eta phi e label:
+0.379018 3.00384 3.91946 3.83044 -3
+parton jet 87 pt eta phi e label:
+0.3724 2.29737 5.90631 1.87103 21
+parton jet 88 pt eta phi e label:
+0.367978 0.40433 4.81584 0.422205 -2
+parton jet 89 pt eta phi e label:
+0.366531 -3.40821 0.321025 5.54274 -3
+parton jet 90 pt eta phi e label:
+0.363479 0.999616 4.36757 0.577822 2
+parton jet 91 pt eta phi e label:
+0.357738 -4.34817 2.61209 13.8354 -2
+parton jet 92 pt eta phi e label:
+0.357211 3.83592 3.10449 8.28088 -2
+parton jet 93 pt eta phi e label:
+0.350948 -2.14358 1.50056 1.52376 3
+parton jet 94 pt eta phi e label:
+0.350066 -4.05364 2.85374 10.0861 -1
+parton jet 95 pt eta phi e label:
+0.346911 -7.89306 2.31743 464.623 3
+parton jet 96 pt eta phi e label:
+0.346514 -1.79092 5.24854 1.08265 -3
+parton jet 97 pt eta phi e label:
+0.345768 1.27374 5.03712 0.680751 -2
+parton jet 98 pt eta phi e label:
+0.339499 -1.6317 0.1527 0.911804 -2
+parton jet 99 pt eta phi e label:
+0.337126 -7.53059 0.401996 314.236 -1
+parton jet 100 pt eta phi e label:
+0.336693 -7.53364 3.14122 314.791 21
+parton jet 101 pt eta phi e label:
+0.335815 7.04263 5.04571 192.153 -2
+parton jet 102 pt eta phi e label:
+0.33485 -5.90631 2.34308 61.5037 -3
+parton jet 103 pt eta phi e label:
+0.334547 4.09483 3.12574 10.0451 3
+parton jet 104 pt eta phi e label:
+0.332593 -4.46134 5.03735 14.4044 1
+parton jet 105 pt eta phi e label:
+0.323693 3.08441 5.32331 3.54723 3
+parton jet 106 pt eta phi e label:
+0.322387 0.422165 5.53181 0.351544 21
+parton jet 107 pt eta phi e label:
+0.319525 -3.16342 0.918473 3.78541 21
+parton jet 108 pt eta phi e label:
+0.318859 -0.969444 0.471414 0.50065 3
+parton jet 109 pt eta phi e label:
+0.306762 -3.43192 5.44652 4.74996 3
+parton jet 110 pt eta phi e label:
+0.305116 -3.13612 2.74757 3.52043 -3
+parton jet 111 pt eta phi e label:
+0.300376 1.72838 6.23544 0.883548 -3
+parton jet 112 pt eta phi e label:
+0.291608 0.837601 5.62389 0.400023 21
+parton jet 113 pt eta phi e label:
+0.276716 1.99721 1.95017 1.04761 -3
+parton jet 114 pt eta phi e label:
+0.274125 2.23351 5.36581 1.30866 -3
+parton jet 115 pt eta phi e label:
+0.2719 -3.9309 1.43716 6.93108 -1
+parton jet 116 pt eta phi e label:
+0.270274 -0.416652 1.23735 0.346954 -2
+parton jet 117 pt eta phi e label:
+0.268537 -0.654709 0.0312707 0.328175 -1
+parton jet 118 pt eta phi e label:
+0.267189 -0.694247 0.579036 0.334207 -1
+parton jet 119 pt eta phi e label:
+0.251518 0.586404 1.69995 0.32727 -2
+parton jet 120 pt eta phi e label:
+0.247298 -2.9362 3.29089 2.33662 -1
+parton jet 121 pt eta phi e label:
+0.243829 0.467845 2.87894 0.307429 21
+parton jet 122 pt eta phi e label:
+0.241708 -1.16407 2.42725 0.424823 1
+parton jet 123 pt eta phi e label:
+0.237823 -2.76267 4.99575 1.89645 -3
+parton jet 124 pt eta phi e label:
+0.237324 3.36388 5.90051 3.43369 2
+parton jet 125 pt eta phi e label:
+0.232333 4.85547 2.77491 14.9221 21
+parton jet 126 pt eta phi e label:
+0.231079 -3.82366 1.89617 5.29278 3
+parton jet 127 pt eta phi e label:
+0.22852 5.20291 2.83655 20.7732 3
+parton jet 128 pt eta phi e label:
+0.226167 2.4137 0.883531 1.28147 -3
+parton jet 129 pt eta phi e label:
+0.225644 -0.330032 5.83618 0.275944 3
+parton jet 130 pt eta phi e label:
+0.219607 5.40365 4.29975 24.4007 -1
+parton jet 131 pt eta phi e label:
+0.215612 1.12235 2.22571 0.366278 3
+parton jet 132 pt eta phi e label:
+0.211132 -5.41766 3.02433 23.7952 -2
+parton jet 133 pt eta phi e label:
+0.201286 -3.0625 4.24385 2.15654 21
+parton jet 134 pt eta phi e label:
+0.197459 4.70894 5.16549 10.9534 -3
+parton jet 135 pt eta phi e label:
+0.195539 -3.96547 0.595232 5.16059 1
+parton jet 136 pt eta phi e label:
+0.182798 -5.89708 3.34 33.2674 3
+parton jet 137 pt eta phi e label:
+0.180362 -8.49339 1.94973 440.299 1
+parton jet 138 pt eta phi e label:
+0.179465 0.852332 3.72773 0.248696 3
+parton jet 139 pt eta phi e label:
+0.177332 -0.926317 4.68149 0.294222 2
+parton jet 140 pt eta phi e label:
+0.168958 5.14712 3.70347 14.5255 2
+parton jet 141 pt eta phi e label:
+0.16745 -5.40477 3.27183 18.6267 -2
+parton jet 142 pt eta phi e label:
+0.167196 -4.51804 4.55731 7.66316 -3
+parton jet 143 pt eta phi e label:
+0.166107 -0.0444607 0.463621 0.166271 1
+parton jet 144 pt eta phi e label:
+0.164468 -5.53242 4.68984 20.7853 21
+parton jet 145 pt eta phi e label:
+0.153138 5.16695 1.9153 13.429 21
+parton jet 146 pt eta phi e label:
+0.152628 -6.26017 1.30987 39.9363 21
+parton jet 147 pt eta phi e label:
+0.152258 -4.67305 2.22934 8.14983 -3
+parton jet 148 pt eta phi e label:
+0.151674 0.945817 4.35015 0.224726 3
+parton jet 149 pt eta phi e label:
+0.151259 1.36746 0.699387 0.345579 21
+parton jet 150 pt eta phi e label:
+0.149881 3.16874 0.822116 1.79049 21
+parton jet 151 pt eta phi e label:
+0.149116 -4.03041 4.43254 4.19773 -2
+parton jet 152 pt eta phi e label:
+0.146842 -6.30141 4.49534 40.0428 -3
+parton jet 153 pt eta phi e label:
+0.146828 -4.5488 6.06845 6.94119 21
+parton jet 154 pt eta phi e label:
+0.139938 0.849045 2.96988 0.193481 21
+parton jet 155 pt eta phi e label:
+0.134877 -0.476565 3.12096 0.150485 -3
+parton jet 156 pt eta phi e label:
+0.134599 -4.92149 0.416705 9.23441 2
+parton jet 157 pt eta phi e label:
+0.130477 -2.69209 1.79249 0.967508 -2
+parton jet 158 pt eta phi e label:
+0.129156 -0.664424 5.30254 0.158729 3
+parton jet 159 pt eta phi e label:
+0.123419 -0.272199 5.70893 0.128019 2
+parton jet 160 pt eta phi e label:
+0.119485 -3.30599 1.64078 1.6317 21
+parton jet 161 pt eta phi e label:
+0.115239 -2.11548 2.54038 0.504507 21
+parton jet 162 pt eta phi e label:
+0.108449 -2.95179 6.10259 1.0407 -2
+parton jet 163 pt eta phi e label:
+0.101009 7.12265 5.16223 62.6118 -1
+parton jet 164 pt eta phi e label:
+0.0935608 2.12965 2.6498 0.399075 3
+parton jet 165 pt eta phi e label:
+0.0920219 1.77917 1.76744 0.313195 21
+parton jet 166 pt eta phi e label:
+0.0762185 -5.74088 1.75044 11.8658 2
+parton jet 167 pt eta phi e label:
+0.0711186 3.80441 3.92573 1.59736 -2
+parton jet 168 pt eta phi e label:
+0.0696156 7.45441 1.19308 60.1295 1
+parton jet 169 pt eta phi e label:
+0.0666772 7.94575 5.44196 94.1332 1
+parton jet 170 pt eta phi e label:
+0.0644283 -2.04102 5.0208 0.252183 21
+parton jet 171 pt eta phi e label:
+0.0613046 7.28041 2.34496 44.4945 21
+parton jet 172 pt eta phi e label:
+0.0575471 2.55093 4.86649 0.371093 2
+parton jet 173 pt eta phi e label:
+0.0570969 -8.12607 0.317817 96.5358 3
+parton jet 174 pt eta phi e label:
+0.0523809 3.57931 1.8923 0.939631 2
+parton jet 175 pt eta phi e label:
+0.0492661 -3.18735 0.216372 0.597734 -3
+parton jet 176 pt eta phi e label:
+0.0456 -0.848275 4.81144 0.0630138 2
+parton jet 177 pt eta phi e label:
+0.0393041 1.52532 2.10055 0.0946084 2
+parton jet 178 pt eta phi e label:
+0.0336539 -0.725797 4.57599 0.146019 2
+parton jet 179 pt eta phi e label:
+0.0306704 -8.25351 4.46831 58.9037 21
+parton jet 180 pt eta phi e label:
+0.0271044 -4.52437 0.900872 1.25017 -1
+parton jet 181 pt eta phi e label:
+0.0264685 -1.83523 5.67155 0.0850455 -1
+parton jet 182 pt eta phi e label:
+0.0220963 5.85113 0.823018 3.84066 21
+parton jet 183 pt eta phi e label:
+0.0210644 -0.455283 4.54899 0.0232856 1
+parton jet 184 pt eta phi e label:
+0.0197893 -7.54243 4.7132 18.6653 -1
+parton jet 185 pt eta phi e label:
+0.0140305 4.70069 0.986725 0.771903 1
+parton jet 186 pt eta phi e label:
+0.0136845 6.81955 0.603128 6.26457 -2
+parton jet 187 pt eta phi e label:
+0.0128014 -6.69613 4.83577 5.17988 21
+parton jet 188 pt eta phi e label:
+0.0112633 -9.48923 4.87533 74.4315 21
+parton jet 189 pt eta phi e label:
+0.00508892 -0.419084 3.09668 0.00554239 2
+parton jet 190 pt eta phi e label:
+0.00174647 4.89158 0.177664 0.11629 -2

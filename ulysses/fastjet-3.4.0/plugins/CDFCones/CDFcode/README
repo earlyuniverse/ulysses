@@ -1,0 +1,32 @@
+README for the CDFcode directory
+--------------------------------
+
+----------------------------------------------------------------------
+GPS 21 February 2007
+
+This directory contains code by CDF for jet clustering. It is
+essentially as downloaded from Joey Huston's page, EXCEPT that we have
+
+
+. added functionality in MidPointAlgorithm.cc for using Et or
+  transverse mass (instead of pt) as the comparison and ordering
+  variable inside the split-merge step. The defaults are the same as
+  before.
+
+. added corresponding helpers in ClusterComparisons.hh and
+  LorentzVector.hh 
+
+
+----------------------------------------------------------------------
+GPS 10 March 2007
+
+added functionality for the "pt_tilde" scale in the split-merge; as
+well as modifications in the places indicated above, we've also added
+maintenance of the pt_tilde scale in the Cluster.hh class.
+
+
+----------------------------------------------------------------------
+GPS 16 October 2007
+
+added protection in midpoint code for cases when no stable cones are
+found (e.g. because all particles are below seed threshold).

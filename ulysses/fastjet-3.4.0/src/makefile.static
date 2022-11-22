@@ -1,0 +1,272 @@
+# fastjet/src/makefile.static
+
+# include the Makefile in the top directory, which has the bits and pieces
+# needed to get CGAL working
+include ../makefile.static
+
+# make sure we use the pedantic flags here (defined in ../Makefile)
+#CXXFLAGS += $(CXXPEDANTIC)
+
+FASTJET_INCLUDE = -I../include
+INCLUDE += $(FASTJET_INCLUDE)
+#INCLUDE = 
+
+SRCS = DnnPlane.cc Dnn4piCylinder.cc Dnn3piCylinder.cc Dnn2piCylinder.cc ClusterSequence.cc PseudoJet.cc ClusterSequence_N2.cc ClusterSequence_TiledN2.cc ClusterSequence_Delaunay.cc ClusterSequence_DumbN3.cc ClusterSequence_CP2DChan.cc ClosestPair2D.cc MinHeap.cc ClusterSequenceAreaBase.cc ClusterSequenceActiveAreaExplicitGhosts.cc GhostedAreaSpec.cc ClusterSequenceActiveArea.cc Voronoi.cc ClusterSequenceVoronoiArea.cc ClusterSequencePassiveArea.cc ClusterSequence1GhostPassiveArea.cc BasicRandom.cc JetDefinition.cc Error.cc AreaDefinition.cc RangeDefinition.cc ClusterSequenceArea.cc
+
+OBJS = $(patsubst %.cc,%.o,$(SRCS))
+
+all: libfastjet.a
+
+libfastjet.a: $(OBJS)
+	ar cru libfastjet.a $(OBJS)
+	ranlib libfastjet.a
+
+# generate the config_auto.h file
+../include/fastjet/config_auto.h: ../configure.ac genconfig.sh
+	./genconfig.sh
+
+install: libfastjet.a
+	../install-sh libfastjet.a ../lib/libfastjet.a
+#	cp -p libfastjet.a ../lib/
+
+clean:
+	rm -f $(OBJS) libfastjet.a
+
+
+depend:
+	makedepend -f makefile.static $(FASTJET_INCLUDE) -Y --  -- $(SRCS)
+# DO NOT DELETE
+
+DnnPlane.o: ../include/fastjet/internal/DnnPlane.hh
+DnnPlane.o: ../include/fastjet/internal/Triangulation.hh
+DnnPlane.o: ../include/fastjet/internal/base.hh
+DnnPlane.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+DnnPlane.o: ../include/fastjet/internal/numconsts.hh
+Dnn4piCylinder.o: ../include/fastjet/internal/Dnn4piCylinder.hh
+Dnn4piCylinder.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+Dnn4piCylinder.o: ../include/fastjet/internal/numconsts.hh
+Dnn4piCylinder.o: ../include/fastjet/internal/base.hh
+Dnn4piCylinder.o: ../include/fastjet/internal/DnnPlane.hh
+Dnn4piCylinder.o: ../include/fastjet/internal/Triangulation.hh
+Dnn3piCylinder.o: ../include/fastjet/internal/Dnn3piCylinder.hh
+Dnn3piCylinder.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+Dnn3piCylinder.o: ../include/fastjet/internal/numconsts.hh
+Dnn3piCylinder.o: ../include/fastjet/internal/base.hh
+Dnn3piCylinder.o: ../include/fastjet/internal/DnnPlane.hh
+Dnn3piCylinder.o: ../include/fastjet/internal/Triangulation.hh
+Dnn2piCylinder.o: ../include/fastjet/internal/Dnn2piCylinder.hh
+Dnn2piCylinder.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+Dnn2piCylinder.o: ../include/fastjet/internal/numconsts.hh
+Dnn2piCylinder.o: ../include/fastjet/internal/base.hh
+Dnn2piCylinder.o: ../include/fastjet/internal/DnnPlane.hh
+Dnn2piCylinder.o: ../include/fastjet/internal/Triangulation.hh
+ClusterSequence.o: ../include/fastjet/Error.hh
+ClusterSequence.o: ../include/fastjet/internal/base.hh
+ClusterSequence.o: ../include/fastjet/PseudoJet.hh
+ClusterSequence.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequence.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequence.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequence.o: ../include/fastjet/JetDefinition.hh
+ClusterSequence.o: ../include/fastjet/version.hh ../include/fastjet/config.h
+ClusterSequence.o: ../include/fastjet/config_auto.h
+PseudoJet.o: ../include/fastjet/Error.hh ../include/fastjet/internal/base.hh
+PseudoJet.o: ../include/fastjet/PseudoJet.hh
+PseudoJet.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequence_N2.o: ../include/fastjet/PseudoJet.hh
+ClusterSequence_N2.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequence_N2.o: ../include/fastjet/internal/base.hh
+ClusterSequence_N2.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequence_N2.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequence_N2.o: ../include/fastjet/Error.hh
+ClusterSequence_N2.o: ../include/fastjet/JetDefinition.hh
+ClusterSequence_TiledN2.o: ../include/fastjet/PseudoJet.hh
+ClusterSequence_TiledN2.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequence_TiledN2.o: ../include/fastjet/internal/base.hh
+ClusterSequence_TiledN2.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequence_TiledN2.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequence_TiledN2.o: ../include/fastjet/Error.hh
+ClusterSequence_TiledN2.o: ../include/fastjet/JetDefinition.hh
+ClusterSequence_TiledN2.o: ../include/fastjet/internal/MinHeap.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/Error.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/internal/base.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/PseudoJet.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/JetDefinition.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/internal/Dnn4piCylinder.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/internal/DnnPlane.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/internal/Triangulation.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/internal/Dnn3piCylinder.hh
+ClusterSequence_Delaunay.o: ../include/fastjet/internal/Dnn2piCylinder.hh
+ClusterSequence_DumbN3.o: ../include/fastjet/PseudoJet.hh
+ClusterSequence_DumbN3.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequence_DumbN3.o: ../include/fastjet/internal/base.hh
+ClusterSequence_DumbN3.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequence_DumbN3.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequence_DumbN3.o: ../include/fastjet/Error.hh
+ClusterSequence_DumbN3.o: ../include/fastjet/JetDefinition.hh
+ClusterSequence_CP2DChan.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequence_CP2DChan.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequence_CP2DChan.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequence_CP2DChan.o: ../include/fastjet/internal/base.hh
+ClusterSequence_CP2DChan.o: ../include/fastjet/PseudoJet.hh
+ClusterSequence_CP2DChan.o: ../include/fastjet/Error.hh
+ClusterSequence_CP2DChan.o: ../include/fastjet/JetDefinition.hh
+ClusterSequence_CP2DChan.o: ../include/fastjet/internal/ClosestPair2D.hh
+ClusterSequence_CP2DChan.o: ../include/fastjet/internal/ClosestPair2DBase.hh
+ClusterSequence_CP2DChan.o: ../include/fastjet/internal/SearchTree.hh
+ClusterSequence_CP2DChan.o: ../include/fastjet/internal/MinHeap.hh
+ClosestPair2D.o: ../include/fastjet/internal/ClosestPair2D.hh
+ClosestPair2D.o: ../include/fastjet/internal/ClosestPair2DBase.hh
+ClosestPair2D.o: ../include/fastjet/internal/base.hh
+ClosestPair2D.o: ../include/fastjet/internal/SearchTree.hh
+ClosestPair2D.o: ../include/fastjet/internal/MinHeap.hh
+MinHeap.o: ../include/fastjet/internal/MinHeap.hh
+MinHeap.o: ../include/fastjet/internal/base.hh
+ClusterSequenceAreaBase.o: ../include/fastjet/ClusterSequenceAreaBase.hh
+ClusterSequenceAreaBase.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequenceAreaBase.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequenceAreaBase.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequenceAreaBase.o: ../include/fastjet/internal/base.hh
+ClusterSequenceAreaBase.o: ../include/fastjet/PseudoJet.hh
+ClusterSequenceAreaBase.o: ../include/fastjet/Error.hh
+ClusterSequenceAreaBase.o: ../include/fastjet/JetDefinition.hh
+ClusterSequenceAreaBase.o: ../include/fastjet/internal/LimitedWarning.hh
+ClusterSequenceAreaBase.o: ../include/fastjet/RangeDefinition.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/ClusterSequenceActiveAreaExplicitGhosts.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/PseudoJet.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/internal/base.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/ClusterSequenceAreaBase.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/Error.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/JetDefinition.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/internal/LimitedWarning.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/RangeDefinition.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/GhostedAreaSpec.hh
+ClusterSequenceActiveAreaExplicitGhosts.o: ../include/fastjet/internal/BasicRandom.hh
+GhostedAreaSpec.o: ../include/fastjet/GhostedAreaSpec.hh
+GhostedAreaSpec.o: ../include/fastjet/PseudoJet.hh
+GhostedAreaSpec.o: ../include/fastjet/internal/numconsts.hh
+GhostedAreaSpec.o: ../include/fastjet/internal/base.hh
+GhostedAreaSpec.o: ../include/fastjet/internal/BasicRandom.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/PseudoJet.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/internal/base.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/Error.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/JetDefinition.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/ClusterSequenceActiveArea.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/ClusterSequenceAreaBase.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/internal/LimitedWarning.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/RangeDefinition.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/ClusterSequenceActiveAreaExplicitGhosts.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/GhostedAreaSpec.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/internal/BasicRandom.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/ActiveAreaSpec.hh
+ClusterSequenceActiveArea.o: ../include/fastjet/ClusterSequenceWithArea.hh
+Voronoi.o: ../include/fastjet/internal/Voronoi.hh
+Voronoi.o: ../include/fastjet/ClusterSequenceWithArea.hh
+Voronoi.o: ../include/fastjet/ClusterSequenceAreaBase.hh
+Voronoi.o: ../include/fastjet/ClusterSequence.hh
+Voronoi.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+Voronoi.o: ../include/fastjet/internal/numconsts.hh
+Voronoi.o: ../include/fastjet/internal/base.hh
+Voronoi.o: ../include/fastjet/PseudoJet.hh ../include/fastjet/Error.hh
+Voronoi.o: ../include/fastjet/JetDefinition.hh
+Voronoi.o: ../include/fastjet/internal/LimitedWarning.hh
+Voronoi.o: ../include/fastjet/RangeDefinition.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/ClusterSequenceVoronoiArea.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/PseudoJet.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/internal/base.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/AreaDefinition.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/GhostedAreaSpec.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/internal/BasicRandom.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/ClusterSequenceAreaBase.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/Error.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/JetDefinition.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/internal/LimitedWarning.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/RangeDefinition.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/internal/Voronoi.hh
+ClusterSequenceVoronoiArea.o: ../include/fastjet/ClusterSequenceWithArea.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/ClusterSequencePassiveArea.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/PseudoJet.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/internal/base.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/ClusterSequence1GhostPassiveArea.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/ClusterSequenceAreaBase.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/Error.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/JetDefinition.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/internal/LimitedWarning.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/RangeDefinition.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/ClusterSequenceActiveArea.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/ClusterSequenceActiveAreaExplicitGhosts.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/GhostedAreaSpec.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/internal/BasicRandom.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/ActiveAreaSpec.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/ClusterSequenceWithArea.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/ClusterSequenceVoronoiArea.hh
+ClusterSequencePassiveArea.o: ../include/fastjet/AreaDefinition.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/ClusterSequence1GhostPassiveArea.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/PseudoJet.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/internal/base.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/ClusterSequenceAreaBase.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/Error.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/JetDefinition.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/internal/LimitedWarning.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/RangeDefinition.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/ClusterSequenceActiveArea.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/ClusterSequenceActiveAreaExplicitGhosts.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/GhostedAreaSpec.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/internal/BasicRandom.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/ActiveAreaSpec.hh
+ClusterSequence1GhostPassiveArea.o: ../include/fastjet/ClusterSequenceWithArea.hh
+BasicRandom.o: ../include/fastjet/internal/BasicRandom.hh
+BasicRandom.o: ../include/fastjet/internal/base.hh
+JetDefinition.o: ../include/fastjet/JetDefinition.hh
+JetDefinition.o: ../include/fastjet/internal/numconsts.hh
+JetDefinition.o: ../include/fastjet/internal/base.hh
+JetDefinition.o: ../include/fastjet/PseudoJet.hh ../include/fastjet/Error.hh
+Error.o: ../include/fastjet/Error.hh ../include/fastjet/internal/base.hh
+AreaDefinition.o: ../include/fastjet/AreaDefinition.hh
+AreaDefinition.o: ../include/fastjet/GhostedAreaSpec.hh
+AreaDefinition.o: ../include/fastjet/PseudoJet.hh
+AreaDefinition.o: ../include/fastjet/internal/numconsts.hh
+AreaDefinition.o: ../include/fastjet/internal/base.hh
+AreaDefinition.o: ../include/fastjet/internal/BasicRandom.hh
+RangeDefinition.o: ../include/fastjet/RangeDefinition.hh
+RangeDefinition.o: ../include/fastjet/PseudoJet.hh
+RangeDefinition.o: ../include/fastjet/internal/numconsts.hh
+RangeDefinition.o: ../include/fastjet/internal/base.hh
+ClusterSequenceArea.o: ../include/fastjet/ClusterSequenceArea.hh
+ClusterSequenceArea.o: ../include/fastjet/ClusterSequenceAreaBase.hh
+ClusterSequenceArea.o: ../include/fastjet/ClusterSequence.hh
+ClusterSequenceArea.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+ClusterSequenceArea.o: ../include/fastjet/internal/numconsts.hh
+ClusterSequenceArea.o: ../include/fastjet/internal/base.hh
+ClusterSequenceArea.o: ../include/fastjet/PseudoJet.hh
+ClusterSequenceArea.o: ../include/fastjet/Error.hh
+ClusterSequenceArea.o: ../include/fastjet/JetDefinition.hh
+ClusterSequenceArea.o: ../include/fastjet/internal/LimitedWarning.hh
+ClusterSequenceArea.o: ../include/fastjet/RangeDefinition.hh
+ClusterSequenceArea.o: ../include/fastjet/ClusterSequenceActiveArea.hh
+ClusterSequenceArea.o: ../include/fastjet/ClusterSequenceActiveAreaExplicitGhosts.hh
+ClusterSequenceArea.o: ../include/fastjet/GhostedAreaSpec.hh
+ClusterSequenceArea.o: ../include/fastjet/internal/BasicRandom.hh
+ClusterSequenceArea.o: ../include/fastjet/ActiveAreaSpec.hh
+ClusterSequenceArea.o: ../include/fastjet/ClusterSequenceWithArea.hh
+ClusterSequenceArea.o: ../include/fastjet/ClusterSequencePassiveArea.hh
+ClusterSequenceArea.o: ../include/fastjet/ClusterSequence1GhostPassiveArea.hh
+ClusterSequenceArea.o: ../include/fastjet/ClusterSequenceVoronoiArea.hh
+ClusterSequenceArea.o: ../include/fastjet/AreaDefinition.hh

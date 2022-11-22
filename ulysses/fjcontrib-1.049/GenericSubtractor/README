@@ -1,0 +1,132 @@
+GenericSubtractor is part of the fastjet-contrib project.
+
+The GenericSubtractor class allows one to subtract pile-up
+contamination from jet shapes as described in
+
+   Pileup subtraction for jet shapes
+   Gregory Soyez, Gavin P. Salam, Jihun Kim, Souvik Dutta, Matteo Cacciari. 
+   arXiv:1211.2811 
+
+Basic Usage
+-----------
+
+This code introduces a class named GenericSubtractor. The basic usage
+of this class is as follows:
+
+  GenericSubtractor gensub(& _some_background_estimator);
+  FunctionOfPseudoJet<double> shape;
+  double subtracted_shape_value = gensub(shape, jet);
+
+By default, this only subtracts the transverse momentum density rho
+(obtained from the background estimator provided to the class). Two
+options allow also for the inclusion of the "particle mass"
+contribution to the background density (the "rho_m" term): one can
+either instruct the GenericSubtractor class to compute rho_m from the
+same background estimator using
+
+  gensub.set_common_bge_for_rho_and_rhom();                    (1)
+
+or explicitly construct gensub with two backgroundestimators
+
+  GenericSubtractor gensub(& _background_estimator_for_rho,
+                           & _background_estimator_for_rhom);  (2)
+
+Note that since FastJet 3.1, the option (1) will work with any
+background estimator that internally computes rho_m (and has that
+computation enabled). For FastJet 3.0, the first option is only
+available for JetMedianBackgroundEstimator.
+
+For the option (2), 'gensub' will obtain rho_m using
+
+  background_estimator_for_rhom->rho()   [NOT rho_m()!]  
+
+unless one calls gensub.set_use_bge_rhom_rhom() (it requires FJ>=3.1)
+in which case it will be obtained using
+
+  background_estimator_for_rhom->rhom()
+
+The right choice between these two procedures for option (2) depends
+on the details of 'background_estimator_for_rhom'.
+
+
+If the background transverse momentum density rho (and optionally
+rhom) are known, the subtractor can be constructed directly as
+
+  GenericSubtractor gensub(rho,rhom);
+
+Extra information can be retrieved using
+
+  GenericSubtractorInfo info;
+  double subtracted_shape_value = gensub(shape, jet, info);
+
+[see the class definition in GenericSubtractor.hh for details]
+
+See example.cc for an illustration of the usage of GenericSubtractor.
+
+
+Advanced Usage
+--------------
+
+In some cases, it is possible to use clever tricks to improve the
+subtraction or its efficiency.
+
+- The first case is the one where the calculation of a shape first
+partitions the jet into subjets before proceeding to an actual
+calculation of the shape. To avoid recomputing that partition
+everytimes GenericSubtraction varies the ghost scale, one can derive
+such a shape from the ShapeWithPartition class [see
+ShapeWithPArtition.hh]. To do that, one implements separately the
+partitioning and the calculation fron the partition by overwriting
+
+  // compute the partition, returning a conposite jet
+  PseudoJet ShapeWithPartition::partition(const PseudoJet &jet)
+
+  // compute the shape from the partition
+  double ShapeWithPartition::result_from_partition(const PseudoJet &partit)
+
+For such shapes, GenericSubtraction will only compute the partition once.
+
+- The second case is the one when a shape is made of several
+ingredients and one wishes to subtract each of these ingredients
+independently. A tyical case would be N-subjettiness ratio, say tau21,
+where one wishes to subtract tau2 and tau1 independently and then take
+their ratio. To do that, one would derive the shape from
+ShapeWithComponenents [see ShapeWithComponents.hh] and overwrite the
+following methods:
+
+  // returns the number of components 
+  unsigned int n_components() const;
+
+  // returns a vector (of size n_components()) containing the
+  // different components which go into the calculation of the shape.
+  virtual std::vector<double> components(const PseudoJet &jet) const;
+
+  // given a vector of components, determine the result of the shape
+  virtual double result_from_components(const std::vector <double> &) const = 0;
+
+An example using a ShapeWithComponent is provided in example_with_components.cc.
+
+
+Examples
+--------
+
+The code example.cc illustrates how to use the class in a simple case.
+It can be built using
+
+    make example
+
+example.cc makes use of an input datafile which is provided in the
+/data directory, and it should be run with
+
+   ./example < ../data/Pythia-Zp2jets-lhc-pileup-1ev.dat
+ 
+The expected output can be found in example.ref
+
+A more advanced example (shapes made up of several components) is
+given in example_with_components.cc, which can be built and run with 
+
+    make example_with_components
+   ./example_with_components < ../data/Pythia-Zp2jets-lhc-pileup-1ev.dat
+
+and compared to the expected output example_with_components.ref 
+

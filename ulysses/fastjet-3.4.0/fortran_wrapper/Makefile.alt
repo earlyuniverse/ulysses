@@ -1,0 +1,48 @@
+# Makefile showing how to build the fortran wrapper given a properly 
+# installed fastjet compilation
+
+FASTJET_CONFIG=fastjet-config
+
+# optimisation is recommended when compiling the wrapper. It can make
+# a factor of two difference to speeds for low multiplicities (e.g. in
+# NLO calculations), where significant time is taken by copying
+# information to and from C++ vectors.
+CXXFLAGS = -O -g
+FFLAGS = -O -g
+F77FLAGS = -O -g
+
+# If FastJet was compiled with a standard that is not the compiler's
+# default, on some systems you may need add suitable flags to compile
+# with the smae standard
+# CXXFLAGS += -std=c++11
+
+# get the fastjet libraries
+CXXFLAGS += $(shell $(FASTJET_CONFIG) --cxxflags)
+LIBS += $(shell $(FASTJET_CONFIG) --libs --plugins )
+
+# add the standard C++ libraries
+LIBS += -lstdc++
+
+# for fastjet compiled with MacOS c++ (clang), you may need the following
+# (but it may even be necessary to link with the C++ compiler directly, cf. below)
+#LIBS += -lc++
+
+# set compilers
+FC=gfortran
+F77=gfortran
+
+fastjet_fortran_example: fastjet_fortran_example.o fastjetfortran.o 
+	$(FC)  -o fastjet_fortran_example  fastjet_fortran_example.o fastjetfortran.o $(LIBS)
+	# on some systems (e.g. MacOX 10.14 with native c++) one needs to link
+	# with the C++ compiler rather than the Fortran one
+	#$(CXX)  -o fastjet_fortran_example  fastjet_fortran_example.o fastjetfortran.o $(LIBS) -L/usr/local/lib/gcc/10 -lgfortran
+
+clean: 
+	rm -f *.o
+
+realclean: clean
+	rm -f fastjet_fortran_example
+
+depend:
+	makedepend $(FASTJET_INCLUDE) -Y --   -- $(SRCS) $(PROG_SRCS)
+# DO NOT DELETE

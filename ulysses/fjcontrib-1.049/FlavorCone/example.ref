@@ -1,0 +1,19 @@
+# Read an event with 354 particles
+# Setting two seeds for clustering
+# Running FlavorCone plugin with 2 seeds and rcut = 0.5
+#--------------------------------------------------------------------------
+#                         FastJet release 3.2.0
+#                 M. Cacciari, G.P. Salam and G. Soyez                  
+#     A software package for jet finding and analysis at colliders      
+#                           http://fastjet.fr                           
+#	                                                                      
+# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
+#                                                                       
+# FastJet is provided without warranty under the terms of the GNU GPLv2.
+# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
+# and 3rd party plugin jet algorithms. See COPYING file for details.
+#--------------------------------------------------------------------------
+#  Seed ID        px        py        pz         e    const.
+       142   871.536  -224.526   200.215   923.093        30
+       148  -955.032   230.023  -962.915   1375.94        31

@@ -1,0 +1,74 @@
+2021-12-06  Gavin Salam  <gavin.salam@physics.ox.ac.uk>
+
+	* NEWS:
+        * VERSION:
+	prepared for release 2.0.1
+
+	* AUTHORS:
+	fixed missing names and publication info
+
+2021-12-06  Gregory Soyez  <soyez@fastjet.fr>
+
+	* SecondaryLund.cc:
+	fixed int v. unsigned int in loop over vector indices
+
+2021-12-06  Gavin Salam  <gavin.salam@physics.ox.ac.uk>
+
+	* example.py:
+	fixed name of executable in comments about how to execute
+	this (thanks to Matteo Cacciari)
+
+2021-11-09  Ludovic Scyboz <ludovic.scyboz@physics.ox.ac.uk>
+
+	* VERSION:
+	preparing for release of 2.0.0
+
+	* RecursiveLundEEGenerator.hh:
+	* RecursiveLundEEGenerator.cc:
+	class for recursive Lund declustering in e+e-
+	* example_dpsi_collinear.cc:
+	spin-sensitive collinear observable from 2103.16526
+	* example_dpsi_slice.cc:
+	spin-sensitive non-global observable from 2111.01161
+
+2020-02-23  Gavin Salam  <gavin.salam@cern.ch>
+
+	* NEWS:
+	* VERSION:
+	preparing for release of 1.0.3
+
+	* example.cc:
+	changed outfile open(filename) to outfile.open(filename.c_str());
+	to attempt to solve issue reported by Steven Schramm.
+
+2018-10-26  Gavin Salam <gavin.salam@cern.ch>
+
+	* read_lund_json.py:
+	removed extraneous normalisation of zeroth bin in
+	the LundImage class.
+	Added documentation.
+
+
+2018-08-30  Gavin Salam  <gavin.salam@cern.ch>
+
+	* VERSION: 
+	* NEWS:
+
+	Release of version 1.0.1
+
+2018-08-23  Gavin Salam  <gavin.salam@cern.ch>
+
+	* LundWithSecondary.hh:
+	* LundWithSecondary.cc:
+	added secondary_index(...), removed virtual qualifier from various
+	functions
+
+	* example_secondary.cc:
+	* example_secondary.ref:
+	example now prints out index of the primary declustering being
+	used for the secondary. Referemce file updated accordingly.
+
+2018-08-09  Frédéric Dreyer  <fdreyer@mit.edu>
+
+	First version of LundPlane.
+

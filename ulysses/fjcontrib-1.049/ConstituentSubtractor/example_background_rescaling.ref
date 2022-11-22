@@ -1,0 +1,40 @@
+# 20 pileup events on top of the hard event
+# read an event with 203 signal particles and 1714 background particles with pseudo-rapidity |eta|<4
+#--------------------------------------------------------------------------
+#                         FastJet release 3.3.1
+#                 M. Cacciari, G.P. Salam and G. Soyez                  
+#     A software package for jet finding and analysis at colliders      
+#                           http://fastjet.fr                           
+#	                                                                      
+# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
+#                                                                       
+# FastJet is provided without warranty under the terms of the GNU GPLv2.
+# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
+# and 3rd party plugin jet algorithms. See COPYING file for details.
+#--------------------------------------------------------------------------
+
+Description of fastjet::IterativeConstituentSubtractor:
+       Using rho estimation: GridMedianBackgroundEstimator, with rectangular grid with rapidity extent -4 < rap < 4, tile size drap x dphi = 0.5 x 0.483322
+       The masses of all particles will be set to zero.
+       The rapidity of the particles will be kept unchanged (not pseudo-rapidity).
+       The information about nearby hard proxies will not be used.
+       IterativeConstituentSubtractor parameters: 
+            Iteration 1:  max_distance = 0.1  alpha = 0
+            Iteration 2:  max_distance = 0.2  alpha = 0
+
+# original hard jets
+pt = 89.57, rap = 2.088, mass = 21.55, width = 0.1866
+pt = 144.5, rap = 0.6689, mass = 19.34, width = 0.06909
+pt = 220.1, rap = -1.068, mass = 18.09, width = 0.0337
+
+# unsubtracted full jets
+pt = 115.3, rap = 2.08, mass = 45.33, width = 0.2569
+pt = 167.3, rap = 0.6891, mass = 58.31, width = 0.1268
+pt = 230.5, rap = -1.065, mass = 46.2, width = 0.05647
+
+# subtracted full jets
+pt = 89.67, rap = 2.092, mass = 21.43, width = 0.1938
+pt = 144.1, rap = 0.6761, mass = 17.06, width = 0.07219
+pt = 214.3, rap = -1.072, mass = 11, width = 0.02657
+

@@ -1,0 +1,113 @@
+2020/02/23: release of version 1.4.5:
+        - Further removal of C++11 extensions which were missed previously
+
+
+2019/07/15: release of version 1.4.4:
+        - Removed two more C++11 extensions
+
+
+2019/07/09: release of version 1.4.3:
+        - Removed C++11	extensions
+        - Changed the way how the user should specify that he/she wants to do delta_m correction. Now, additionally the	"set_do_mass_correction" function must be cal
+led
+        - Updated information about the options for the treatment of massive inputs.
+
+
+
+2019/07/04: release of version 1.4.2:
+        -  Updated information about the treatment of massive inputs. No changes in the	code.
+
+
+2019/06/21: release of version 1.4.1:
+	    - Updated the treatment of additional background estimator for rho_m. Currently in ConstituentSubtractor, only such rho_m background estimators are supported which have member function rho_m(), i.e. the result from member function has_rho_m() is true (which is available since fastjet version 30100).
+
+
+2019/06/19: release of version 1.4.0:
+	    - Updated naming of functions and examples to be consistent with arXiv:1905.03470 
+	    - Updated treatment of massive inputs - added new options and clarification in the examples
+	    - Updated values of pt and mass for particles with zero pt and mass
+	    - Added possibility to use selector for particles - only particles passing the selector are corrected, the other particles are unchanged 
+	    - Updated COPYING
+
+
+2019/03/28: release of version 1.3.2:
+	    - Started to use C++11 features
+	    - Added possibility to keep the masses unchanged. The possible options how to treat masses are explained at the beggining of ConstituentSubtractor.hh
+	    - Added possibility to use information about hard particles (e.g. charged tracks from primary vertex) in the definition of the CS distance used for the correction procedure.
+	    - Updated examples
+
+
+2018/06/28: release of version 1.3.1:
+	    - Updated examples
+
+
+2018/06/25: release of version 1.3.0:
+	    - Replaced the "sequential" CS by "iterative CS". Besides the change of name, also the usage changed, see example file example_whole_event_iterative.cc.
+	    - The usage of the ConstituentSubtractor for whole event correction is changes, see updated example file example_whole_event.cc. Currently the new and old usage give the same behaviour, but it will change in the future.
+
+
+2018/06/12: release of version 1.2.8:
+	    - Now removing all ghosts when setting new selector
+	    - Updated sequential CS - possibility to do more iterations than 2 and possibility to remove ghosts which were not used.
+
+2018/05/04: release of version 1.2.7:
+	    - Added possibility to correct only certain phase space defined by an input fastjet::Selector
+	    - Added possibility to change the grid size for background estimation when using function subtract_event_using_charged_info
+	    - Update example for whole event correction.
+
+
+2018/05/03: release of version 1.2.6:
+	    - Updated examples to be more clear.
+
+
+2018/04/11: release of version 1.2.5:
+	    - Fixed bug causing seg fault in ATLAS.
+
+
+2017/12/18: release of version 1.2.4:
+	    - Added back the test example_whole_event_using_charged_info. The problem with this test was fixed by printing all the output particles (also with zero pt and zeo mtMinusPt values).
+
+
+2017/09/08: release of version 1.2.3:
+	    - Fixed warning for too low pt particles in case of active area computation
+	    - Temporarily removed the test example_whole_event_using_charged_info
+
+2017/08/21: release of version 1.2.2:
+	    - Added function set_max_standardDeltaR for backward compatibility. It was replaced in version 1.1.3 by function set_max_distance. In this version, it does the same as the function set_max_distance.
+	    - Further speed improvement for whole event subtraction (especially for small _max_distance parameters, such as 0.25)
+
+
+2017/08/07: release of version 1.2.1:
+	    - Fixed bug for distance enum ConstituentSubtractor::angle
+	    - Added check for the jet-by-jet correction to not use the speed optimization
+
+2017/07/20: release of version 1.2.0:
+	    - Important change for the output corrected particles in case of correction of massive particles. The corrected zero pt particles with non-zero corrected delta_m (massive particles in rest) are now included in the output by default. This is the recommended usage. The user can change this behaviour by using function "set_remove_all_zero_pt_particles". By using argument true, all the zero pt corrected particles are removed.
+	    - Significant change in the speed of the whole event CS procedure. For small values of the _max_distance parameter (~0.25), the speed is now ~10-times greater.
+	    - Added new rescaling classes: rapidity vs azimuth dependence in TH2 Root histogram or in vector<vector<double> >, and rapidity vs azimuth dependence for heavy ions where the rapidity dependence is taken from a vector<double>.
+
+2017/07/11: release of version 1.1.6:
+	    - added new functions "get_ghosts" and "get_ghosts_area".
+	    - now the user can modify the ghosts outside the CS after constructing them with function "construct_ghosts_uniformly" and getting them with "get_ghosts" and "get_ghosts_area"
+	    - added new rescaling class useful for heavy ion events. Now the rapidity dependence can be taken from a Root TH1 object.
+
+2017/01/20: release of version 1.1.4:
+           - fixed few bugs concerning the correction of masses
+
+2016/11/14: release of version 1.1.3:
+           - updated rho rescaling functions
+	   - new function for pileup subtraction: sequential_subtraction
+	   - possibility to change the computation of distance between particles and background proxies
+
+2016/03/11: release of version 1.1.2:
+	   - added two FunctionOfPseudojet<object> classes for rho rescaling: one using root TH1 rapidity parametrization, and the other for heavy ions rapidity-azimuth parametrization
+2016/02/09: release of version 1.1.1:
+	   - faster algortihm for subtraction
+	   - added new function for Constituent Subtraction using tracking information
+2015/11/05: release of version 1.1.0:
+	   - added FastJet v3.1 rho_m support
+	   - simplified way for Constituent Subtraction of the whole event
+	   - updated the meaning of parameter max_deltaR
+	   - added new parameter to the definition of the distance
+	   - added examples for the whole event subtraction
+2014/04/06: release of version 1.0.0

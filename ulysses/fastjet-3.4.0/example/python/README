@@ -1,0 +1,33 @@
+Examples of FastJet usage with Python
+=====================================
+
+The examples here show functionality similar to what is provided by
+some of the C++ examples in ../
+
+For them to work, make sure that the installation location for the
+fastjet python module is included in your PYTHONPATH environment
+variable (e.g. PREFIX/lib/python2.7/site-packages and/or
+PREFIX/lib64/python2.7/site-packages -- on some systems both may be
+needed).
+
+Some things to keep in mind:
+
+- You can pass a python list such as [PseudoJet0, PseudoJet1, ...]
+  to any FastJet call that expects a vector of PseudoJets
+
+- Any FastJet call that in C++ returns a vector of PseudoJets will in python
+  return a list of PseudoJets
+
+- For many objects that provide definitions of some kind, the __str__
+  call maps to description() (potentially with an extra bit of
+  explanatory info)
+
+- For combinations of selectors, (&&, || and !) in C++ map to (&, | and ~) in python
+
+- Any python variable var can be associated with a PseudoJet using the
+  PseudoJet.set_python_info(var) call; it can be retried with the
+  PseudoJet.python_info() call
+
+- Remember that python uses references, e.g. a = b means that a is a
+  reference to b. If you need to copy a PseudoJet (pj), with a view to
+  altering it, do "pjcopy = PseudoJet(pj)"

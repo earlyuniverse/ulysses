@@ -1,0 +1,26 @@
+# common fastjet definitions
+include ../../makefile.static
+
+CXXSRC = D0RunIBaseConePlugin.cc
+OBJS = $(patsubst %.cc,%.o,$(CXXSRC)) 
+
+# fastjet includes
+FASTJET_INCLUDE = -I../../include
+INCLUDE += $(FASTJET_INCLUDE) -I. -Wall -g
+
+all: libD0RunIConePlugin.a
+
+libD0RunIConePlugin.a: $(OBJS)
+	ar cru libD0RunIConePlugin.a $(OBJS)
+	ranlib libD0RunIConePlugin.a
+
+clean:
+	rm -f $(OBJS)
+
+distclean: clean
+	rm -f libD0RunIConePlugin.a *~
+
+# NB: only use "relative" includes here (others are too subject
+#     to change according to the system one is on...)
+depend:
+	makedepend  -f makefile.static $(FASTJET_INCLUDE) -I. -I./fastjet --   -- $(CXXSRC)

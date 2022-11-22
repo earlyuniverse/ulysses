@@ -1,0 +1,415 @@
+#!/bin/bash
+#
+# @configure_input@
+#
+# This is the base script for retrieving all information
+# regarding compiling and linking programs using FastJet.
+# Run ./fastjet-config without arguments for usage details
+#########################################################
+
+# the list of plugins is dynamic so we need the following
+# line to deal with the static lib link
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+installationdir=@prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+
+# print a usage message and exit
+# exit code passed as argument:
+#   0 if it is a normal call
+#   1 if it is due to a misusage.
+usage()
+{
+if [ "x@HAS_SHARED@" == "xyes" ] ; then
+  cat 1>&2 <<EOF
+
+This is FastJet @VERSION@ configuration tool.
+Usage:
+  fastjet-config [--help] [--version] [--prefix] [--cxxflags] [--libs]
+      [--shared[=yes|no]] [--plugins[=yes|no]] [--rpath[=yes|no]] [--runpath]
+      [--list-plugins] [--config]
+
+The arguments can be either queries (one must be present):
+
+  --help       prints this message and exits
+  --version    prints FastJet version and exits
+  --prefix     gets the FastJet installation directory
+  --cxxflags   returns the compilation flags to be used with C++ programs
+  --libs       returns the flags to pass to the linker
+  --list-plugins  lists all the available plugins
+  --config     shows a summary of how FastJet was configured
+  --pythonpath returns path for FastJet Python module (add to PYTHONPATH)
+
+or flags (optional):
+
+  --shared     controls whether you want to use the static or shared lib
+               (default=yes)
+
+  --plugins    controls whether you also want to link the FastJet plugins
+               (default=no)
+
+  --rpath      adds a -rpath argument at link-time that points to the
+               directory where FastJet libraries are installed. This
+               avoid having to set LD_LIBRARY_PATH at runtime when
+               using shared libs in a non standard location (but may
+               cause the program to inadvertently pick up other shared
+               libraries that happen to be in the FastJet installation
+               directory). 
+               (default=yes)
+
+  --runpath    at link-time, adds info about the directory where FastJet
+               libraries are installed to the runpath (ELF systens
+               only). This avoids having to set LD_LIBRARY_PATH at
+               runtime when using shared libs in a non standard
+               location but gives priority to an existing LD_LIBRARY_PATH.
+
+  --guess-prefix  instead of using the default FastJet installation
+                  prefix, try to guess the prefix from the
+                  fastjet-config path. This is meant to help providing
+                  a relocatable installation of FastJet
+
+EOF
+else
+  cat 1>&2 <<EOF
+
+This is FastJet @VERSION@ configuration tool.
+Usage:
+  fastjet-config [--help] [--version] [--prefix] [--cxxflags] [--libs]
+      [--plugins[=yes|no]] [--list-plugins] [--config]
+
+The arguments can be either queries (one must be present):
+
+  --help       prints this message and exits
+  --version    prints FastJet version and exits
+  --prefix     get the FastJet installation directory
+  --cxxflags   returns the compilation flags to be used with C++ programs
+  --libs       returns the flags to pass to the linker
+  --list-plugins  list all the available plugins
+  --config     shows a summary of how FastJet was configured
+
+or flags (optional):
+
+  --plugins    controls whether you also want to link the FastJet plugins
+               (default=no)
+
+  --guess-prefix  instead of using the default FastJet installation
+                  prefix, try to guess the prefix from the
+                  fastjet-config path. This is meant to help providing
+                  a relocatable installation of FastJet
+
+EOF
+fi
+  exit $1
+}
+
+
+# first deal with the case where no argument is passed
+[ $# -gt 0 ] || usage 1
+
+
+# tools to parse options
+########################
+
+# option_name _string
+# Returns NAME if _string is of the form: --NAME[=...]
+option_name()
+{
+    echo "$1" | sed 's/^--//;s/=.*//' | tr '-' '_'
+}
+
+# option_value _string
+# Returns FOO if _string is of the form: --option=FOO
+option_value()
+{
+    echo "$1" | sed 's/^[^=]*=//'
+}
+
+# is_in_list _arg _arg_list
+# return true if the argument _arg is in the list _arg_list
+# and false otherwise
+is_in_list()
+{
+    arg_match="$1"
+    shift
+    for arg_match_i do
+        [ "x$arg_match_i" != "x$arg_match" ] || return 0
+    done
+    false
+}
+
+
+# useful utilities
+##################
+
+# wite error messages and exit
+write_error()
+{
+    echo "Error: $1"
+    echo "Use fastjet-config --help for more information"
+    exit 1
+}
+
+
+# browse the argument list
+# This is done the following way:
+#  - at first pass, we check if the --help argument is set. If yes, 
+#    print usage and exit.
+#    we also and make sure that there is no interference between the
+#    arguments (e.g. --cflags --libs is wrong)
+#  - we then check for extra arguments and return the requested info
+#####################################################################
+# useful lists of arguments
+arg_query_list="version prefix list_plugins config pythonpath help" # cxxflags libs
+arg_yesno_list="shared plugins rpath guess_prefix"
+
+# default behaviour for parameters
+plugins_included="no"
+use_shared="yes"
+add_rpath="yes"
+add_runpath="no"
+guess_prefix="no"
+
+# no query found initially
+found_query="no"
+found_flags="no"
+found_libs="no"
+
+# browse arguments
+for arg do
+    case "$arg" in
+	--help|-h)
+	    usage 0
+	    ;;
+	--*=*)
+	    arg_name=`option_name $arg`
+	    arg_value=`option_value $arg`
+	    # check the validity of the parmeter value
+	    if ! is_in_list $arg_value yes no ; then
+		write_error "$arg: parameter value must be yes or no"
+	    fi
+            # set the parameter value
+	    case $arg_name in
+		plugins)
+		    plugins_included="$arg_value"
+		    ;;
+		shared)
+		    use_shared="$arg_value"
+		    if [ "x$arg_value" == "xno" ] ; then
+			add_rpath="no"
+		    fi
+		    ;;
+		rpath)
+		    if test "x@HAS_SHARED@" = "xyes" ; then
+			add_rpath="$arg_value"
+		    else
+			write_error "--rpath is only available together with shared libraries"
+		    fi
+		    ;;
+		guess_prefix)
+		    guess_prefix="$arg_value"
+		    ;;
+		*)
+		    write_error "$arg: unrecognised argument"
+		    ;;
+	    esac
+	    ;;
+	--cxxflags)
+	    # we've found a query, make sure we don't already have one
+	    # except if it is --libs
+	    if [[ "x$found_query" != "xno" && "x$found_query" != "xlibs" ]]; then
+		write_error "--cxxflags cannot be used with --$found_query"
+	    fi
+
+	    # update found_query 
+	    # note: for the "big case" later, don't overwrite it if libs are already asked for
+	    found_flags="yes"
+	    if [ "x$found_query" != "xlibs" ]; then
+		found_query="cxxflags"
+	    fi	    
+	    ;;
+	--libs)
+	    # we've found a query, make sure we don't already have one
+	    # except if it is --cxxflags
+	    if [[ "x$found_query" != "xno" && "x$found_query" != "xcxxflags" ]]; then
+		write_error "--libs cannot be used with --$found_query"
+	    fi
+
+	    # update found_query 
+	    found_libs="yes"
+	    found_query="libs"
+	    ;;
+	--*)
+	    arg_name=`option_name $arg`
+	    if is_in_list $arg_name $arg_query_list ; then
+		# we've found a query, make sure we don't already have one
+		if [ "x$found_flags" != "xno" ] ; then
+		    write_error "--$arg_name cannot be used with --cxxflags"
+		fi
+		if [ "x$found_libs" != "xno" ] ; then
+		    write_error "--$arg_name cannot be used with --libs"
+		fi
+		if [ "x$found_query" != "xno" ] ; then
+		    write_error "You can only make one query at a time"
+		fi
+		found_query="$arg_name"
+	    else
+		if is_in_list $arg_name $arg_yesno_list ; then
+		    # we've found a parameter, set it to "yes"
+		    case $arg_name in
+			plugins)
+			    plugins_included="yes"
+			    ;;
+			shared)
+			    use_shared="yes"
+			    ;;
+			rpath)
+			    if test "x@HAS_SHARED@" = "xyes" ; then
+				add_rpath="yes"
+			    else
+				write_error "--rpath is only available together with shared libraries"
+			    fi
+			    ;;
+			guess_prefix)
+			    guess_prefix="yes"
+			    ;;
+			*)
+			    write_error "$arg: unrecognised argument"
+			    ;;
+		    esac
+		else
+		    case $arg_name in
+			runpath)
+			    if test "x@HAS_SHARED@" = "xyes" ; then
+				if test "x@HAS_RUNPATH_SUPPORT@" = "xyes" ; then
+				    add_runpath="yes"
+				    add_rpath="no"
+				else
+				    write_error "--runpath is not available on this platform"
+				fi
+			    else
+				write_error "--runpath is only available together with shared libraries"
+			    fi
+			    ;;
+			*)
+			    write_error "$arg: unrecognised argument"
+			    ;;
+		    esac
+		fi
+	    fi
+	    ;;
+	*)
+	    write_error "$arg is not a valid argument"
+	    ;;
+    esac
+done
+    
+# handle prefix guessing if needed
+if test "x${guess_prefix}" = "xyes" ; then
+    #echo "Guessing prefix"
+    # sample code taken from
+    # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+    # to get the action of "readlink -f" on any system
+    current_dir=`pwd`
+    target_file=$0
+    cd `dirname $target_file`
+    #pwd
+    target_file=`basename $target_file`
+
+    # Iterate down a (possible) chain of symlinks
+    while [ -L "$target_file" ]
+    do
+        target_file=`readlink $target_file`
+        cd `dirname $target_file`
+        #pwd
+        target_file=`basename $target_file`
+    done
+
+    # Compute the canonicalized name by finding the physical path 
+    # for the directory we're in and appending the target file.
+    final_dir=`pwd -P`
+
+    # strip the final "bin"
+    prefix=${final_dir%/bin}
+    includedir=${prefix}/include
+    libdir=${prefix}/lib
+
+    # go back to initial dir
+    cd $current_dir
+fi
+
+# now deal with the output
+case $found_query in
+    no)
+	write_error "you must at least specify one query in '$arg_query_list'"
+	;;
+    version)
+	echo @PACKAGE_VERSION@
+	;;
+    prefix)
+	echo ${prefix}
+	;;
+    cxxflags)
+	echo -I${includedir} @CONFIG_CXXFLAGS@
+	;;
+    libs)
+	libs_string=" @CONFIG_LIBS@"
+#       since we use the system default (use shared lib if available, static 
+#       otherwise), we only need to worry if shared available and static
+#       explicitely asked
+	if test "x$use_shared" = "xno" && test "x@HAS_SHARED@" = "xyes" ; then
+	    libs_string="${libdir}/libfastjettools.a ${libdir}/libfastjet.a "$libs_string
+	else
+	    libs_string="-L${libdir} -lfastjettools -lfastjet "$libs_string
+	fi
+	if test "x$add_rpath" = "xyes" ; then
+	    libs_string="-Wl,-rpath,${libdir} "$libs_string
+        else
+            # GPS 2009-05-29: remove any left over -Wl, e.g. related to CGAL.
+            libs_string=`echo $libs_string | sed 's/-Wl,-rpath[^ ]*//'`
+	fi
+	if test "x$add_runpath" = "xyes" ; then
+	    libs_string="@CONFIG_RUNPATH_FLAGS@ -Wl,-rpath,${libdir} "$libs_string
+	fi
+	if test "x$plugins_included" = "xyes" ; then
+	    if test "x$use_shared" = "xno" && test "x@HAS_SHARED@" = "xyes" ; then
+		libs_string=$libs_string" @CONFIG_LIBS_PLUGINS_STATIC@"
+	    else
+		libs_string=$libs_string" @CONFIG_LIBS_PLUGINS@"
+	    fi
+
+	fi
+	if [ "x$found_flags" = "xyes" ] ; then
+	    echo -I${includedir} @CONFIG_CXXFLAGS@ $libs_string
+	else
+	    echo $libs_string
+	fi
+	;;
+    list_plugins)
+	echo "Available plugins: "
+	echo -n "  "
+	echo @LIST_ALL_PLUGINS@ | sed -e "s/ /\\`printf '\n\r  '`/g"
+	;;
+    config)
+	echo "This is FastJet version @PACKAGE_VERSION@"
+	echo ""
+	echo "Configuration invocation was"
+	echo ""
+	echo "  @CONFIGURE_INVOCATION@"
+	echo ""
+	printf "@CONFIG_SUMMARY@"
+	;;
+    pythonpath)
+        # we have potentially two path to include:
+        # one for the so lib
+        incl1=@pyexecdir@
+        # one for the fastjet module
+        incl2=@pythondir@
+        if [ "x$incl1" = "x$incl2" ]; then
+            echo "$incl1"
+        else 
+            echo "$incl1:$incl2"
+        fi
+        ;;
+esac

@@ -1,0 +1,58 @@
+SUBDIRS = spherical
+CC      = g++
+LIBOUT  = libsiscone.a
+CFLAGS  = -Wall -g -O3 -ffast-math
+
+LDFLAGS = -lm #-lprofiler -lpthread -ltcmalloc
+ifeq ($(shell whoami),salam)
+  # needed for Gavin to include tcmalloc
+  LDFLAGS += -L/ada1/lpthe/salam/software/local/lib
+endif
+
+OBJS    = ranlux.o reference.o geom_2d.o momentum.o hash.o quadtree.o \
+          vicinity.o protocones.o split_merge.o siscone.o siscone_error.o area.o
+
+SRCS = $(patsubst %.o,%.cpp,$(OBJS))
+
+
+%.o: %.cpp %.h
+	$(CC) -c $(CFLAGS) $<
+
+%.o: %.cpp
+	$(CC) -c $(CFLAGS) $<
+
+all: $(OBJS) $(SUBDIRS)
+	ar cru $(LIBOUT) $(OBJS)
+	ranlib $(LIBOUT)
+
+.PHONY: clean $(SUBDIRS)
+
+clean: $(SUBDIRS)
+	rm -f *.o *~
+
+spherical:
+	@cd spherical && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+
+# note the -Y option below avoids including all the standard
+# include directories (which change from one system to another)
+depend: $(SUBDIRS)
+	makedepend -f makefile.static -- -Y  -- $(SRCS)
+# DO NOT DELETE
+
+ranlux.o: ranlux.h
+reference.o: reference.h ranlux.h
+geom_2d.o: geom_2d.h defines.h
+momentum.o: momentum.h reference.h geom_2d.h defines.h
+hash.o: hash.h momentum.h reference.h geom_2d.h defines.h
+quadtree.o: quadtree.h momentum.h reference.h geom_2d.h defines.h
+vicinity.o: vicinity.h momentum.h reference.h geom_2d.h defines.h quadtree.h
+protocones.o: protocones.h momentum.h reference.h geom_2d.h defines.h
+protocones.o: vicinity.h quadtree.h hash.h siscone_error.h circulator.h
+split_merge.o: split_merge.h defines.h geom_2d.h momentum.h reference.h
+split_merge.o: siscone_error.h
+siscone.o: config.h ranlux.h momentum.h reference.h geom_2d.h defines.h
+siscone.o: siscone.h protocones.h vicinity.h quadtree.h hash.h split_merge.h
+siscone.o: siscone_error.h
+siscone_error.o: siscone_error.h
+area.o: area.h momentum.h reference.h geom_2d.h defines.h siscone.h
+area.o: protocones.h vicinity.h quadtree.h hash.h split_merge.h

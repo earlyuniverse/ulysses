@@ -1,0 +1,307 @@
+2018-02-08 Jesse Thaler  <jthaler@jthaler.net>
+
+	* NEWS
+	* VERSION
+	Making 1.3.1
+
+
+2018-02-08 Lina Necib  <lnecib@caltech.edu>
+
+	* EnergyCorrelator.cc
+	Debugging memory allocation, deleting energyStore/angleStore properly this time
+
+
+2018-02-04 Lina Necib  <lnecib@caltech.edu>
+
+	* EnergyCorrelator.cc
+	Debugging memory allocation, deleting energyStore/angleStore
+
+	* VERSION
+	Making 1.3.1-devel  
+
+2018-01-09 Jesse Thaler  <jthaler@jthaler.net>
+
+	* NEWS
+	* VERSION
+	Finalizing 1.3.0
+
+2018-01-09 Lina Necib  <lnecib@caltech.edu>
+
+	* NEWS
+	Preparing for version candidate
+
+	* VERSION
+	Making 1.3.0-rc1
+
+2018-01-07 Lina Necib  <lnecib@caltech.edu>
+
+	* EnergyCorrelator.hh/cc
+	Sped up evaluations of ECFs.
+	Functions are defined in ECFs and called to evaluate ECFGs.
+
+	* VERSION
+	Making 1.2.3-devel
+
+
+2018-01-04 Lina Necib  <lnecib@caltech.edu>
+
+	* EnergyCorrelator.hh/cc
+	Sped up evaluations of ECFG by a factor of 4.
+	Refactored some of the code in functions
+
+	* VERSION
+	Making 1.2.2-devel
+
+	* example.cc
+	Added some timings tests for ECFGs, N2, and N3.
+
+
+2017-01-25 Jesse Thaler  <jthaler@jthaler.net>
+
+	* EnergyCorrelator.hh/cc
+	Converting all _N to unsigned integers, removing _N < 0 warning
+	Added warning to constructors for N < 1 in some cases.
+
+	* VERSION
+	Making 1.2.1-devel
+
+	* Makefile
+	Added -Wextra to compiler flags
+
+2016-10-07 Jesse Thaler  <jthaler@jthaler.net>
+
+	* AUTHORS/COPYING:
+	Updated the publication arXiv number to 1609.07483.
+
+	* EnergyCorrelator.hh
+	Fixed typo in EnergyCorrelatorGeneralized description
+
+	* NEWS
+	Added "USeries" to news.
+
+	* VERSION
+	Changed version to 1.2.0
+
+2016-09-27 Lina Necib  <lnecib@mit.edu>
+
+	* EnergyCorrelator.hh/README
+	Updated the publication arXiv number to 1609.07483.
+
+2016-09-23 Lina Necib  <lnecib@mit.edu>
+
+	* EnergyCorrelator.cc
+	Made the evaluation of ECFG faster by replacing sort -> partial_sort and simplified multiplication syntax
+	* example.cc/ref
+	Fixed minor typo
+	* VERSION
+	Changed version to 1.2.0-rc3
+
+2016-09-23 Lina Necib  <lnecib@mit.edu>
+
+	* EnergyCorrelator.hh
+	Fixed minor doxygen typo
+	* example.cc/ref
+	Changed EnergyCorrelatorNormalized -> EnergyCorrelatorGeneralized in function explanations
+	* VERSION
+	Changed version to 1.2.0-rc2
+
+2016-09-22 Jesse Thaler  <jthaler@jthaler.net>
+
+	* EnergyCorrelator.cc/hh
+	Renamed EnergyCorrelatorNormalized -> EnergyCorrelatorGeneralized
+	Changed order of arguments for EnergyCorrelatorGeneralized
+	Updated doxygen documentation
+	* example_basic_usage.cc
+	Changed EnergyCorrelatorNormalized -> EnergyCorrelatorGeneralized
+	* README
+	Updated for EnergyCorrelatorGeneralized
+
+2016-09-15 Lina Necib  <lnecib@mit.edu>
+
+	*VERSION:
+	1.2.0-rc1
+
+2016-08-24 Jesse Thaler  <jthaler@jthaler.net>
+
+        Minor comment fixes throughout.
+
+	* EnergyCorrelator.cc/hh
+	Put in _helper_correlator when defining overall normalization
+	Removed angle error for result_all_angles() 
+	*NEWS:
+	Made this more readable.
+	*README:
+	Clarified some of the documentation.
+
+2016-08-23 Lina Necib  <lnecib@mit.edu>
+
+	*VERSION:
+	*NEWS:
+	*AUTHORS:
+	*COPYING:
+	*README:
+	*EnergyCorrelator.cc
+	Added if statement that the ECF and ECFNs return exactly zero
+ 	if the number of particles is less than N of the ECF.
+	*EnergyCorrelator.hh
+	*example.cc	
+	*example_basic_usage.cc
+	Updated this example.
+
+2016-08-21 Lina Necib  <lnecib@mit.edu>
+
+	*VERSION:
+	*NEWS:
+	*AUTHORS:
+	*COPYING:
+	*README:
+	*EnergyCorrelator.cc
+	Added Cseries. 
+	*EnergyCorrelator.hh
+	Added Cseries.
+	*example.cc
+	Added example of Cseries	
+	*example_basic_usage.cc
+	Simplified examples.
+
+2016-08-17 Lina Necib  <lnecib@mit.edu>
+
+	*VERSION:
+	*NEWS:
+	*AUTHORS:
+	Added placeholder for new reference
+	*COPYING:
+	Added placeholder for new reference
+	*README:
+	added information on different measures E_inv
+	*EnergyCorrelator.cc
+	Minor text edits + added comments
+	*EnergyCorrelator.hh
+	Minor text edits + added comments
+	*example_basic_usage.cc
+	added a simplified example file that shows the use of the
+	different observables.
+
+
+2016-06-23 Lina Necib  <lnecib@mit.edu>
+
+	*VERSION:
+	1.2.0-alpha0
+	*NEWS:
+	*AUTHORS:
+	Lina Necib
+	*COPYING:
+	*README:
+        added descriptions of functions that will appear shortly 
+	arXiv:160X.XXXXX
+
+	*EnergyCorrelator.cc
+	added code to calculate normalized ECFS.
+	*EnergyCorrelator.hh
+	added code to calculate normalized ECFS, Nseries, generalized
+	D2, N2, N3, and M2.
+
+	*example.cc
+	added calculation of normalized ECFS, Nseries, generalized 
+	D2, N2, N3, and M2 to example file.
+
+
+2014-11-20  Jesse Thaler  <jthaler@mit.edu>
+
+	* README:
+	Typos fixed
+
+2014-11-13  Andrew Larkoski  <larkoski@mit.edu>
+
+	*VERSION:
+	*NEWS:
+        release of version 1.1.0
+
+	*AUTHORS:
+	*COPYING:
+	*README:
+        added reference to arXiv:1409.6298.
+
+	*EnergyCorrelator.cc
+	*EnergyCorrelator.hh
+	added code to calculate C1, C2, and D2 observables.
+
+	*example.cc
+	added calculation of C1, C2, and D2 to example file.
+
+2013-05-01  Gavin Salam  <gavin.salam@cern.ch>
+
+	* VERSION:
+	* NEWS:
+	release of version 1.0.1
+
+	* README: 
+	updated to reflect v1.0 interface.
+
+2013-05-01  Jesse Thaler
+
+	* EnergyCorrelator.cc
+	Switched from NAN to std::numeric_limits<double>::quiet_NaN()
+
+2013-04-30  Jesse Thaler
+
+	* EnergyCorrelator.cc
+	Implemented Gregory Soyez's suggestions on errors/asserts
+
+2013-04-30  Gavin Salam  <gavin.salam@cern.ch>
+
+	* VERSION:
+	* NEWS:
+	released v. 1.0.0
+
+	* EnergyCorrelator.hh:
+	* example.cc
+	small changes to documentation to reflect the change below + an
+	gave an explicit command-line in the example.
+
+2013-04-29 Jesse Thaler
+
+	* EnergyCorrelator.cc
+	- Added support for N = 5
+
+	* example.cc|.ref
+	- Added N = 5 to test suite.
+
+2013-04-29  Gavin Salam  <gavin.salam@cern.ch>
+
+	* EnergyCorrelator.hh|cc:
+	- reduced memory usage from roughly 8n^2 to 4n^2 bytes (note that
+	  sums are now performed in a different order, so results may
+	  change to within rounding error).
+
+	- Implemented description() for all three classes.
+
+	- Worked on doxygen-style comments and moved some bits of code into
+	  the .cc file.
+
+	* Doxyfile:  *** ADDED ***
+
+	* example.cc:
+	developers' timing component now uses clock(), to get
+	finer-grained timing, and also outputs a description for some of
+	the correlators being used.
+
+2013-04-26 + 04-27 Jesse Thaler <jthaler@MIT.EDU>
+
+	* EnergyCorrelator.hh|cc:
+	added temporary storage array for interparticle angles, to speed
+	up the energy correlator calculation for N>2
+
+        * example.cc
+	has internal option for printing out timing info.
+
+2013-04-26  Gavin Salam  <gavin.salam@cern.ch> + Jesse & Andrew
+
+	* Makefile:
+	added explicit dependencies
+
+	* example.cc (analyze):
+	added a little bit of commented code for timing tests.
+
+2013-03-10 <jthaler>
+   Initial creation

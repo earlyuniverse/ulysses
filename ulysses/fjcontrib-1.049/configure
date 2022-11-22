@@ -1,0 +1,389 @@
+#!/bin/bash
+#
+# This script will generate a Makefile according to the options one requests.
+# The Makefile will then allow one to build and install the FastJet contrib.
+#
+# See
+#   configure --help
+# for information about how to use this script
+
+#------------------------------------------------------------------------
+# the list of contribs supported by this script
+#------------------------------------------------------------------------
+all_contribs=`find . -mindepth 2 -maxdepth 2 -name VERSION -not -print \
+                 | sed 's/\.\///g;s/\/.*$//g' | grep -v "Template"`
+
+#------------------------------------------------------------------------
+# default values prior to the arg parsing
+#------------------------------------------------------------------------
+only_contribs=""
+excluded_contribs=""
+
+fjconfig="fastjet-config"
+
+
+
+#------------------------------------------------------------------------
+# print a usage message and exit
+#------------------------------------------------------------------------
+# exit code passed as argument:
+#   0 if it is a normal call
+#   1 if it is due to a misusage.
+usage(){
+cat 1>&2 <<EOF
+
+This is a FastJet-contrib tool to configure the behaviour of
+the build and installation.
+
+Usage:
+  configure [--help] [--list] [--fastjet-config=FILE] [--prefix=PREFIX] [CXX=...] [CXXFLAGS=...]
+
+The arguments can be the following [default in square brackets]:
+
+  --help            prints this message and exits
+  --list            prints the list of existing contribs and exits
+  --fastjet-config=FILE  
+                    sets the 'fastjet-config' file to use [$fjconfig]
+  --prefix=PREFIX   sets the installation directory [prefix returned by fastjet-config]
+  --only=Contrib1,Contrib2,... 
+                    only configures for compilation selected contribs 
+  --exclude=Contrib1,Contrib2,...
+                    excludes selected contribs from configuration
+EOF
+  exit $1
+}
+
+#------------------------------------------------------------------------
+# write error messages and exit
+#------------------------------------------------------------------------
+write_error(){
+    echo "Error: $1"
+    echo "Use fastjet-config --help for more information"
+    exit 1
+}
+
+
+#------------------------------------------------------------------------
+# tools to parse options
+#------------------------------------------------------------------------
+
+# option_name _string
+# Returns NAME if _string is of the form: --NAME[=...]
+option_name(){
+    echo "$1" | sed 's/^--//;s/=.*//' | tr '-' '_'
+}
+
+# option_value _string
+# Returns FOO if _string is of the form: --option=FOO
+option_value(){
+    echo "$1" | sed 's/^[^=]*=//'
+}
+
+# is_in_list _arg _arg_list
+# return true if the argument _arg is in the list _arg_list
+# and false otherwise
+is_in_list(){
+    arg_match="$1"
+    shift
+    for arg_match_i do
+        [ "x$arg_match_i" != "x$arg_match" ] || return 0
+    done
+    false
+}
+
+#------------------------------------------------------------------------
+# parse the command line options
+#------------------------------------------------------------------------
+# first deal with the case where no argument is passed
+#[ $# -gt 0 ] || usage 1
+
+# make sure Makefile.inc is absent
+makefileinc=".Makefile.inc"
+[ -e $makefileinc ] && rm $makefileinc && touch $makefileinc
+echo "# contrib-wide Makefile include file, generated automatically with" >> $makefileinc
+echo "# $0 $*" >>  $makefileinc
+
+for arg do
+    case "$arg" in
+        --help|-h)
+            usage 0
+            ;;
+        --list)
+            echo $all_contribs
+	    exit 0
+            ;;
+        --*=*)
+            arg_name=`option_name $arg`
+	    arg_value=`option_value $arg`
+            case $arg_name in
+                prefix)
+                    prefix="$arg_value"
+                    ;;
+                fastjet_config)
+                    fjconfig="$arg_value"
+                    ;;
+                only)
+                    only_contribs="${arg_value//,/ }" # replace all commas with a blank
+                    ;;
+                exclude)
+                    excluded_contribs="${arg_value//,/ }" # replace all commas with a blank
+                    ;;
+		*)
+		    write_error "$arg: unrecognised argument"
+		    ;;
+	    esac
+            ;;
+        [A-Z]*=*)
+            # variables that go into the $makefileinc
+            echo "$arg" >> $makefileinc
+            ;;
+        *)
+            write_error "$arg is not a recognised argument. Aborting"
+            ;;
+    esac
+done
+
+#------------------------------------------------------------------------
+# check for fastjet-config and set up prefix
+#------------------------------------------------------------------------
+
+# exit if fastjet-config is not found (bad file name or not in path)
+if ! [ `command -v $fjconfig` ]; then
+    echo "Error:" $fjconfig" has not been found."
+    echo "       You may explicitly specify the location of fastjet-config "
+    echo "       with the option --fastjet-config=...."
+    echo "Exiting"
+    exit 1 
+fi
+
+# if prefix has not been set explicitly from command line, set it to
+# the one returned by 'fastjet-config --prefix'
+if [ "x"$prefix == "x" ] ; then 
+     prefix=`$fjconfig --prefix`
+fi
+
+# generate the rest of $makefileinc
+echo "FASTJETCONFIG=$fjconfig" >> $makefileinc
+echo "PREFIX=$prefix" >> $makefileinc
+echo 'install_script = $(SHELL) ../utils/install-sh' >> $makefileinc
+echo 'check_script = ../utils/check.sh' >> $makefileinc
+
+
+#------------------------------------------------------------------------
+# check for C++11 support (needed as of version 1.047 of fjcontrib)
+# and add in options if needed
+#------------------------------------------------------------------------
+checkc11(){
+    fjcdir=$(pwd)
+    tmpdir=$(mktemp -d)
+    pushd $tmpdir > /dev/null
+    cp -p $fjcdir/scripts/c11check/Makefile $fjcdir/scripts/c11check/c11check.cc .
+    makeoutput=$(make FJCDIR=$fjcdir c11check 2>&1)
+    c11retcode=$?
+    popd > /dev/null
+    rm -rf $tmpdir
+    return $c11retcode
+}
+echo "Checking for c++11 support"
+checkc11
+if [ $? -ne 0 ]
+then 
+    echo "Adding compile-time flag to support c++11"
+    echo "Make sure you use c++11 when compiling/linking with fjcontrib"
+    echo "CXXFLAGS+=-std=c++11" >> $makefileinc
+    checkc11
+    if [ $? -ne 0 ]
+    then
+        echo "Failed to set up C++11 support. Error was"
+        echo "$makeoutput"
+        exit -1
+    fi
+else
+    echo "c++11 already supported with existing CXXFLAGS"
+fi
+    
+#------------------------------------------------------------------------
+# construct the list of directories to recurse into
+#------------------------------------------------------------------------
+
+included_contribs=""
+if [ "x${only_contribs}" == "x" ] ; then
+    included_contribs="$all_contribs"
+else
+    included_contribs="$only_contribs"
+fi
+
+built_contribs=""
+if [ "x${excluded_contribs}" == "x" ] ; then
+    built_contribs="$included_contribs"
+else
+    built_contribs=""
+    for contrib in $included_contribs; do
+	if ! is_in_list $contrib ${excluded_contribs} ; then
+	    built_contribs="$built_contribs $contrib"
+	fi
+    done
+fi
+
+#------------------------------------------------------------------------
+# create the Makefile
+#------------------------------------------------------------------------
+TAB="$(printf '\t')"
+
+# cat >Makefile <<EOF
+# # This Makefile has been generated by the 'configure' script.
+# # Please edit this with great care.
+# 
+# # installation setup
+# SUBDIRS=$built_contribs
+# 
+# # Note: we could simply use "export" here to have all variables
+# # exported by default, but the explicit mention below has the advantage
+# # that it overrides any default in the sub-makefile. Note also
+# # that we could play some games with te MAKELEVEL variable.
+# SUBMAKE=\$(MAKE) FASTJETCONFIG=${fjconfig} PREFIX=$prefix
+# 
+# RECURSIVE_TARGETS=all-recursive install-recursive clean examples
+# 
+# .PHONY: \$(RECURSIVE_TARGETS) install examples
+# 
+# all: all-recursive
+# 
+# install: all install-recursive
+# 
+# \$(RECURSIVE_TARGETS):
+# ${TAB}@+failcom='exit 1' \\
+# ${TAB}target=\`echo \$@ | sed s/-recursive//\`; \\
+# ${TAB}list='\$(SUBDIRS)'; for subdir in \$(SUBDIRS); do \\
+# ${TAB}  \$(SUBMAKE) -C \$\$subdir \$\$target || eval \$\$failcom; \\
+# ${TAB}done
+# 
+# EOF
+
+# The method below id more along the lines of what is present in the
+# GNU make manual but the explicit use of $(MAKECMDGOALS) in the
+# recursion causes make install to recurse as "make install" (even
+# though it depends on make all... so each the contribs is built and
+# installed before going to the next one, In case of a compilation
+# error, it is better to build everything and then install everything.
+#
+# The option to avoid that would be to define an explicit recursion
+# for each target e.g. doing
+#
+#   SUBDIRS.clean = $(SUBDIRS:=.clean)
+#   clean: $(SUBDIRS.clean)
+#   $(SUBDIRS.clean):
+#        $(MAKE) -C $@ clean
+#   .PHONY: clean $(SUBDIRS.clean)
+#
+# which, in our case would probably only be required for "all" (so
+# that it can explicitly be called by install
+#
+# Note that this method may have a better behaviour when using the -j
+# option.
+
+# cat >Makefile <<EOF
+# # This Makefile has been generated by the 'configure' script.
+# # Please edit this with great care.
+# 
+# # installation setup
+# SUBDIRS=$built_contribs
+# SUBDIRS.all=\$(SUBDIRS:=.all)
+# 
+# SUBMAKE=\$(MAKE) FASTJETCONFIG=${fjconfig} PREFIX=$prefix
+# 
+# .PHONY: \$(SUBDIRS) \$(SUBDIRS.all) clean distclean check install examples
+# 
+# all: \$(SUBDIRS.all)
+# 
+# install: all \$(SUBDIRS)
+# 
+# examples check clean distclean: \$(SUBDIRS)
+# 
+# \$(SUBDIRS):
+# ${TAB}+\$(SUBMAKE) -C \$@ \$(MAKECMDGOALS)
+# 
+# \$(SUBDIRS.all):
+# ${TAB}+\$(SUBMAKE) -C \$(basename \$@)
+# 
+# EOF
+
+# alternatively we could build this from the Makefile.in
+# prefix variable
+
+commandline="$0 $*"
+# the apparently bizarre constructs below ensure that the
+# slashes are escaped in the sed replacement, so as not to conflicit
+# with those in the s/// syntax
+escaped_built_list="$(echo ${built_contribs} | sed -e 's/[\/&]/\\&/g')"
+escaped_fjconfig="$(echo ${fjconfig} | sed -e 's/[\/&]/\\&/g')"
+escaped_prefix="$(echo ${prefix} | sed -e 's/[\/&]/\\&/g')"
+escaped_commandline="$(echo ${commandline} | sed -e 's/[\/&]/\\&/g')"
+
+# this is the list of all sources that go into libraries. It is quite
+# fragile and only intended for CMS's dirty shared-library hack.
+srclist=""; 
+for contrib in $included_contribs 
+do 
+srclist="${srclist} "`grep "^SRCS=" ${contrib}/Makefile | sed 's/^SRCS=/ /' | sed 's/ \([^ ]\)/ '${contrib}'\/\1/g'`
+done
+escaped_srclist="$(echo ${srclist} | sed -e 's/[\/&]/\\&/g')"
+if [ "x"`uname` == "xDarwin" ] ;  then
+    dynlibopt="-dynamiclib"
+    dynlibext="dylib"
+    dynlibpostproc="install_name_tool -id \\1 \\1"
+else 
+    dynlibopt="-shared"
+    dynlibext="so"
+    dynlibpostproc="" # some dummy command needed
+fi
+
+# write out the Makefile
+sed -e "s/@CONTRIB_BUILD_LIST@/$escaped_built_list/g" \
+    -e "s/@FJCONFIG@/$escaped_fjconfig/g" \
+    -e "s/@PREFIX@/${escaped_prefix}/g" \
+    -e "s/template gets processed/was generated automatically/" \
+    -e "s/@contrib_commandline@/$escaped_commandline/" \
+    -e "s/@FRAGILE_SHARED_SRC_LIST@/$escaped_srclist/" \
+    -e "s/@DYNLIBOPT@/$dynlibopt/g;s/@DYNLIBEXT@/$dynlibext/g" \
+    -e "s/@DYNLIBPOSTPROC@ \(.*\)/$dynlibpostproc/g" \
+    -e "s/any edits fit with the rest of the build system/you only edit Makefile.in/" Makefile.in > Makefile
+
+#------------------------------------------------------------------------
+# write output and config.log file
+#------------------------------------------------------------------------
+# order contribs alphabetically (making sure we use LC_ALL=C")
+LC_ALL=C
+sorted_built_contribs=`echo $built_contribs | tr " " "\n" | sort | tr "\n" " "`
+#
+# output to screen
+#echo 
+echo "Configuring fjcontrib version" `cat VERSION`
+echo
+echo -e "Enabled contribs: "
+for contrib in $sorted_built_contribs
+do
+    # check if a contrib has an associated svn directory; if so include info about the svn repo
+    if [ -e $contrib/.svn ] ; then 
+        svninfo="svn:"`svn info $contrib | grep '^ *URL' | sed -e 's/URL: //' -e 's/.*\/contribs\/'$contrib'\///'`""
+    else
+        svninfo=""
+    fi
+    printf "        %-22s v%-15s $svninfo\n" $contrib `cat $contrib/VERSION` 
+done
+#
+# output to config.log
+#
+echo
+echo -e "Installation prefix: "$prefix
+echo "--------------------------------------------------"
+echo -e "Now run 'make', optionally 'make check', and 'make install'\n"
+
+echo -e "This file was created by the fastjet contrib configure on "`date`"\n"  > config.log
+echo -e "The command line invocation was\n"                                >> config.log
+echo -e "    $0 $@\n"                                                      >> config.log
+for contrib in $sorted_built_contribs
+do
+    printf "        %-22s v%s\n" $contrib `cat $contrib/VERSION`           >> config.log
+done
+echo -e "\nInstallation prefix: "$prefix"\n"                                 >> config.log

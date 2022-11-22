@@ -1,0 +1,26 @@
+common_include_dir
+cythonize_script
+cythonize_script_excludes
+cythonize_script_package
+initial_file_path
+package_compilation
+
+carray_coercion
+int_float_builtins_as_casts_T400
+int_float_builtins_as_casts_T400_long_double
+list_pop
+test_coroutines_pep492
+type_inference
+
+parallel
+numpy_parallel
+py_unicode_type
+
+test_grammar
+
+# Those tests don't work because MSVC wants to link to the c-algorithms library
+# when compiling and we don't want to download c-algorithms just for those tests.
+queue
+queue2
+queue3
+lunch

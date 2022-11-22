@@ -1,0 +1,42 @@
+# makefile to illustrate how to build things using includes and
+# libraries from a standard installation
+
+# find location of fastjet-config
+FASTJETCONFIG=fastjet-config
+
+# get appropriate flags
+CXXFLAGS = $(shell $(FASTJETCONFIG) --cxxflags)
+LDFLAGS = $(shell $(FASTJETCONFIG) --libs --plugins)
+
+
+fastjet_example: fastjet_example.o
+	$(CXX) -o fastjet_example fastjet_example.o $(LDFLAGS)
+
+fastjet_example_v1_interface: fastjet_example_v1_interface.o 
+	$(CXX)  -o fastjet_example_v1_interface fastjet_example_v1_interface.o  $(LDFLAGS)
+
+
+fastjet_areas: fastjet_areas.o  
+	$(CXX)  -o fastjet_areas fastjet_areas.o  $(LDFLAGS) 
+
+fastjet_areas_2.1.0: fastjet_areas_2.1.0.o
+	$(CXX)  -o fastjet_areas_2.1.0 fastjet_areas_2.1.0.o  $(LDFLAGS) 
+
+fastjet_subtraction: fastjet_subtraction.o
+	$(CXX)  -o fastjet_subtraction fastjet_subtraction.o  $(LDFLAGS)
+
+fastjet_timing: fastjet_timing.o CmdLine.o
+	$(CXX)  -o fastjet_timing fastjet_timing.o CmdLine.o  $(LDFLAGS)
+
+fastjet_timing_plugins: fastjet_timing_plugins.o CmdLine.o
+	$(CXX) -o fastjet_timing_plugins fastjet_timing_plugins.o CmdLine.o $(LDFLAGS)
+
+
+
+
+clean:
+	rm -f *.o
+
+
+depend:
+	makedepend $(FASTJET_INCLUDE) -Y -- -- $(SRCS)

@@ -1,0 +1,346 @@
+#! /usr/bin/env python
+
+"""\
+%(prog)s - generate histogram comparison plots
+
+USAGE:
+ %(prog)s [options] yodafile1[:'Option1=Value':'Option2=Value':...]
+       [path/to/yodafile2 ...] [PLOT:PlotOption1=Value:...]
+"""
+
+import yoda, sys, os
+
+def main():
+
+    import argparse
+    parser = argparse.ArgumentParser(usage=__doc__)
+    parser.add_argument("ARGS", nargs="+", help="YODA data files with optional colon-separated option strings")
+    parser.add_argument("-o", "--outdir", dest="OUTDIR",
+                      default=".", help="write data files into this directory")
+    # parser.add_argument("--hier-out", action="store_true", dest="HIER_OUTPUT", default=False,
+    #                   help="write output dat files into a directory hierarchy which matches the analysis paths")
+    # parser.add_argument("--plotinfodir", dest="PLOTINFODIRS", action="append",
+    #                   default=["."], help="directory which may contain plot header information (in addition "
+    #                   "to standard Rivet search paths)")
+
+    stygroup = parser.add_argument_group("Plot style")
+    # stygroup.add_argument("--refid", dest="REF_ID",
+    #                     default="REF", help="ID of reference data set (file path for non-REF data)")
+    # stygroup.add_argument("--linear", action="store_true", dest="LINEAR",
+    #                     default=False, help="plot with linear scale")
+    # stygroup.add_argument("--mc-errs", action="store_true", dest="MC_ERRS",
+    #                     default=False, help="show vertical error bars on the MC lines")
+    # stygroup.add_argument("--no-title", action="store_true", dest="NOPLOTTITLE",
+    #                     default=False, help="don't show the plot title on the plot "
+    #                     "(useful when the plot description should only be given in a caption)")
+    # stygroup.add_argument("--style", dest="STYLE", default="default",
+    #                     help="change plotting style: default|bw|talk")
+    stygroup.add_argument("-c", "--config", dest="CONFIGFILES", action="append", default=[], #["~/.make-plots"],
+                        help="additional plot config file(s). Settings will be included in the output configuration.")
+
+    # TODO: re-enable the pattern matching, and _maybe_ the variants on ref-only plotting if we don't have a plotting system via YODA soon
+    #
+    selgroup = parser.add_argument_group("Selective plotting")
+    # selgroup.add_argument("--show-single", dest="SHOW_SINGLE", choices=("no", "ref", "mc", "all"),
+    #                     default="mc", help="control if a plot file is made if there is only one dataset to be plotted "
+    #                     "[default=%(default)s]. If the value is 'no', single plots are always skipped, for 'ref' and 'mc', "
+    #                     "the plot will be written only if the single plot is a reference plot or an MC "
+    #                     "plot respectively, and 'all' will always create single plot files.\n The 'ref' and 'all' values "
+    #                     "should be used with great care, as they will also write out plot files for all reference "
+    #                     "histograms without MC traces: combined with the -R/--rivet-refs flag, this is a great way to "
+    #                     "write out several thousand irrelevant reference data histograms!")
+    # selgroup.add_argument("--show-mc-only", "--all", action="store_true", dest="SHOW_IF_MC_ONLY",
+    #                     default=False, help="make a plot file even if there is only one dataset to be plotted and "
+    #                     "it is an MC one. Deprecated and will be removed: use --show-single instead, which overrides this.")
+    # # selgroup.add_argument("-l", "--histogram-list", dest="HISTOGRAMLIST",
+    # #                     default=None, help="specify a file containing a list of histograms to plot, in the format "
+    # #                     "/ANALYSIS_ID/histoname, one per line, e.g. '/DELPHI_1996_S3430090/d01-x01-y01'.")
+    selgroup.add_argument("-m", "--match", action="append",
+                        help="only write out histograms whose $path/$name string matches these regexes. The argument "
+                        "may also be a text file.",
+                        dest="PATHPATTERNS")
+    selgroup.add_argument("-M", "--unmatch", action="append",
+                        help="exclude histograms whose $path/$name string matches these regexes",
+                        dest="PATHUNPATTERNS")
+
+
+    ## Parse command line args into filenames and associated annotations
+    args = parser.parse_args()
+    fnames, fname_anns = [], []
+    for a in args.ARGS:
+        fname, anns = parse_arg(a)
+        fnames.append(fname)
+        fname_anns.append(anns)
+
+
+    ## Read .plot files
+    # TODO: Order, dict merging, etc.
+    import re
+    plotkeys = {}
+    for pf in args.CONFIGFILES:
+        plotkeys.update( yoda.plotting.read_plot_keys(plotfile) )
+
+    ## Extract PLOT keys
+    plotanns = {}
+    if "PLOT" in fnames:
+        i = fnames.index("PLOT")
+        plotanns = fname_anns[i]
+        del fnames[i]
+        del fname_anns[i]
+
+
+    ## Load data objects into a dict of list[AO]s, and apply annotations
+    # TODO: do the path pattern matching 'inline' here?
+    aolists = {}
+    for i, (fname, anns) in enumerate(zip(fnames, fname_anns)):
+        aos = [ ao.mkScatter() for ao in yoda.read(fname, asdict=False) ]
+        for ao in aos:
+            # TODO: Allow Rivet to strip /REF prefixes in its use of this API
+            p = ao.path().replace("/REF", "")
+            ## Apply .plot patterns first
+            for patt, keys in plotkeys.keys():
+                if re.match(patt, p):
+                    for k, v in keys.items():
+                        ao.setAnnotation(k, v)
+            ## Then command line annotation overrides
+            for k, v in anns.items():
+                ao.setAnnotation(k, v)
+            ## Obsfucate the path for uniqueness
+            # TODO: Tidy fname slashes etc. for this purpose
+            ao.setPath(p + "@" + fname)
+            ## The first file is used as the reference
+            # TODO: Use arg[0] or --refid for identifying the ref histo (if there is one)
+            if i == 0:
+                ao.setAnnotation("RatioRef", "yes")
+            ## Label with the original filename
+            ao.setAnnotation("Origin", fname)
+            ## Add to plotting dict
+            aolists.setdefault(p, []).append(ao)
+    # for p, aos in sorted(aolists.items()): print(p, len(aos))
+
+    ## Apply path pattern match discarding from dict
+    args.PATHPATTERNS = [re.compile(r) for r in args.PATHPATTERNS] if args.PATHPATTERNS else []
+    args.PATHUNPATTERNS = [re.compile(r) for r in args.PATHUNPATTERNS] if args.PATHUNPATTERNS else []
+    keylist = list(aolists.keys())
+    for path in keylist: # can't modify for-loop target in loop
+        useThis = True
+        if args.PATHPATTERNS:
+            useThis = False
+            for regex in args.PATHPATTERNS:
+                if regex.search(path):
+                    useThis = True
+                    break
+        if useThis and args.PATHUNPATTERNS:
+            for regex in args.PATHUNPATTERNS:
+                if regex.search(path):
+                    useThis = False
+                    break
+        if not useThis:
+            del aolists[path]
+    # for p, aos in sorted(aolists.items()): print(p, len(aos))
+
+
+    ## Loop over unique paths, plotting in order of command-line appearance
+    # TODO: bind default color/style cycling to the filenames
+
+
+    ## Now loop over all MC histograms and plot them
+    for path, aos in aolists.items():
+
+        ## Find and move the reference plot
+        has_ref = False
+        for i, ao in enumerate(aos):
+            if ao.annotation("RatioRef", False):
+                aos.insert(0, aos.pop(i))
+                has_ref = True
+                break
+
+        ## Plot object for the PLOT section in the .dat file
+        plot = Plot()
+        plot["Legend"] = has_ref
+        plot["LogY"] = True # TODO: make dynamic?
+        ##
+        ## Apply PLOT annotations from command line
+        # TODO: also handle .plot file annotations via plotanns?
+        for k, v in plotanns.items():
+            plot[k] = v
+        ##
+        # for key, val in plotparser.getHeaders(h).items():
+        #     plot[key] = val
+        # if args.LINEAR:
+        #     plot["LogY"] = "0"
+        # if args.NOPLOTTITLE:
+        #     plot["Title"] = ""
+        ##
+        # if args.STYLE == "talk":
+        #     plot["PlotSize"] = "8,6"
+        # elif args.STYLE == "bw":
+        #     if args.RATIO:
+        #         plot["RatioPlotErrorBandColor"] = "black!10"
+
+
+        ## Style the histos
+        # TODO: Make style and label more customisable
+        for i, ao in enumerate(aos):
+            if ao.annotation("RatioRef", False):
+                ao.setAnnotation("ErrorBars", "1")
+                ao.setAnnotation("Marker", "o")
+                ao.setAnnotation("Title", "Data") # TODO:improve
+                ao.setAnnotation("Color", "black") # TODO:improve
+                # ao.setAnnotation("ConnectBins", "0") # TODO: add
+            else:
+                setStyle(ao, i)
+
+
+        # ## Loop over the MC files to plot all instances of the histogram
+        # styleidx = 0
+        # for infile in filelist:
+        #     if mchistos.has_key(infile) and mchistos[infile].has_key(h):
+        #         ## Default linecolor, linestyle
+        #         setStyle(mchistos[infile][h], styleidx)
+        #         styleidx += 1
+        #         if args.MC_ERRS:
+        #             mchistos[infile][h].setAnnotation("ErrorBars", "1")
+        #         ## Plot defaults from .plot files
+        #         for key, val in plotparser.getHistogramOptions(h).items():
+        #             mchistos[infile][h].setAnnotation(key, val)
+        #         ## Command line plot options
+        #         setOptions(mchistos[infile][h], plotoptions[infile])
+        #         mchistos[infile][h].setAnnotation("Path", infile + h)
+        #         anaobjects.append(mchistos[infile][h])
+        #         drawonly.append(infile + h)
+        #         if args.RATIO and ratioreference is None:
+        #             ratioreference = infile + h
+
+        # if args.RATIO and len(drawonly) > 1:
+        #     plot["RatioPlot"] = "1"
+        #     plot["RatioPlotReference"] = ratioreference
+
+
+        ## Create the output. We can't use yoda.writeFLAT because PLOT and SPECIAL aren't AOs
+        from io import StringIO
+        sio = StringIO()
+        yoda.writeFLAT(aos, sio)
+        output = str(plot) + sio.getvalue()
+        ##
+        outpath = path.strip("/").replace("/", "_") + ".dat" # TODO: tidy up
+        with open(outpath, "w") as of:
+            of.write(output)
+
+
+
+
+
+
+
+def parse_arg(arg):
+    "Function to parse a command line arg and return the filename + dict of command-line annotations"
+    argparts = arg.split(":")
+    fname = argparts[0]
+    anns = {}
+    for ann in argparts[1:]:
+        if "=" in ann:
+            aname, aval = ann.split("=")
+            anns[aname] = aval
+        else:
+            anns["Title"] = ann
+    return fname, anns
+
+
+class Plot(dict):
+    "A tiny Plot object to help writing out the head in the .dat file"
+    def __repr__(self):
+        return "# BEGIN PLOT\n" + "\n".join("%s=%s" % (k,v) for k,v in self.items()) + "\n# END PLOT\n\n"
+
+
+def setStyle(ao, index):
+    """Set default plot styles (color and line width)"""
+
+    # Colors: red (Google uses "DC3912"), blue, green, orange, lilac
+    LINECOLORS = ["#EE3311", "#3366FF", "#109618", "#FF9900", "#990099"]
+    LINECOLORS = ["Blue", "Red", "Green", "DarkOrange", "DarkOrchid"]
+    LINESTYLES = ["-", "--", "-.", ":"]
+
+    # if args.STYLE == "talk":
+    #     ao.setAnnotation("LineWidth", "1pt")
+    # if args.STYLE == "bw":
+    #     LINECOLORS = [0.9, 0.5, 0.3]
+
+    c = index %  len(LINECOLORS)
+    s = index // len(LINECOLORS)
+
+    if not ao.hasAnnotation("LineStyle"):
+        ao.setAnnotation("LineStyle", "%s" % LINESTYLES[s])
+    if not ao.hasAnnotation("Color"):
+        ao.setAnnotation("Color", "%s" % LINECOLORS[c])
+
+
+def mkoutdir(outdir):
+    "Function to make output directories"
+    if not os.path.exists(outdir):
+        try:
+            os.makedirs(outdir)
+        except:
+            msg = "Can't make output directory '%s'" % outdir
+            raise Exception(msg)
+    if not os.access(outdir, os.W_OK):
+        msg = "Can't write to output directory '%s'" % outdir
+        raise Exception(msg)
+
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def parseArgs(args):
+#     """Look at the argument list and split it at colons, in order to separate
+#     the file names from the plotting options. Store the file names and
+#     file specific plotting options."""
+#     filelist = []
+#     plotoptions = {}
+#     for a in args:
+#         asplit = a.split(":")
+#         path = asplit[0]
+#         filelist.append(path)
+#         plotoptions[path] = []
+#         has_title = False
+#         for i in xrange(1, len(asplit)):
+#             ## Add "Title" if there is no = sign before math mode
+#             if not "=" in asplit[i] or ("$" in asplit[i] and asplit[i].index("$") < asplit[i].index("=")):
+#                 asplit[i] = "Title=%s" % asplit[i]
+#             if asplit[i].startswith("Title="):
+#                 has_title = True
+#             plotoptions[path].append(asplit[i])
+#         if not has_title:
+#             plotoptions[path].append("Title=%s" % sanitiseString(os.path.basename( os.path.splitext(path)[0] )) )
+#     return filelist, plotoptions
+
+
+def writeOutput(output, h):
+    "Choose output file name and dir"
+    hparts = h.strip("/").split("/")
+    if args.HIER_OUTPUT:
+        ana = "_".join(hparts[:-1]) if len(hparts) > 1 else "ANALYSIS"
+        outdir = os.path.join(args.OUTDIR, ana)
+        outfile = "%s.dat" % hparts[-1]
+    else:
+        outdir = args.OUTDIR
+        outfile = "%s.dat" % "_".join(hparts)
+    mkoutdir(outdir)
+    outfilepath = os.path.join(outdir, outfile)
+    f = open(outfilepath, "w")
+    f.write(output)
+    f.close()

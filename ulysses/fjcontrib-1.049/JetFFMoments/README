@@ -1,0 +1,20 @@
+The JetFFMoments class allows one to calculate moments of jet
+fragmentation functions and to subtract from them the effect of
+background noise, as well as the effect of fluctuations, as described
+in
+
+   Jet Fragmentation Function Moments in Heavy Ion Collisions
+   Matteo Cacciari, Paloma Quiroga, Gavin P. Salam, Gregory Soyez
+   arXiv:1209.6086 
+
+The code example.cc illustrates the use of the class in a simple case.
+It can be built using the included Makefile with the usual
+
+    make example
+
+example.cc makes use of an input datafile which is provided in the
+../data directory, and it should be run with
+
+   ./example < ../data/Pythia-Zp2jets-lhc-pileup-1ev.dat
+ 
+The expected output can be found in example.ref

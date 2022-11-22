@@ -1,0 +1,34 @@
+The LundPlane FastJet contrib is developed and maintained by:
+
+  Frederic Dreyer <frederic.dreyer@physics.ox.ac.uk>
+  Keith Hamilton <keith.hamilton@ucl.ac.uk>
+  Alexander Karlberg <alexander.karlberg@physics.ox.ac.uk>
+  Gavin P. Salam <gavin.salam@physics.ox.ac.uk>
+  Ludovic Scyboz <ludovic.scyboz@physics.ox.ac.uk>
+  Gregory Soyez <soyez@fastjet.fr>
+  Rob Verheyen <r.verheyen@ucl.ac.uk>
+
+The physics is based on:
+
+  The Lund Jet Plane.
+  Frederic A. Dreyer, Gavin P. Salam, and Gregory Soyez
+  JHEP 12 (2018) 064
+  https://doi.org/10.1007/JHEP12(2018)064
+  arXiv:1807.04758
+
+The definition of azimuthal angles, and examples of
+all-order observables sensitive to spin correlations
+(example_dpsi_collinear and example_dpsi_slice), are from:
+
+  Spin correlations in final-state parton showers and jet observables
+  A. Karlberg, G. P. Salam, L. Scyboz, and R. Verheyen
+  Eur. Phys. J. C 81, 681 (2021)
+  https://doi.org/10.1140/epjc/s10052-021-09378-0
+  arXiv:2103.16526
+  
+and
+
+  Soft spin correlations in final-state parton showers
+  K. Hamilton, A. Karlberg, G. P. Salam, L. Scyboz,
+  and R. Verheyen
+  arXiv:2111.01161

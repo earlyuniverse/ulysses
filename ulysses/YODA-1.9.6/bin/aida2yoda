@@ -1,0 +1,31 @@
+#! /usr/bin/env python
+
+"""\
+%(prog)s aidafile [yodafile]
+
+Convert an AIDA data file to the YODA data format.
+
+WARNING: aida2yoda is DEPRECATED
+It will die when AIDA does! Which is *soon*...
+"""
+
+import yoda, os, sys, argparse
+from yoda.script_helpers import parse_x2y_args, filter_aos
+
+parser = argparse.ArgumentParser(usage=__doc__)
+parser.add_argument("ARGS", nargs="+", help="infile [outfile]")
+parser.add_argument("-m", "--match", dest="MATCH", metavar="PATT", default=None,
+                    help="only write out histograms whose path matches this regex")
+parser.add_argument("-M", "--unmatch", dest="UNMATCH", metavar="PATT", default=None,
+                    help="exclude histograms whose path matches this regex")
+
+args = parser.parse_args()
+in_out = parse_x2y_args(args.ARGS, ".aida", ".yoda")
+if not in_out:
+    sys.stderr.write("You must specify the AIDA and YODA file names\n")
+    sys.exit(1)
+
+for i, o in in_out:
+    analysisobjects = yoda.readAIDA(i)
+    filter_aos(analysisobjects, args.MATCH, args.UNMATCH)
+    yoda.writeYODA(analysisobjects, o)

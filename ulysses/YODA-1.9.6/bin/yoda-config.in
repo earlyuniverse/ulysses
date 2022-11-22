@@ -1,0 +1,71 @@
+#! /usr/bin/env bash
+## @configure_input@
+
+tmp=$(echo $* | egrep -- '--\<help\>|-\<h\>')
+if test $# -eq 0 || test -n "$tmp"; then
+    echo "yoda-config: configuration tool for the YODA data analysis library"
+    echo
+    echo "Usage: $( basename $0 ) [--help|-h] | "
+    echo "           [--{prefix,datadir,libdir,includedir}] | "
+    echo "           [--{cxxflags,ldflags,libs}] | "
+    echo "           [--version]"
+    echo "Options:"
+    echo "  --help | -h   : show this help message"
+    echo
+    echo "  --prefix      : show the installation prefix (cf. autoconf)"
+    echo "  --includedir  : show the path to the directory containing the YODA headers"
+    echo "  --libdir      : show the path to the directory containing the YODA libraries"
+    echo "  --pythonpath  : show the path(s) to the directory containing YODA's Python package"
+    echo
+    echo "  --guess-prefix: try to use the runtime prefix, rather than that set at install-time"
+    echo
+    echo "  --cflags|--cppflags : returns a '-I' string for insertion into CPPFLAGS or CXXFLAGS"
+    echo "  --ldflags|--libs    : returns a '-L/-l' string for insertion into LIBS or LIBADD"
+    echo
+    echo "  --version     : returns the YODA release version number"
+    exit 0
+fi
+
+
+## These variables need to exist
+## Note no use of $DESTDIR... we ignore it so that destdir can be used
+## for temp installs later copied to /
+tmp=$( echo "$*" | egrep -- '--\<guess-prefix\>')
+if [[ -n "$tmp" ]]; then
+    bindir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    prefix=$(dirname $bindir)
+    exec_prefix=$prefix
+else
+    prefix=@prefix@
+    exec_prefix=@exec_prefix@
+fi
+datarootdir=@datarootdir@
+
+
+OUT=""
+
+## "Atomic" build info
+tmp=$( echo "$*" | egrep -- '--\<prefix\>')
+test -n "$tmp" && OUT="$OUT @prefix@"
+
+tmp=$( echo "$*" | egrep -- '--\<includedir\>')
+test -n "$tmp" && OUT="$OUT @includedir@"
+
+tmp=$( echo "$*" | egrep -- '--\<libdir\>')
+test -n "$tmp" && OUT="$OUT @libdir@"
+
+tmp=$( echo "$*" | egrep -- '--\<pythonpath\>')
+test -n "$tmp" && OUT="$OUT @YODA_PYTHONPATH@"
+
+## "Pre-rolled" build info
+tmp=$( echo "$*" | egrep -- '--\<cflags\>|--\<cppflags\>|--\<cxxflags\>')
+test -n "$tmp" && OUT="$OUT -I@includedir@"
+
+tmp=$( echo "$*" | egrep -- '--\<ldflags\>|--\<libs\>|--\<ldadd\>')
+test -n "$tmp" && OUT="$OUT -L@libdir@ -lYODA"
+
+## Version
+tmp=$( echo "$*" | egrep -- '--\<version\>')
+test -n "$tmp" && echo @PACKAGE_VERSION@ && exit 0
+
+echo $OUT

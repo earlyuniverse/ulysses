@@ -1,0 +1,151 @@
+# fastjet/example/makefile.static
+
+# include the Makefile in the top directory, which has the bits and pieces
+# needed to get CGAL working
+include ../makefile.static
+# make sure we use the pedantic flags here (defined in ../Makefile)
+CXXFLAGS += $(CXXPEDANTIC)
+
+FASTJET_INCLUDE = -I../include
+INCLUDE += $(FASTJET_INCLUDE)
+LDFLAGS += -L../lib -lfastjet
+
+CXXFLAGS += -Woverloaded-virtual
+
+# plugin includes here are temporary and subject to change...
+PLUGIN_INCLUDE = -I../plugins/GridJet -I../plugins/CDFCones -I../plugins/EECambridge -I../plugins/Jade -I../plugins/NestedDefs -I../plugins/SISCone
+PLUGIN_LIBRARY = -L../plugins/GridJet -lGridJetPlugin -L../plugins/CDFCones -L../plugins/EECambridge -L../plugins/Jade -L../plugins/NestedDefs -L../plugins/SISCone -lCDFConesPlugin -lEECambridgePlugin -lJadePlugin -lNestedDefsPlugin -lSISConePlugin -L../plugins/SISCone/siscone/siscone -lsiscone -L../plugins/SISCone/siscone/siscone/spherical -lsiscone_spherical
+#PLUGIN77_INCLUDE = $(PLUGIN_INCLUDE) -I../plugins/PxCone
+#PLUGIN77_LIBRARY = $(PLUGIN_LIBRARY) -L../plugins/PxCone -lPxConePlugin  $(F77LIB)
+PLUGIN77_INCLUDE = $(PLUGIN_INCLUDE) 
+PLUGIN77_LIBRARY = $(PLUGIN_LIBRARY) 
+
+INCLUDE += $(PLUGIN77_INCLUDE)
+
+# Gavin sometimes likes to compile with google's tcmalloc and profiler
+# libraries: tcmalloc gives a faster malloc (about 10% speed
+# gain on the CGAL based algorithms), while the profiler is useful
+# for a faithful estimation of where the time is being spent
+#ifeq ($(shell whoami),salam)
+#  LDFLAGS += -L/ada1/lpthe/salam/software/local/lib -ltcmalloc -lprofiler
+#endif
+
+SRCS = fastjet_example.cc ktjet_example.cc fastjet_timing.cc fastjet_timing_plugins.cc CmdLine.cc fastjet_subtraction.cc fastjet_areas.cc
+OBJS = $(patsubst %.cc,%.o,$(SRCS))
+
+fastjet_example: fastjet_example.o  ../lib/libfastjet.a
+	$(CXX)  -o fastjet_example fastjet_example.o  $(LDFLAGS)
+
+fastjet_example_v1_interface: fastjet_example_v1_interface.o  ../lib/libfastjet.a
+	$(CXX)  -o fastjet_example_v1_interface fastjet_example_v1_interface.o  $(LDFLAGS)
+
+fastjet_areas: fastjet_areas.o  ../lib/libfastjet.a
+	$(CXX)  -o fastjet_areas fastjet_areas.o  $(LDFLAGS) $(PLUGIN_LIBRARY)
+
+fastjet_areas_2.1.0: fastjet_areas_2.1.0.o  ../lib/libfastjet.a
+	$(CXX)  -o fastjet_areas_2.1.0 fastjet_areas_2.1.0.o  $(LDFLAGS) $(PLUGIN_LIBRARY)
+
+fastjet_subtraction: fastjet_subtraction.o  ../lib/libfastjet.a
+	$(CXX)  -o fastjet_subtraction fastjet_subtraction.o  $(LDFLAGS)
+
+#fastjet_subtraction: fastjet_subtraction.o  ../lib/libfastjet.a ../areas/ClusterSequencePassiveArea.o
+#	$(CXX)  -o fastjet_subtraction fastjet_subtraction.o ../areas/ClusterSequencePassiveArea.o $(LDFLAGS)
+
+# for the following to compile the KTJET_INCLUDE and KTJET_LIBRARY
+# variables must be set in ../Makefile
+ktjet_example: ktjet_example.o 
+	$(CXX)  -o ktjet_example ktjet_example.o $(KTJET_LIBRARY) $(LDFLAGS) 
+
+# explicit compilation so as to add ktjet libaries only for this file
+ktjet_example.o: ktjet_example.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(KTJET_INCLUDE) -c $<
+
+fastjet_timing: fastjet_timing.o CmdLine.o ../lib/libfastjet.a
+	$(CXX)  -o fastjet_timing fastjet_timing.o CmdLine.o  $(LDFLAGS)
+
+fastjet_timing_plugins: fastjet_timing_plugins.o CmdLine.o ../lib/libfastjet.a
+	$(CXX)  -o fastjet_timing_plugins fastjet_timing_plugins.o CmdLine.o  $(LDFLAGS) $(PLUGIN77_LIBRARY)
+
+# for the following to compile the KTJET_INCLUDE and KTJET_LIBRARY
+# variables must be set in ../Makefile
+ktjet_timing: ktjet_timing.o CmdLine.o
+	$(CXX)  -o ktjet_timing ktjet_timing.o CmdLine.o $(KTJET_LIBRARY) $(LDFLAGS) 
+
+# explicit compilation so as to add ktjet libaries only for this file
+ktjet_timing.o: ktjet_timing.cc
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(KTJET_INCLUDE) -c $<
+
+clean: 
+	rm -f *.o
+
+realclean: clean
+	rm -f  fastjet_example fastjet_timing ktjet_example ktjet_timing
+
+depend:
+	makedepend -f makefile.static $(FASTJET_INCLUDE) -Y -- -- $(SRCS)
+# DO NOT DELETE
+
+fastjet_example.o: ../include/fastjet/PseudoJet.hh
+fastjet_example.o: ../include/fastjet/internal/numconsts.hh
+fastjet_example.o: ../include/fastjet/internal/base.hh
+fastjet_example.o: ../include/fastjet/ClusterSequence.hh
+fastjet_example.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+fastjet_example.o: ../include/fastjet/Error.hh
+fastjet_example.o: ../include/fastjet/JetDefinition.hh
+fastjet_timing.o: ../include/fastjet/PseudoJet.hh
+fastjet_timing.o: ../include/fastjet/internal/numconsts.hh
+fastjet_timing.o: ../include/fastjet/internal/base.hh
+fastjet_timing.o: ../include/fastjet/ClusterSequence.hh
+fastjet_timing.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+fastjet_timing.o: ../include/fastjet/Error.hh
+fastjet_timing.o: ../include/fastjet/JetDefinition.hh CmdLine.hh
+fastjet_timing_plugins.o: ../include/fastjet/PseudoJet.hh
+fastjet_timing_plugins.o: ../include/fastjet/internal/numconsts.hh
+fastjet_timing_plugins.o: ../include/fastjet/internal/base.hh
+fastjet_timing_plugins.o: ../include/fastjet/ClusterSequence.hh
+fastjet_timing_plugins.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+fastjet_timing_plugins.o: ../include/fastjet/Error.hh
+fastjet_timing_plugins.o: ../include/fastjet/JetDefinition.hh CmdLine.hh
+CmdLine.o: CmdLine.hh
+fastjet_subtraction.o: ../include/fastjet/PseudoJet.hh
+fastjet_subtraction.o: ../include/fastjet/internal/numconsts.hh
+fastjet_subtraction.o: ../include/fastjet/internal/base.hh
+fastjet_subtraction.o: ../include/fastjet/ClusterSequenceArea.hh
+fastjet_subtraction.o: ../include/fastjet/ClusterSequenceAreaBase.hh
+fastjet_subtraction.o: ../include/fastjet/ClusterSequence.hh
+fastjet_subtraction.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+fastjet_subtraction.o: ../include/fastjet/Error.hh
+fastjet_subtraction.o: ../include/fastjet/JetDefinition.hh
+fastjet_subtraction.o: ../include/fastjet/internal/LimitedWarning.hh
+fastjet_subtraction.o: ../include/fastjet/RangeDefinition.hh
+fastjet_subtraction.o: ../include/fastjet/ClusterSequenceActiveArea.hh
+fastjet_subtraction.o: ../include/fastjet/ClusterSequenceActiveAreaExplicitGhosts.hh
+fastjet_subtraction.o: ../include/fastjet/GhostedAreaSpec.hh
+fastjet_subtraction.o: ../include/fastjet/internal/BasicRandom.hh
+fastjet_subtraction.o: ../include/fastjet/ActiveAreaSpec.hh
+fastjet_subtraction.o: ../include/fastjet/ClusterSequenceWithArea.hh
+fastjet_subtraction.o: ../include/fastjet/ClusterSequencePassiveArea.hh
+fastjet_subtraction.o: ../include/fastjet/ClusterSequence1GhostPassiveArea.hh
+fastjet_subtraction.o: ../include/fastjet/ClusterSequenceVoronoiArea.hh
+fastjet_subtraction.o: ../include/fastjet/AreaDefinition.hh
+fastjet_areas.o: ../include/fastjet/PseudoJet.hh
+fastjet_areas.o: ../include/fastjet/internal/numconsts.hh
+fastjet_areas.o: ../include/fastjet/internal/base.hh
+fastjet_areas.o: ../include/fastjet/ClusterSequenceArea.hh
+fastjet_areas.o: ../include/fastjet/ClusterSequenceAreaBase.hh
+fastjet_areas.o: ../include/fastjet/ClusterSequence.hh
+fastjet_areas.o: ../include/fastjet/internal/DynamicNearestNeighbours.hh
+fastjet_areas.o: ../include/fastjet/Error.hh
+fastjet_areas.o: ../include/fastjet/JetDefinition.hh
+fastjet_areas.o: ../include/fastjet/internal/LimitedWarning.hh
+fastjet_areas.o: ../include/fastjet/RangeDefinition.hh
+fastjet_areas.o: ../include/fastjet/ClusterSequenceActiveArea.hh
+fastjet_areas.o: ../include/fastjet/ClusterSequenceActiveAreaExplicitGhosts.hh
+fastjet_areas.o: ../include/fastjet/GhostedAreaSpec.hh
+fastjet_areas.o: ../include/fastjet/internal/BasicRandom.hh
+fastjet_areas.o: ../include/fastjet/ActiveAreaSpec.hh
+fastjet_areas.o: ../include/fastjet/ClusterSequenceWithArea.hh
+fastjet_areas.o: ../include/fastjet/ClusterSequencePassiveArea.hh
+fastjet_areas.o: ../include/fastjet/ClusterSequence1GhostPassiveArea.hh
+fastjet_areas.o: ../include/fastjet/ClusterSequenceVoronoiArea.hh
+fastjet_areas.o: ../include/fastjet/AreaDefinition.hh

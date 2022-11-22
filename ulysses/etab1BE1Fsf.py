@@ -12,9 +12,9 @@ from ulysses.numba import jit
 
 @jit
 def fast_RHS(y0, a, rRADi, log10_ain, d, w1, epstt, epsmm, epsee, rnuRda_eq, Del, GCF):
-    rnuR      = y0[0] # RHN
-    Tp        = y0[1] # Temperature
-    NBL       = y0[2] # B-L asymmetry
+    rnuR         =      y0[0] # RHN
+    Tp           =      y0[1] # Temperature
+    NBL          =      y0[2] # B-L asymmetry
     H            =      np.sqrt(8 * np.pi * GCF * rRADi * 10.**(4.*(log10_ain - a))/3.) #Hubble parameter
     expression1  =      np.log(10.) * (rnuR -  rnuRda_eq) * d/H
     dTda         =    - (Tp/Del) * np.log(10.)
@@ -69,9 +69,8 @@ class EtaB_1BE1Fsf(ulysses.ULSBase):
         Tp            = y0[1]
         z             = self.M1/Tp
         from ulysses.ulsbase import my_kn2, my_kn1
-        kn2 = my_kn2(z)
-        _d       = np.real(self.Gamma1* my_kn1(z) / kn2)
-        _w1      = _d * 0.25 * kn2 * z**2
+        _d            = np.real(self.Gamma1* my_kn1(z) / my_kn2(z))
+        _w1           = _d * 0.25 * kn2 * z**2
         rnuRda_eq     = self.N1Eq(z)
         Del           =  1. + Tp * self.ipol_dgstarSdT(Tp)/(3. * self.ipol_gstar(Tp)) # Temperature parameter
         return fast_RHS(y0, a, rRADi, log10_ain, _d, _w1,  epstt, epsmm, epsee, rnuRda_eq, Del, self.GCF)
@@ -91,17 +90,17 @@ class EtaB_1BE1Fsf(ulysses.ULSBase):
         t1 = np.linspace(0., aflog10, num=1000, endpoint=True)
 
         # solve equation
-        ys      = odeint(self.RHS, y0, t1, args = tuple(params))
+        ys          = odeint(self.RHS, y0, t1, args = tuple(params))
         # functions for converting to etaB using the solution to find temp
         T           = ys[:, 1]
-        gstarSrec = self.ipol_gstarS(0.3e-9) # d.o.f. at recombination
-        gstarSoff = self.ipol_gstarS(T[-1])  # d.o.f. at the end of leptogenesis
+        gstarSrec   = self.ipol_gstarS(0.3e-9) # d.o.f. at recombination
+        gstarSoff   = self.ipol_gstarS(T[-1])  # d.o.f. at the end of leptogenesis
         SMspl       = 28./79.
         zeta3       = zeta(3)
         ggamma      = 2.
         coeffNgamma = ggamma*zeta3/np.pi**2
         Ngamma      = coeffNgamma*(10**t1*T)**3
-        coeffsph    =  SMspl * gstarSrec/gstarSoff
+        coeffsph    = SMspl * gstarSrec/gstarSoff
         self.ys = np.empty((len(T), 4))
         self.ys[:,0]=t1
         self.ys[:,1]=T

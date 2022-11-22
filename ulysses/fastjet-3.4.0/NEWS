@@ -1,0 +1,1153 @@
+Release Notes for FastJet
+-------------------------
+
+================================================================
+Summary of changes from v3.3.4 -> v3.4.0: 2021-06-25
+================================================================
+New features:
+
+* addition of support for thread safety. It requires a compiler 
+  supporting the C++11 standard (or later) and must be explicitly 
+  enabled at configure time. There are two options
+  - the --enable-limited-thread-safety configure option is generally 
+    sufficient if each thread is processing entirely distinct events.
+    It should have essentially no speed overhead.
+  - the --enable-thread-safety configure option is required if
+    you want to be able to read/copy/process a common set of PseudoJets 
+    across multiple threads. Depending on the system, our tests have
+    shown speed penalties of up to 10-15%.
+  For further details, see section 10 of the manual, doc/fastjet-doc.tex
+
+* The jet area infrastructure has new calls to facilitate reproducible
+  multi-threaded running: AreaDefinition::with_fixed_seed(seed) and
+  GhostedAreaSpec::get_last_seed(seed). See section 10.3.1 of the manual.
+  
+* The background estimators have a new interface to facilitate 
+  reproducible multi-threaded running: 
+  BackgroundEstimatorBase::estimate(...) 
+  returns a BackgroundEstimate object, which contains rho, sigma, etc. 
+  For details on using it, see sections 8 and 10.3.2 of the manual.
+  The Subtractor class has been updated to use this. 
+
+Improvements to existing features:
+
+* the Python interface now has improved exceptions (a fastjet Error is
+  translated into a FastJetError python exception) and can be more
+  easily be used with projects using FastJet that want to define their
+  own python wrappers. Thanks to Patrick Komiske for the suggestions.
+
+* PxConePlugin now has an optional mode argument for e+e- running
+  (mode=1) instead of pp running (mode=2). Thanks to Stefan Kluth for
+  the suggestion.
+
+Bug fixes:
+
+* the Fortran interface to e+e- interface now returns jets ordered
+  in decreasing energy rather than decreasing transverse momentum. 
+
+================================================================
+Summary of changes from v3.4.0-beta.1 -> v3.4.0: 2021-06-25
+================================================================
+
+* added set_default_stream_and_mutex to Error and LimitedWarnings 
+  to help guard against garbled output
+
+================================================================
+Summary of changes from v3.3.4 -> v3.4.0-beta.1: 2021-03-10
+================================================================
+New features:
+
+* addition of support for thread safety. It requires a compiler 
+  supporting the C++11 standard (or later) and must be explicitly 
+  enabled at configure time. There are two options
+  - the --enable-limited-thread-safety configure option is generally 
+    sufficient if each thread is processing entirely distinct events.
+    It should have essentially no speed overhead.
+  - the --enable-thread-safety configure option is required if
+    you want to be able to read/copy/process a common set of PseudoJets 
+    across multiple threads. Depending on the system, our tests have
+    shown speed penalties of up to 10-15%.
+  For further details, see section 10 of the manual, doc/fastjet-doc.tex
+
+* The jet area infrastructure has new calls to facilitate reproducible
+  multi-threaded running: AreaDefinition::with_fixed_seed(seed) and
+  GhostedAreaSpec::get_last_seed(seed). See section 10.3.1 of the manual.
+  
+* The background estimators have a new interface to facilitate 
+  reproducible multi-threaded running: 
+  BackgroundEstimatorBase::estimate(...) 
+  returns a BackgroundEstimate object, which contains rho, sigma, etc. 
+  For details on using it, see sections 8 and 10.3.2 of the manual.
+  The Subtractor class has been updated to use this. 
+
+Improvements to existing features:
+
+* the Python interface now has improved exceptions (a fastjet Error is
+  translated into a FastJetError python exception) and can be more
+  easily be used with projects using FastJet that want to define their
+  own python wrappers. Thanks to Patrick Komiske for the suggestions.
+
+* PxConePlugin now has an optional mode argument for e+e- running
+  (mode=1) instead of pp running (mode=2). Thanks to Stefan Kluth for
+  the suggestion.
+
+Bug fixes:
+
+* the Fortran interface to e+e- interface now returns jets ordered
+  in decreasing energy rather than decreasing transverse momentum. 
+
+================================================================
+Summary of changes from v3.3.3 -> v3.3.4: 2020-05-05
+================================================================
+This is a bug-fix release with
+* clarifications in documentation for handling of CGAL v5
+* resolved run-time crash with certain strict g++ options and
+  compilation issue with oracle c++ (both reported by Andrii
+  Verbyitskyi)
+* included SISCone v3.0.5 (fixes signed-unsigned mismatch,
+  no impact on results).
+
+================================================================
+Summary of changes from v3.3.2 -> v3.3.3: 2019-11-29
+================================================================
+
+This is a bug-fix release with
+* improved treatment of CGAL in the build system (thanks to Marco van Leeuwen)
+* fixed an overflow issue in the JadePlugin (thanks to Andrii Verbytskyi) 
+
+================================================================
+Summary of changes from v3.3.1 -> v3.3.2: 2018-10-01
+================================================================
+
+* improved the shared-library behaviour by setting the proper
+  inter-dependences (thanks to Jan Strube)
+* included SISCone v3.0.4 with a similar fix
+
+================================================================
+Summary of changes from v3.3.0 -> v3.3.1: 2018-04-24
+================================================================
+
+* Main FastJet License clarified as being GPL v2 or later
+* added theta() and cos_theta() members to PseudoJet 
+* added a --with-cgal-boostdir=... configure option to handle
+  cases where CGAL uses a non-standard Boost installation path
+* fixed compilation bug in the SISCone interface
+  (thanks to Attila Krasznahorkay)
+
+================================================================
+Summary of changes from v3.2.2 -> v3.3.0: 2017-07-12
+================================================================
+
+This release adds a first version of a Python interface to
+FastJet (some details may still evolve in the future).
+Enable it with --enable-pyext at configure time and see
+examples/python/ for usage.
+
+Thanks to Lily Asquith, Stefano Carrazza and Eric Metodiev for
+testing and helpful feedback.
+
+================================================================
+***** PUT IN CHANGES from v3.2.1 -> v3.2.2: 2017-05-23
+================================================================
+This is a bug-fix release. Main changes:
+
+* fixed issue with negative masses in MassDropTagger
+  (reported by Johannes Elmsheuser)
+* fixed the return type of some PseudoJet operators
+* fixed type mismatch for diJ_plus_link in NNFJN2Tiled
+
+================================================================
+Summary of changes from v3.2.0 -> v3.2.1: 2016-08-04
+================================================================
+This is a bug-fix release. Main changes:
+
+* added a missing assignment operator for ClusterSequence
+  (reported by Roberto Franceschini)
+* eliminated a warning about unused variables when assertions are
+  disabled (reported by Andy Buckley)
+* included SISCone-3.0.3 which now installs config.h to improve
+  build stability
+
+================================================================
+Summary of changes from v3.1.3 -> v3.2.0: 2016-03-17
+================================================================
+
+* exposed the N2Plain and N2Tiled strategies for 3rd-party clustering
+  algorithms under the form of two new classes (NNFJN2Plain and
+  NNFJN2Tiled), similar to NNH
+* included version 3.0.2 SISCone with minor bug fixes
+* made template implementation of PseudoJet::obj_sorted_by_values() public
+* added a --guess-prefix option to fastjet-config (guesses prefix
+  from location of fastjet-config instead of prefix from configure)
+* added a --disable-auto-ptr option to configure (for clean C++11 compilation)
+* added internal helpers for C++11 and C++14 features: compile-time
+  deprecation and the override keyword 
+* small tweaks to the build system
+* fjcore now ships with an illustrative fortran wrapper and example
+
+================================================================
+Summary of changes from v3.1.2 -> v3.1.3: 2015-07-04
+================================================================
+This is a maintenance relase with the following changes:
+* disabled JetDefinition::operator(...) when CINT is detected, for
+  ROOT v5 compatibility.
+* worked around an issue with recent versions of CGAL and the clang
+  compiler 
+
+================================================================
+Summary of changes from v3.1.1 -> v3.1.2: 2015-03-12
+================================================================
+This is a bug-fix release. Main changes:
+
+* fixed rounding error issue in the "lazy" clustering strategies that,
+  in rare cases, caused infinite loops or crashes (reported by Jochen Ott).
+* added check on clustering's internal consistency; failure will throw
+  a new "InternalError" exception (derived from Error).
+* fixed bug in extraction of fjcore code that resulted in fjcore
+  failing for high multiplicities (~1000) (reported by Sergei Chekanov).
+  Only affects fjcore, not the full fastjet library.
+
+================================================================
+Summary of changes from v3.1.0 -> v3.1.1: 2015-01-06
+================================================================
+This is a bug-fix release. Main changes:
+
+* fix to area support for Filter with Cambridge/Aachen jets and subjets
+* GridMedianBackgroundEstimator has new constructor and RectangularGrid as public base
+* added virtual destructor to TilingBase class
+
+================================================================
+Summary of changes from v3.0.6 -> v3.1.0: 2014-09-30
+================================================================
+* Significant speed improvements (x1.5-10) for large N (few thousand-10^5)
+* FASTJET_VERSION_NUMBER preprocessor symbol, for easy in-code version testing
+* New JetDefinition::operator(): jets = jet_def(particles);
+* Native particle-mass support in PU estimation (rho_m())
+* Subtraction can use rho_m (set_use_rho_m()) and force m>0 (set_safe_mass())
+* Addition of Winner-Takes-All recomb. schemes (WTA_pt_scheme, WTA_modp_scheme)
+* SISCone updated to v3.0.0 (addition of SISCone with progressive removal)
+* New Recluster class, serving as base for Filter
+* New RectangularGrid class, base for GridMedianEstimator & GridJetPlugin
+* Fixed long-standing issue with coincident points in NlnN strategies
+* Other small additions and changes include:
+  * Selector::sum(particles) to get 4-vector sum of particles that pass selector
+  * pruned_jet.structure_of<Pruner>() has Rcut() and zcut() functions
+  * easy copying of Recombiner info: jet_def1.set_recombiner(jet_def2)
+* Various bug-fixes, build-system tweaks (e.g. default -O2 instead of -O3)
+
+================================================================
+Summary of changes from v3.1.0-beta.1 -> v3.1.0: 2014-09-30
+================================================================
+* Addition of Winner-Takes-All recomb. schemes (WTA_pt_scheme, WTA_modp_scheme)
+* SISCone updated to v3.0.0 (addition of SISCone with progressive removal)
+* minor changes including doxygen doc fixes and elimination of gcc warnings
+
+================================================================
+Summary of changes from v3.0.6 -> v3.1.0-beta.1: 2014-08-15
+================================================================
+* Significant speed improvements (x1.5-10) for large N (few thousand-10^5)
+* FASTJET_VERSION_NUMBER preprocessor symbol, for easy in-code version testing
+* New JetDefinition::operator(): jets = jet_def(particles);
+* Native particle-mass support in PU estimation (rho_m())
+* Subtraction can use rho_m (set_use_rho_m()) and force m>0 (set_safe_mass())
+* New Recluster class, serving as base for Filter
+* New RectangularGrid class, base for GridMedianEstimator & GridJetPlugin
+* Fixed long-standing issue with coincident points in NlnN strategies
+* Other small additions and changes include:
+  * Selector::sum(particles) to get 4-vector sum of particles that pass selector
+  * pruned_jet.structure_of<Pruner>() has Rcut() and zcut() functions
+  * easy copying of Recombiner info: jet_def1.set_recombiner(jet_def2)
+* Various bug-fixes, build-system tweaks (e.g. default -O2 instead of -O3)
+
+================================================================
+Summary of changes from v3.0.5 -> v3.0.6: 2013-10-29
+================================================================
+This is a minor maintenance release. Main changes:
+* fixed compilation issues for two plugins under OS X 10.9 (Mavericks)
+* fixed incorrect warnings in JHTopTagger, MassDropTagger and an example
+* GridJetPlugin now has extra enquiry functions
+
+================================================================
+Summary of changes from v3.0.4 -> v3.0.5: 2013-09-16
+================================================================
+This is a minor maintenance release. Main changes:
+* modified include guards, to solve coexistence issue for fjcore
+* resolved (bogus) compiler warning about uninitialised variables
+* added an example event file that was missing from the distribution
+
+================================================================
+Summary of changes from v3.0.3 -> v3.0.4: 2013-06-05
+================================================================
+
+This is a minor maintenance release. Changes include:
+* dummy init of PseudoJet rapidity to avoid warnings with some configs.
+* minor code structure adjustments to allow for release of fjcore
+* inclusion of SISCone 2.0.6
+
+================================================================
+Summary of changes from v3.0.2 -> v3.0.3: 26/06/12
+================================================================
+
+This is a bug-fix release, fixing 
+
+* compilation issues with g++-4.7 and clang
+* issue of missing documentation figures in the tarball
+* issue with the --enable-extra-warnings flag in configure
+
+================================================================
+Summary of changes from v3.0.1 -> v3.0.2: 17/01/12
+================================================================
+
+This is a bug-fix release, including
+
+* small fixes to the build system and fastjet-config
+* further licence clarifications
+* user can force early printing of banner with ClusterSequence::print_banner()
+* included SISCone 2.0.5 (with small modifications to the build system)
+
+================================================================
+Summary of changes from v3.0.0 -> v3.0.1: 25/11/11
+================================================================
+
+Version 3.0.1 includes further reorganisation of the manual (version to 
+appear on arXiv), and a number of small additional changes, including :
+
+* PseudoJet now also has a pt() member function for transverse momentum
+* minor speed improvements (very low N + strategy choice for N ~ 20-50)
+* elimination of many compilation warnings found with -Wextra -Wshadow
+* clarification of licenses for many of the plugins + new plugin banners
+* fixed a memory leak in the ATLASConePlugin
+
+================================================================
+Summary of changes from v2.4.4 -> v3.0.0:  09/10/11
+================================================================
+
+Changes relative to the 2.4.x series include:
+
+Addition of FastJet tools:
+
+  * Filtering, trimming, pruning and a few boosted object taggers as
+    part of a new native "Transformers" framework for post-clustering
+    manipulation of jets
+
+  * New background estimation and subtraction interface, with
+    JetMedianBackgroundEstimator, GridMedianBackgroundEstimator and Subtractor. 
+  
+New functionality:
+  
+  * Enhancement of the PseudoJet class so that jets are now aware of their
+    internal structure (e.g. one can use jet.constituents()).
+  * It is possible to associate arbitrary user information with a PseudoJet.
+  * Selectors, which allow easy communication of cuts across different functions 
+  
+Other changes:
+
+  * Improved doxygen and examples
+  * aids for easier memory management
+  * elimination of the R<pi/2 restriction on native jet algorithms
+  * control of Error and warning output, including public LimitedWarning class
+  * new plugins (GridJet and two D0RunICone plugins)
+  * enhanced fortran wrappers 
+
+Interface modifications (May break backwards compatibility):
+
+  * by default a JetDefinition is initialised to undefined_jet_algorithm 
+    instead of kt_algorithm with a radius of 1.
+  * JetDefinition::DefaultRecombiner sets the user index of the result
+    of the recombination to -1 (the default for a PseudoJet;
+    previously was being set to 0)
+  * ghosts are placed more sensibly in 3.0 than in the 2.X series;
+    call ghost_area_spec.set_fj2_placement(true) to reinstate old behaviour
+  * CS::exclusive_subjets used to silently return fewer subjets than
+    requested if there were too few particles in a jet; to be
+    consistent with exclusive_jets(...) it now throws an exception;
+    use exclusive_jets_up_to(...) and exclusive_subjets_up_to(...) to
+    avoid the exception.
+  * ATLASCone and TrackJet plugins use stable_sort instead of sort for
+    more stable behaviour across architectures and compiler versions;
+    this can change clustering results in events with degeneracies.
+  * some legacy headers have been removed (include/FjPseudoJet.hh and
+    include/FjClusterSequence.hh), and some classes are deprecated:
+    ClusterSequenceWithArea (use ClusterSequenceArea instead),
+    ActiveAreaSpec (use GhostedAreaSpec instead), and RangeDefinition
+    and CircularRange (use Selector instead); see appendix G in manual
+    for further small removals. 
+
+Configure modifications
+
+  * the plugins are by default built in a single 'libfastjetplugin'
+    library. This is transparent if you use the fastjet-config
+    script. The previous behaviour (each plugin in its own library)
+    can be recovered by passing the --disable-monolithic option to
+    configure.
+  * an additional library, libfastjettools, contains tools like
+    boosted object taggers, filters, etc. It is included by default
+    with "fastjet-config --libs" 
+
+   
+New features relative to 3.0beta1:
+
+  * addition of Pruner class
+  * control of Error and warning output, including public LimitedWarning class
+  * addition of SelectorIsZero
+  * ClusterSequence::childless_pseudojets() 
+    
+Bug fixes and other changes relative to 3.0beta1:
+   
+  * JetMedianBackgroundEstimator::set_particles(...) no longer resets other parameters
+  * fixed issue with persistency of internal recombiner in Filter
+  * removed deprecated ClusterSequence constructor with R (rather than
+    jet def) and also CS::set_jet_algorithm(...), CS::set_jet_def(...) 
+
+
+================================================================
+Summary of changes from v3.0beta1 -> v3.0.0:  09 October 2011
+================================================================
+New features:
+- addition of Pruner class
+- control of Error and warning output, including public LimitedWarning class
+- addition of SelectorIsZero
+- ClusterSequence::childless_pseudojets()
+
+Bug fixes and other changes
+- JetMedianBackgroundEstimator::set_particles(...) no longer resets other parameters
+- fixed issue with persistency of internal recombiner in Filter
+- removed deprecated ClusterSequence constructor with R (rather than jet def)
+  and also CS::set_jet_algorithm(...), CS::set_jet_def(...)
+
+================================================================
+Summary of changes from v3.0alpha3 -> v3.0beta1:  10 August 2011
+================================================================
+New features
+- Reorganised background estimation to have a JetMedianBackgroundEstimator
+  and a GridMedianBackgroundEstimator (derived from BackgroundEstimatorBase)
+  [v3.0alpha3 programs should replace BackgroundEstimator 
+   -> JetMedianBackgroundEstimator, and use a new order of constructor arguments]
+- Added the GridJetPlugin
+- added a TopTaggerBase and a Johns Hopkins top tagger (JHTopTagger)
+- to JetDefinition added delete_plugin_when_unused(), 
+  delete_recombiner_when_unused()
+- improved Filter (for area and recombiner support, also works with a subtractor)
+- added a --config flag to fastjet-config
+
+Bug fixes and other changes
+- some speed gains in the default recombiner
+- TrackJet and ATLASCone now use stable_sort (can change results;
+  makes results stable across machine architectures & compilers, cf BUGS)
+- fixed bugs in Voronoi areas (as in v.2.4.4) 
+- fixed bugs in handling of empty areas in background estimator (as in 2.4.4)
+- renamed SelectorMXXX -> SelectorMassXXX
+- renamed NSubjettinessTagger -> RestFrameNSubjettinessTagger
+- exclusive_[sub]jets(njets) now consistenty throws an error if it
+  can't deliver njets; exclusive_[sub]jets_upto(njets) gives up to njets
+- deprecated ClusterSequenceWithArea and ActiveAreaSpec
+  (ClusterSequenceWithArea no longer available from
+  ClusterSequenceArea.hh header)
+- deprecated RangeDefinition & CircularRange; use Selector instead
+- reorganisation of substantial parts of the manual
+
+
+================================================================
+Summary of changes from v3.0alpha2 -> v3.0alpha3:  03 June 2011
+================================================================
+
+New features
+- Added a series of "Transformer"s in tools/:
+   * Subtractor: subtract the jet using a BackgroundEstimator
+   * Boost/Unboost: boosts/unboosts a jet
+   * MassDropTagger: look for a mass drop in the jet substructure
+   * NSubjettinessTagger: 2-pronged tagger based on rest-frame 2-subjettiness
+   * CASubJetTagger: 2-pronged tagger based on maximal distance in jet history
+   * Filter updated from alpha2 (bug fixes & new constructors)
+  NB: examples 11 (boosted Higgs) and 12 (Filter) illustrate usage.
+
+- CS::delete_self_when_unused() allows it to handle its own memory management
+- GhostedAreaSpec can take a Selector to help specify ghost placement
+- added a FunctionOfPseudoJet<T> base class to help standardise tool interfaces
+- ClusterSequence::transfer_from_sequence now allows for a
+  FunctionOfPseudoJet<PseudoJet> argument to transform (e.g. boost)
+  the jets from an old sequence as they are transferred to the new one
+- fortran interface now has basic area functionality
+
+Changes to features introduced in alpha2 and alpha1:
+- Numerous changes to BackgroundEstimator 
+    * it allows manual encoding of rapidity dependence;
+    * it can calculate density of quantities other than pt;
+    * it has additional constructors, plus methods to reset its ClusterSequence, etc.
+    * its sigma() now properly handles finite numbers of jets (+ other bug fixes).
+- jet.pieces() for a jet from a clustering now returns the two parents
+- various changes to behaviour of a jet's structural calls; see new table in doc
+- PseudoJet::extra_properties<...>() -> PseudoJet::structure_of<...>() (cf example 12)
+- join(...) can now include a recombiner argument; it also now supports areas
+- Selector::count(jets) to know how many pass a cut (also new: Selector::sift)
+
+Other changes 
+- by default a PseudoJet is constructed with zero momentum
+- by default a JetDefinition has an undefined_jet_algorithm
+- efficiency improvements in PtYPhiM and ghost generation
+- all uses of RangeDefinition now replaced by Selector. Old interfaces
+  retained, but deprecated.
+- added an example (09) to illustrate how to add user-info to a PseudoJet
+- doxygen output now configured with an internal search engine
+
+Bug fixes
+- the default recombiner used to set the user_index to the non-default
+  value of 0. Now it sets it to the default (-1).
+- fixed crashes of VoronoiAreas for particles on a grid (also in 2.4.3)
+
+
+================================================================
+Summary of changes from v3.0alpha1 -> v3.0alpha2:  10 March 2011
+================================================================
+
+New features:
+- two jets, a and b can now be joined:  PseudoJet c = join(a,b),
+  intended to facilitate packaging the result of substructure tools;
+  individual pieces can be recovered with c.pieces();
+- New PseudoJetStructureBase class, to help implement such features
+- New fastjet/tools/Filter.hh provides a unified interface to filtering and trimming
+- New very preliminary fastjet/tools/BackgroundEstimator.hh to provide
+  a more flexible interface to estimation of backgrounds (removal of
+  hardest jets, etc.).
+- a few extra Selectors
+
+Changes to features introduced in alpha1:
+- Selector is now in fastjet/Selector.hh (no longer fastjet/tools/...)
+- Selector::relocate(...) and is_relocatable() renamed to
+  Selector::set_reference(...) and takes_reference()
+- PseudoJet::ExtraInfo has been renamed PseudoJet::UserInfoBase and
+  corresponding access functions are now called set_user_info(...), etc.
+
+Other changes and fixes
+- some legacy headers removed
+- bug fixes in NlnNCam strategies for R>pi
+
+===========================================================
+Summary of changes from v2.4.X -> v3.0alpha1:  27 January 2011
+===========================================================
+
+This is an alpha release, previewing some of the new features that are
+expected to be available in FastJet version 3. Interfaces of new
+features may yet evolve.
+
+New features:
+- Several extensions to PseudoJet:
+  * it now knows what ClusterSequence it belongs to
+  * info about internals of jets can be accessed e.g. as jet.constituents()
+  * it now has a virtual destructor + other support for classes derived from PseudoJet
+  * new facilities for associating user info with a jet (see PseudoJet::ExtraInfo)
+  * some of these features make use of a new SharedPtr class 
+    (intended mainly for advanced users)  
+    similar to C++0x std::shared_ptr
+  * calculation of phi and rapidity (cached) only on request
+- R can now be taken larger than pi/2 for natively coded jet algorithms
+- Addition of "Selector" tools through #include "fastjet/tools/Selector.hh"
+- New plugin for D0RunICone (code contributed by Lars Sonnenschein)
+- Improvements to fortran wrapper (access to SISCone, jet constituents, etc.)
+
+Bug fixes:
+- fixed issue with inconsistent returned sign in PseudoJet::delta_phi_to(...)
+
+Other notable changes:
+- Revamping of examples
+- by default all plugins are now packaged into libfastjetplugins.
+  Note that "external" libraries like libsiscone are still separate.
+- Significant improvements to doxygen documentation
+
+===========================================================
+Summary of changes from v2.4.1 -> v2.4.2:  26 February 2010
+===========================================================
+- exclusive_ymerge_max(...) was not working; now fixed
+- the D0RunIIConePlugin gave segfaults for some parameters; now fixed
+- the D0RunIIConePlugin gave different results on 32/64 bit machines;
+  optimisation flags now changed just for D0 code so that 32 bit gives same
+  results as 64 bit. 
+- changes to configure.ac to better handle fortran compiler checks
+- removed some orphan/redundant code that was generating compilation warnings
+- added an "--enable-monolithic" option to ./configure which causes
+  all plugins to be placed in a single library (except SISCone)
+- added a "--list-plugins" option to fastjet-config
+
+=======================================================
+Summary of changes from v2.4.0 -> v2.4.1:  29 May 2009
+=======================================================
+
+Fixes to the build system
+-------------------------
+- Included SISCone 2.0.1 (shared libs now enabled by default in
+  SISCone too, and other small fixes)
+- Fixed platform-dependent failures during make check
+- Fixed gcc 4.4 compatibility issues (missing headers)
+- Fixed a problem on Mac OS X with the arguments provided by
+  "fastjet-config --libs" (--rpath versus -rpath).
+- fastjet-config has new optional arguments (--rpath=no, --runpath)
+  related to finding shared libraries at runtime on linux. 
+  Run fastjet-config without any arguments for more info.
+  To instead use static libraries, either configure with the
+  --disable-shared option, or use fastjet-config with the --shared=no option.
+- fastjet-config can now take --cxxflags and --libs in a single invocation
+- With --cxxflags, fastjet-config now returns the minimal required set of arguments 
+- Various other small mods (better fortran support, standardisation, ...)
+  [thanks to Andy Buckley and David Grellscheid for suggestions]
+
+Also
+----
+- Added a fortran wrapper for pp sequential recombination algorithms
+- Fixed issue in median rho estimation when some jets have zero area
+- Expanded descriptions that are returned by ATLAS/TrackJet/CMS plugins
+- Warnings are no longer given when using exclusive jets with
+  Cam/Aachen and certain e+e- algorithms (the warnings were misleading)
+- Small fixes to the manual
+
+=======================================================
+Summary of changes from v2.3.X -> v2.4.0: 17 April 2009
+=======================================================
+
+
+New pp algorithms
+-----------------
+
+- added implementation of generalised kt algorithm (genkt_algorithm) for pp
+- added D0RunIICone plugin [--enable-d0runiicone at configure time]
+- added ATLASCone Plugin [--enable-atlascone at configure time]
+- added CMSIterativeConePlugin [--enable-cmsiterativecone at configure time]
+- added TrackJet Plugin (used by CDF in UE studies)
+  [--enable-trackjet at configure time]
+
+Introduction of e+e- algorithms
+-------------------------------
+
+- added an implementation of the e+e- kt algorithm (ee_kt_algorithm),
+- added EECambridgePlugin for the (original) e+e- Cambridge algorithm
+- added JADEPlugin for the JADE algorithm (see the ChangeLog or header
+  file for details)
+- added SISConeSphericalPlugin [enabled by default] for SISCone in
+  e+e- and other spherical environments.
+- native implementation of generalised kt algorithm for e+e- (ee_genkt_algorithm)
+  [also provides access to e+e- form of anti-kt alg, conical jets on a sphere]
+- added JadePlugin for the e+e- Jade algorithm
+
+Meta-algorithms
+----------------
+
+- added NestedDefs plugin for daisy-chaining multiple jet definitions
+  [still under testing; API may change in the future]
+
+New functionality
+-----------------
+- added subjet functions for viewing jet at particular dcut, etc.
+- added access to exclusive jets based on ycut as well as dcut (for e+e-)
+- added support for asymmetric rapidity ranges in GhostedAreaSpec
+- added support for a CircularRange (derived from RangeDefinition) for
+  use in background estimation
+- added class NNH to help users implement algorithms with
+  user-chosen distance measure (see JadePlugin for an example)
+
+Interface modifications
+-----------------------
+- removed default value of 0.5 for overlap_threshold in
+  CDFMidPointPlugin, CDFJetCluPlugin and SISConePlugin constructors
+
+  *** may break backwards compatibility ***
+
+- a JetDefinition(jet_alg) constructor, without an R value, is no
+  longer legal, except when jet_alg is ee_kt_algorithm (it has no R).
+
+  *** may break backwards compatibility ***
+
+- in SISCone, new way of accessing the information about pass at which
+  a jet was found (old method retained for 2.4, but now deprecated)
+
+
+Configure modifications
+-----------------------
+- added --enable-allplugins and --enable-allcxxplugins options, to
+  avoid having to specify a long list of individual plugins
+- shared libraries are now enabled by default
+
+Bugs fixed
+----------
+- fixed missing support for periodicity in azimuth in RangeDefinition
+  class
+
+Other modifications
+-----------------------
+- added support for CGAL 3.4 (for non-standard locations, specify
+  --with-cgaldir at configure time)
+- removed restriction that fastjet throws exception on empty events
+- added an example that illustrates the use of subjet techniques for
+  a boosted Higgs->b+bbar search
+
+Still to come
+-------------
+- add CMSIterativeCone Plugin
+
+
+
+=======================================================================
+Summary of changes from v2.3.3 -> v2.3.4 (bug fix release): 15 Aug 2008
+==========================================================
+
+- fixed infinite-loop bug in JetClu plugin on certain rare events
+
+- fixed compatibility issues of certain example programs with g++-4.3
+
+- incorporated SISCone 1.3.3 with similar g++-4.3 fixes
+
+=======================================================================
+Summary of changes from v2.3.2 -> v2.3.3 (bug fix release): 28 Apr 2008
+==========================================================
+
+- fixed missing installation of .../config_auto.h
+
+- fixed missing typename in .../SearchTree.hh
+
+=======================================================================
+Summary of changes from v2.3.1 -> v2.3.2 (bug fix release): 03 Apr 2008
+==========================================================
+
+- fixes to propagation of CXXFLAGS through the build chain
+
+- small change in Voronoi area code to fix crashes on regular
+  (calorimeter) layouts of momenta
+
+- small change in active areas code to fix crashes on algorithms that
+  do not cluster all particles
+
+- eliminated "using namespace std" that had accidentally been left in
+  certain area header files
+
+- incorporation of SISCone 1.3.2 with fixes for inappropriate public
+  symbols and to build framework
+
+
+======================================================================
+Summary of changes from v2.3.0 -> v2.3.1 (bug fix release)
+==========================================================
+
+- Fixed compilation issues under windows VC7.1 (reported by
+  I. Belyaev); also included SISCone 1.3.1 with similar fixes.
+
+- Fixed speed issue under optimized compilation of CDF MidPoint plugin
+  for 32 bit architectures that had arisen subsequent to the switch to
+  autotools with its common optimization settings.
+
+- Fixed "make check" failure with the --disable-siscone option.
+
+- Fixed crash in exclusive_dmerge(njets) for njets=0 (reported by P. Lenzi)
+
+
+======================================================================
+Summary of changes from v2.1.0 (previous stable release) to v2.3.0
+===================================
+
+- added the anti-kt algorithm (LPTHE-07-03), which is a sequential
+  recombination algorithm that gives conical jets.
+
+- Added Passive and Voronoi areas, and new common class for accessing
+  all types of areas, ClusterSequenceArea.
+
+- switched to autotools for compilation and installation:
+     ./configure --prefix=... 
+     make
+     make check      [optional]
+     make install
+
+  NB: users should no longer include fastjet-2.x.y/Makefile
+  when building their own programs, and instead should use
+    g++ -c file.cc `fastjet-config --cxxflags`
+    g++ file.o `fastjet-config --libs --plugins` 
+
+- plugin include files are now to be accessed with fastjet/ in 
+  front of them, i.e.
+    #include "fastjet/SISConePlugin.hh"
+  A simple #include "SISConePlugin.hh" is now obsolete but will
+  continue to work through 2.x
+
+- Added RangeDefinition class to provide more flexibility in UE/pileup
+  estimation.
+
+- New facilities for navigating the cluster sequence (has_parents,
+  has_child and has_partner members of ClusterSequence)
+
+- other bug fixes and small enhancements (including SISCone-1.3.0,
+  improvements to plugin facilities).
+
+See individual beta-releases below for more information, as well as
+the ChangeLog.
+
+
+======================================================================
+Changes from v2.2beta0 to v2.3-beta0
+===================================
+
+- switched to autotools for compilation and installation;
+
+- old build procedure still available for now, with files called
+  makefile.static  (make -f makefile.static); 
+
+  test-script.sh has been renamed test-static.sh and builds and 
+  tests using the old procedure.
+
+- plugins include files are now to be accessed with fastjet/ in 
+  front of them, i.e.
+  #include "fastjet/SISConePlugin.hh"
+
+  For backwards compatibility, the old access method will continue
+  to work throughout v2.x, i.e.
+  #include "SISConePlugin.hh"
+
+- added PseudoJet::reset(...) functions to reset the contents of a
+  PseudoJet.
+
+- added fastjet_version_string()
+
+- added a function PtYPhiM(...) that returns a PseudoJet with the
+  given py, rapidity , phi and mass.  Defined in PseudoJet.hh
+
+- added a directory fortran_wrapper/ to illustrate how to access
+  fastjet from fortran
+
+- some small bug fixes in the CDF midpoint code
+
+
+======================================================================
+Changes from v2.1.0 to v2.2beta0
+===============================
+
+- added the anti-kt algorithm (LPTHE-07-03)
+
+- Provided  a new common class for accessing all different types of  
+  areas: ClusterSequenceArea.
+
+- added functionality for Passive areas and Voronoi areas. 
+  Areas are now defined much in the same way as jets, via an 
+  AreaDefinition, which is passed as an argument
+  to ClusterSequenceArea. NB: the Voronoi area uses Fortune's
+  sweepline code for calculating the Voronoi diagram and so does not
+  require CGAL to be installed (it still is needed for NlnN kt
+  clustering). 
+
+- Added class RangeDefinition which allows detailed definitions
+  of the rapidity-azimuth ranges over which to study jet areas
+  and possibly perform noise subtraction
+
+- added facilities for navigating the cluster sequence (has_parents,
+  has_child and has_partner members of ClusterSequence)
+
+- changed plugin base class, so that it now includes R() virtual
+  member, and modified the various plugins to account for this.
+
+- modified the plugin interface to provide facilities to help with
+  passive areas.
+
+- included SISCone-1.2.0 rather than 1.1.1.
+
+- adapted SISCone plugin to the 1.2.0 release of SISCone -- main
+  changes are facilities and improvements related areas: some speed
+  improvements on the split-merge (relevant for active areas) and a
+  fairly efficient way of running passive areas.
+
+- added ClusterSequence::print_jets_for_root(...) and a corresponding root
+  script (example/root/jet-plots.C), so as to provide a crude
+  visualisation tool.
+
+
+======================================================================
+Summary of main changes from v2.0.0 to v2.1.0
+=============================================
+
+- added plugin structure for external jet finders.
+
+- included plugins for SISCone, CDFMidPoint, CDFJetClu, PxCone (with
+  extensions for MidPoint and bug fixes for PxCone relative to public
+  codes).
+
+- introduced option of control over recombination scheme, with a
+  RecombinationScheme enum, which applies also to area_4vector.
+
+- added description() member function to JetDefinition class, so 
+  that you can get a (string) summary of what you're running!
+
+- changed the default number of repeats in ActiveAreaSpec to 1 (which
+  is sufficient for most purposes).
+
+For further details, see the changes listed in detail below.
+
+======================================================================
+Changes from v2.1.0b4 to v2.1.0
+===============================
+
+- corrected bug in test-script.sh
+
+- removed PxCone from default tests and from 
+  plugins/usage_examples/many_algs_example.cc (to avoid fortran
+  compilation issues).
+
+======================================================================
+Changes from v2.1.0b3 to v2.1.0b4
+=================================
+
+FastJet modifications
+---------------------
+
+- default number of repeats for the active area specification has been
+  changed from 5 to 1 (the latter goes fast, but note that it provides
+  a zero error estimate for the area).
+
+Plugin modifications
+--------------------
+
+- adapted plugin to accomodate new scale for use in the SISCone
+  split-merge (pttilde), with a corresponding change of interface.
+
+  Changed default number of passes for SISCone to 0.
+  
+- Added the pttilde scale choice to the CDF plugin.
+
+
+
+======================================================================
+Changes from v2.1.0b2 to v2.1.0b3
+=================================
+
+FastJet enhancements
+--------------------
+
+- methods for estimating the underlying now have the option of using
+  area_4vector rather than the plain area
+
+FastJet bug fixes
+-----------------
+
+- area_4vector is now calculated with the same recombination scheme as
+  the jets themselves
+
+- massless recombination schemes now work correctly on particles with
+  zero momentum
+
+- PseudoJet::phi_std() returned wrong result for phi < pi -- thanks to
+  Oscar Stal for pointing this out.
+
+Plugin modifications
+--------------------
+
+- the plugin mechanism now allows a plugin to add "extra" information
+  to the ClusterSequence, essentially by providing an auto_ptr to a
+  class derived from (the new) ClusterSequence::Extras; an example of
+  this has been implemented with siscone (SISConeExtras) which allows
+  a user to access the initial (stable) protocones.
+
+- included new siscone version (1.1) which uses transverse mass (mt) rather
+  than pt in the split-merge procedure, to address an IR problem in
+  events where the hadronic part conserves momentum -- this can have
+  an effect on some physical distributions; the siscone update also
+  addresses issues with collinear safety and co-circular points.
+
+- included bug fixes to pxcone regarding 2pi periodicity when
+  recombining momenta
+
+- modified the version of the CDF midpoint cone code so as to allow it
+  to use mt and Et as the parameters in the split--merge step.
+
+======================================================================
+Changes from v2.1.0b1 to v2.1.0b2
+=================================
+
+Bug fixes
+---------
+
+- included new siscone version which solves the memory-leak problem
+
+Other changes
+-------------
+
+- added sample output from the test-script as test-script-output-orig.txt
+
+======================================================================
+Changes from v2.1.0b0 to v2.1.0b1
+=========================
+
+New features:
+-------------
+
+- added the SISCone plugin and the beta version of the siscone code
+  (authored by Soyez & Salam)
+
+Bug fixes
+---------
+
+- removed extraneous semicolons after functions that were causing
+  problems on some compilers.
+
+Other additions
+---------------
+
+- Added COPYING file with GPL license
+
+======================================================================
+Changes from v2.0 to v2.1 (beta0)
+=========================
+
+New features:
+-------------
+
+- introduced option of control over recombination scheme, with a
+  RecombinationScheme enum (a variable of this type should be provided
+  to the JetDefinition constructor) and also the possibility of an
+  externally defined recombination scheme.
+
+- introduced a "plugin" facility for alternative jet finders, via an
+  abstract base class
+ 
+    class JetDefinition::Plugin
+
+  Plugins are to be provided as classes derived from this,
+  implementing the relevant virtual functions (see manual and examples
+  for further info).
+
+- introduced "description" member function for the JetDefinition
+  class, which returns a (std::string) textual description of the
+  algorithm defined.
+
+- provided plugins for CDF JetClu, CDF Midpoint, PxCone code; the
+  plugins, the code they interface to and example programs are to be
+  found in the new plugins/ directory.
+
+- added ClusterSequence::unclustered_particles() a vector containing
+  the unclustered particles (relevant for some plugin algorithms).
+
+Minor additions
+---------------
+
+- introduced PseudoJet::squared_distance (does same as "plain_distance")
+
+
+
+Notational changes:
+-------------------
+
+- in the documentation, replaced eta -> y, to make it clear that it's
+  rapidity and not pseudorapidity that is being used throughout. Some
+  internal code continues to use variables called "eta" -- but these
+  are actually proper rapidity.
+
+
+======================================================================
+Changes from v1.0 to v2.0
+=========================
+
+New features:
+-------------
+
+- the longitudinally invariant inclusive Cambridge/Aachen jet finder
+  has been added.
+
+  Note that the exclusive jets extraction for the Cambridge jet-finder
+  does not provide the definition as given in the original Cambridge
+  paper. See the documentation for further details
+
+- classes have been introduced for running jet clustering and
+  simultaneously collecting information about the area of each jet. 
+  The base class specifying the functionality is
+   
+    class ClusterSequenceWithArea;
+
+  itself derived from ClusterSequence.
+
+  Two derived classes that provide the actual areas functionality are:
+
+    class ClusterSequenceActiveArea;
+    class ClusterSequenceActiveAreaExplicitGhosts;
+
+  To construct them, one also needs to specify how one wishes the area
+  to be calculated, via a class
+
+    class ActiveAreaSpec;
+
+
+New optimizations:
+------------------
+- new clustering strategies have been added:
+  
+  
+    N2MinHeapTiled : like N2Tiled, except that the non-geometric
+                     part has been replaced with a N ln N algorithm
+                     (overall the strategy still scales as N^2, but with a
+                     smaller coefficient)
+
+    NlnNCam, NlnNCam2pi2R, NlnNCam4pi:
+
+                     NlnN strategies specific to the Cambridge/Aachen
+                     jet-finder -- the fastest of them is NlnNCam.
+                     Depending on the size of the event and of the CPU
+                     cache it may be up to 2.5 times faster than the
+                     CGAL-based NlnN strategy. Experiment on your own
+                     hardware and events to establish whether the
+                     speed gain is significant.
+
+                     These strategies are based on the work on dynamic
+                     Closest Pair problems by Timothy Chan.
+
+    Best           : (was present before) now attempts to select best 
+                     among N2Plain, N2Tiled, N2MinHeapTiled, NlnN. 
+
+                     As the best option for a given N may depend on R
+                     and the event structure, you are advised to
+                     experiment with individual strategies if the
+                     last few tens of percent in speed are critical.
+                     
+
+
+Updates to user interface
+-------------------------
+
+While the v1 interface to fastjet has been maintained for backwards
+compatibility, for new developments in v2 and related forthcoming
+work, a new interface is provided as follows:
+
+- User accessible classes and enums have had the "Fj" prefix removed
+  and are instead now in namespace fastjet; the corresponding include
+  files are in the include/fastjet directory. So, for example instead
+  of
+
+    #include "FjClusterSequence.hh"
+    //...
+    FjClusterSequence clust_seq(...)
+
+  one now uses the following
+
+    #include "fastjet/ClusterSequence.hh"
+    //...
+    fastjet::ClusterSequence clust_seq(...)
+
+  If typing "fastjet::" the whole time seems too long-winded, you can
+  abbreviate "fastjet" as "fj" with
+
+    namespace fj = fastjet;
+
+  or eliminate the need for it altogether with
+
+    using namespace fastjet;
+  
+- a new class, fastjet::JetDefinition, has been introduced for holding
+  the details of the jet finder (which one, value of R, etc...) that
+  is to be used in a given clustering.
+
+    #include "fastjet/JetDefinition.hh"
+    #include "fastjet/ClusterSequence.hh"
+    //...
+
+    double R = 0.7;
+
+    // define jet algorithm
+    fastjet::JetDefinition jet_def(fastjet::kt_algorithm, R);
+
+    // get the cluster sequence for a vector of 4-momenta and the 
+    // given jet definition
+    fastjet::ClusterSequence clust_seq(momenta, jet_def);
+
+- some errors that previously were assertions now throw an
+  fastjet::Error -- exception. A fully uniform handling of exceptions
+  is currently some way away however and users for whom this is an
+  important issue should contact the authors.

@@ -1,0 +1,26 @@
+# common fastjet definitions
+include ../../makefile.static
+
+CXXSRC = GridJetPlugin.cc 
+OBJS = $(patsubst %.cc,%.o,$(CXXSRC)) 
+
+# fastjet includes
+FASTJET_INCLUDE = -I../../include
+INCLUDE += $(FASTJET_INCLUDE)
+
+all: libGridJetPlugin.a
+
+libGridJetPlugin.a: $(OBJS)
+	ar cru libGridJetPlugin.a $(OBJS)
+	ranlib libGridJetPlugin.a
+
+clean:
+	rm -f $(OBJS)
+
+distclean: clean
+	rm -f libGridJetPlugin.a *~
+
+# NB: only use "relative" includes here (others are too subject
+#     to change according to the system one is on...)
+depend:
+	makedepend  -f makefile.static $(FASTJET_INCLUDE) -I. -I./fastjet --   -- $(CXXSRC)

@@ -1,0 +1,33 @@
+JetCleanser is part of the fastjet-contrib project.
+
+   The JetCleanser class allows one to cleanse a jet as described in
+   
+      Jet Cleansing: Pileup Removal at High Luminosity
+      David Krohn, Matthew Low, Matthew D. Schwartz, and Lian-Tao Wang.
+      arXiv:1309.4777
+   
+   The code example.cc illustrates how to use the class in a simple case.
+   
+      make example
+   
+   example.cc makes use of an input datafile which is provided in the
+   /data directory, and it should be run with
+   
+      ./example < ../data/Pythia-Zp2jets-lhc-pileup-1ev.dat
+    
+   The expected output can be found in example.ref
+
+
+******************************************************
+   Warning:
+    If the jet constituents passed to JetCleanser are associated with a ClusterSequence, only the jet
+    and subjets will be resaled, not the constituents themselves.  Thus jet pt and jet mass will be
+    "cleansed", but general shapes, like N-Subjettiness", will not be.  This can be fixed by passing
+    JetCleanser a jet that is not associated to a ClusterSequence or by commenting out line 402 and
+    uncommenting lines 403-406 in JetCleanser.cc
+
+
+******************************************************
+   Not currently supported (but may be added in the future):
+      - areas after cleansing
+      - information whether linear defaulted to JVF or not

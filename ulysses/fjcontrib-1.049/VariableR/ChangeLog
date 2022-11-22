@@ -1,0 +1,96 @@
+2016-06-01  Gregory Soyez  <soyez@fastjet.fr>
+  NEWS: small tweaks to acknowledgments
+2016-05-29  <jthaler>
+  README/NEWS:  updated to include proper acknowledgments
+  VariableRPlugin.cc:  updated comments
+2016-03-29  Gregory Soyez  <soyez@fastjet.fr>
+  Released version 1.2.0
+2016-03-17  Gregory Soyez  <soyez@fastjet.fr>
+  Preparing a 1.2.0-beta.1 release for testing purpose
+2016-03-10  Gregory Soyez  <soyez@fastjet.fr>
+  VariableRPlugin.cc: removed commented out code.
+2016-03-09  <jthaler>
+  VariableRPlugin.{hh,cc}:
+     Fixed -Wgnu-static-float-init warning.  Small typos in comments fixed.
+     Some commented out code removed in preparation for release.
+  example.{cc,ref}:
+     Change gen-kt example to p = -0.5 (since that is more physical)
+  README:
+     A bit more documentation added.
+2016-03-09  Gregory Soyez  <soyez@fastjet.fr>
+  VariableRPlugin.{hh,cc}:
+     implemented as a gen-kt type of clustering. ClusterType is now
+     defined as a double so one can pass any value with AKTLIKE,
+     CALIKE and KTLIKE defined as -1, 0 and 1 respectively
+  example.{cc,ref}: added an example using gen-kt(p=1/2)
+2016-03-09  <jthaler>
+   AUTHORS,example.cc,VariableR.hh,VariableRPlugin.{cc,hh}:
+      Updated authorship/copyright information
+2016-03-09  Gregory Soyez  <soyez@fastjet.fr>
+   VariableRPlugin.{hh,cc}:
+      issued a warning for deprecated pre-clustering
+      best strategy now has a transition between N2Plain and N2Tiled
+2016-03-08  <jthaler>
+   example.cc,VariableR.hh,VariableRPlugin.{hh,cc}:
+      Added fastjet authors to copyright statement
+   AUTHORS:  Added fastjet authors to the list
+   NEWS, README:  Fixed some typos
+   VariableRPlugin.cc:
+      Added "#" to timing test to avoid "make check" failing.
+      Fixed error message to say that NNH is indeed supported in FJ<3.2.0
+   example.cc:
+      Adding in separate timing tests for the various strategies
+2016-03-08  Gregory Soyez  <soyez@fastjet.fr>
+   VariableRPlugin.{hh,cc}: adjusted a few details for compilation w FJ>3.2.0
+   VariableRPlugin.{hh,cc}: added a "Best" strategy which selects a decent default
+2016-03-07  Gregory Soyez  <soyez@fastjet.fr>
+   example.{cc,ref}: prefixed the description line by "#" to avoid its
+     inclusion in make check
+   VariableRPlugin.{hh,cc}: For FastJet>=3.2.0, used the NNFJN2Tiled,
+     NNFJN2Plain (and NNH) classes. The NNFJN2Tiled interface provides
+     a much faster clustering than the native implementation.
+     In practice, we introduced a "Strategy" class in VariableR that
+     can take the following values: N2Tiled (the default if available),
+     N2Plain, NNH or Native (the default for FastJet<3.2.0.
+   VERSION: switched to 1.2.0-devel
+2014-06-02 <jthaler>
+   Added dates to NEWS, wrapped to 80 characters.
+2014-05-30 <jthaler>
+   Addressed suggestions of FJ authors (thanks!)
+   Reorganized VariableRPlugin.hh for readability
+   Wrapped README file to 80 characters
+   Added Error("...")s for invalid parameter choices
+2014-05-18 <jthaler>
+   Added VariableRPlugin.hh/.cc to stick to naming conventions.
+   VariableR.hh maintained for backwards compatability
+   Updated README to use new naming convention
+2014-05-17 <jthaler>
+   Clarified NEWS about backwards compatibility.
+2014-05-16 <jthaler>
+   Added additional comments for readability.
+   First v1.1.0 release candidate.
+   Added extra test in example.cc
+   Changed the name VR -> VariableRPlugin
+   Put classes JetDistancePair and CompareJetDistancePair into VariableRPlugin class.
+   Renamed VRClustType -> ClusterType and put in VariableRPlugin class
+2014-04-14 <jthaler>
+   Fix compile issue with example (needed stdio.h)
+   Removed old CoreJetAlgorithm
+   Changed CAVR and AKTVR to point to the new code.
+   Added KTVR class.
+   Removed example_new since this debugging is no longer needed.
+   Added test with preclustering to example
+2014-03-31 <jthaler>
+   Included David Krohn's new version of the code, which should have same behavior but faster.
+   Old version of the code temporarily kept for debugging purposes.
+   Moved print_jets out of VariableR.hh/.cc
+   Added example_new file for debugging purposes
+   Reindented the files
+2013-02-23 <jthaler>
+   Fixed dependency issue (now using make depend)
+2013-02-22 <jthaler>
+   Fixed memory management and failed make check issues.
+2013-02-21 <jthaler>
+   First version submitted to fjcontrib
+2013-02-21 <jthaler>
+   Initial creation based on previous plugin hosted at http://www.jthaler.net/jets/

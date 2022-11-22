@@ -1,0 +1,55 @@
+--------------------------------------------------------------------------------
+FlavorCone Package
+--------------------------------------------------------------------------------
+
+The FlavorCone package is based on the algorithm described in the
+"FlavorCone Jets to Disentangle Heavy-Flavor Production" section of:
+
+   Disentangling Heavy Flavor at Colliders
+   Philip Ilten, Nicholas L. Rodd, Jesse Thaler, Mike Williams.
+   arXiv:1702.02947 [hep-ph].
+
+FlavorCone builds jets around heavy flavor seeds, resolving the issue
+of overlapping heavy-flavor jets found in traditional approaches.
+
+--------------------------------------------------------------------------------
+Classes
+--------------------------------------------------------------------------------
+
+The following two classes are provided in this package:
+
+FlavorConePlugin         [FlavorCone.hh]:
+   A FastJet plugin for using the FlavorCone jet algorithm.
+
+FlavorConePlugin::Extras [FlavorCone.hh]:
+   Stores extra information for the jets created with the
+   FlavorConePlugin. Particularly, provides access to the input seed
+   associated with a given jet.
+
+--------------------------------------------------------------------------------
+Usage
+--------------------------------------------------------------------------------
+
+The primary class is FlavorConePlugin, while Extras provides access
+to the seed for each jet. The basic functionality is given by:
+
+   // seeds are the input seeds, and rcut is the jet radius cut
+   contrib::FlavorConePlugin jdf(seeds, rcut);
+
+   // create a cluster sequence in the usual way,
+   // using the input particles from event.
+   ClusterSequence jcs(event, &jdf);
+
+   // extract jets in the usual way, but do not apply a pt cut
+   // if you want the number of jets to equal the number of seeds
+   vector<PseudoJet> jets = jcs.inclusive_jets(0);
+
+   // The following accesses the seed for a given jet from the
+   // ClusterSequence extras.
+   PseudoJet jet  = jets[0];
+   const FlavorConePlugin::Extras* extras
+      = dynamic_cast<const FlavorConePlugin::Extras*>(jcs.extras());
+   PseudoJet seed = extras->seed(jet);
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------

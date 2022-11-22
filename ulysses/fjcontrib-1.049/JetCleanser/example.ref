@@ -1,0 +1,90 @@
+# 20 pileup events on top of the hard event
+#--------------------------------------------------------------------------
+#                         FastJet release 3.0.3
+#                 M. Cacciari, G.P. Salam and G. Soyez                  
+#     A software package for jet finding and analysis at colliders      
+#                           http://fastjet.fr                           
+#                                                                       
+# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
+#								      	   
+# FastJet is provided without warranty under the terms of the GNU GPLv2.
+# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
+# and 3rd party plugin jet algorithms. See COPYING file for details.
+#--------------------------------------------------------------------------
+ATLAS-like cleansing:
+
+JetCleanser [JVF mode, input = neutral and charged together]
+ Trimming: fcut = 0.01
+
+JetCleanser [Linear mode, input = neutral and charged together]
+ Trimming: fcut = 0
+ g0_mean = 0.65
+
+JetCleanser [Gaussian mode, input = neutral and charged together]
+ Trimming: fcut = 0
+ g0_mean = 0.67, g0_width = 0.2, g1_mean = 0.62, g1_width = 0.25
+
+                  no pileup: pt = 220.906 eta = -1.06907 phi = 0.0717256   m = 22.7227
+                with pileup: pt = 247.759 eta = -1.08698 phi = 0.0806401   m = 87.203
+ with pileup + jvf cleansed: pt = 217.734 eta = -1.07237 phi = 0.0688758   m = 15.2394
+ with pileup + lin cleansed: pt = 221.792 eta = -1.07142 phi = 0.0721328   m = 35.0329
+ with pileup + gau cleansed: pt = 220.658 eta = -1.07264 phi = 0.0687144   m = 31.6946
+
+                  no pileup: pt = 146.072 eta = 0.67842 phi = 3.45297   m = 24.9521
+                with pileup: pt = 187.895 eta = 0.730275 phi = 3.43113   m = 93.0914
+ with pileup + jvf cleansed: pt = 144.257 eta = 0.677429 phi = 3.45474   m = 27.1299
+ with pileup + lin cleansed: pt = 148.369 eta = 0.702338 phi = 3.46144   m = 38.0922
+ with pileup + gau cleansed: pt = 148.66 eta = 0.700801 phi = 3.46025   m = 39.7723
+
+                  no pileup: pt = 91.4158 eta = 2.12005 phi = 2.86325   m = 26.4442
+                with pileup: pt = 126.371 eta = 2.20036 phi = 2.82385   m = 66.2302
+ with pileup + jvf cleansed: pt = 85.4452 eta = 2.13727 phi = 2.84508   m = 27.0736
+ with pileup + lin cleansed: pt = 88.5949 eta = 2.15194 phi = 2.86396   m = 29.4166
+ with pileup + gau cleansed: pt = 87.7365 eta = 2.15711 phi = 2.8524   m = 30.0241
+
+Dijet Masses: 
+ plain = 648.398
+ truth = 506.133
+ jvf   = 499.67
+ lin   = 519.053
+ gau   = 518.186
+
+CMS-like cleansing:
+
+JetCleanser [JVF mode, input = neutral and charged separate]
+ Trimming: fcut = 0.01
+
+JetCleanser [Linear mode, input = neutral and charged separate]
+ Trimming: fcut = 0
+ g0_mean = 0.65
+
+JetCleanser [Gaussian mode, input = neutral and charged separate]
+ Trimming: fcut = 0
+ g0_mean = 0.67, g0_width = 0.2, g1_mean = 0.62, g1_width = 0.25
+
+                  no pileup: pt = 220.906 eta = -1.06907 phi = 0.0717256   m = 22.7227
+                with pileup: pt = 247.759 eta = -1.08698 phi = 0.0806401   m = 87.203
+ with pileup + jvf cleansed: pt = 217.734 eta = -1.07241 phi = 0.0688002   m = 14.1166
+ with pileup + lin cleansed: pt = 221.792 eta = -1.07107 phi = 0.0721269   m = 33.7469
+ with pileup + gau cleansed: pt = 220.65 eta = -1.07197 phi = 0.0687981   m = 30.0674
+
+                  no pileup: pt = 146.072 eta = 0.67842 phi = 3.45297   m = 24.9521
+                with pileup: pt = 187.895 eta = 0.730275 phi = 3.43113   m = 93.0914
+ with pileup + jvf cleansed: pt = 144.308 eta = 0.673998 phi = 3.4519   m = 23.2852
+ with pileup + lin cleansed: pt = 148.406 eta = 0.696304 phi = 3.45868   m = 34.4735
+ with pileup + gau cleansed: pt = 148.68 eta = 0.694878 phi = 3.45782   m = 36.6283
+
+                  no pileup: pt = 91.4158 eta = 2.12005 phi = 2.86325   m = 26.4442
+                with pileup: pt = 126.371 eta = 2.20036 phi = 2.82385   m = 66.2302
+ with pileup + jvf cleansed: pt = 85.4201 eta = 2.12132 phi = 2.85548   m = 22.7869
+ with pileup + lin cleansed: pt = 88.6254 eta = 2.14135 phi = 2.86573   m = 25.8387
+ with pileup + gau cleansed: pt = 87.7388 eta = 2.14129 phi = 2.86286   m = 25.8998
+
+Dijet Masses: 
+ plain = 648.398
+ truth = 506.133
+ jvf   = 498.58
+ lin   = 517.141
+ gau   = 516.243
+

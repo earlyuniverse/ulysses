@@ -1,0 +1,26 @@
+# common fastjet definitions
+include ../../makefile.static
+
+CXXSRC = CMSIterativeConePlugin.cc 
+OBJS = $(patsubst %.cc,%.o,$(CXXSRC)) 
+
+# fastjet includes
+FASTJET_INCLUDE = -I../../include
+INCLUDE += $(FASTJET_INCLUDE) -I.
+
+all: libCMSIterativeConePlugin.a
+
+libCMSIterativeConePlugin.a: $(OBJS)
+	ar cru libCMSIterativeConePlugin.a $(OBJS)
+	ranlib libCMSIterativeConePlugin.a
+
+clean:
+	rm -f $(OBJS)
+
+distclean: clean
+	rm -f libCMSIterativeConePlugin.a *~
+
+# NB: only use "relative" includes here (others are too subject
+#     to change according to the system one is on...)
+depend:
+	makedepend  -f makefile.static $(FASTJET_INCLUDE) -I. -I./fastjet --   -- $(CXXSRC)

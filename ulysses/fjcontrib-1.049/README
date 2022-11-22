@@ -1,0 +1,74 @@
+This is the README file for the fastjet-contrib project
+
+     https://fastjet.hepforge.org/contrib/
+
+which provides a library of 3rd-party add-ons to FastJet (http://fastjet.fr/) 
+
+======================================================================
+Instructions for generic users
+------------------------------
+
+You should have downloaded a tarball for the contrib. Unpack it, enter
+the resulting directory and run
+
+  ./configure [--fastjet-config=FILE] [CXXFLAGS="..."] [--prefix=...] [...]
+  make
+  make check   # optional
+  make install
+
+Once you have installed, a contrib named XYZ will typically be
+accessible through a line
+
+#include "fastjet/contrib/XYZ.hh"
+
+with the corresponding library available through -lXYZ .
+
+If you compiled FastJet with a C++11 compiler, then fjcontrib should
+also be compiled with a C++11 compiler (if your compiler needs options
+to get that behaviour, e.g. -std=c++11, then give those same options
+in the CXXFLAGS passed to configure).
+
+Queries about the fastjet-contrib project as a whole should be sent to
+<fastjet@projects.hepforge.org> 
+
+Queries about individual contribs should be sent to the people
+mentioned in the contrib/AUTHORS file
+
+
+======================================================================
+For users who want the latest version (and for developers)
+----------------------------------------------------------
+
+To get started, you will need an account on hepforge. If you don't
+have one yet, go to
+
+   https://www.hepforge.org/register
+
+to create it. You will also need to set up your ssh key on hepforge
+(go to https://phab.hepforge.org/settings/user/USERNAME/page/ssh/
+where USERNAME is replaced by your username).
+
+Now you can get an svn checkout of the top-level directory
+  
+    svn co https://svn.hepforge.org/fastjetsvn/contrib/trunk fjcontrib
+
+which contains the scripts and a current list of contribs and their
+versions. Within the fjcontrib directory, get the contribs themselves
+by running
+
+   ./scripts/update-contribs.sh
+
+usually, the contribs are tagged (released) versions and there is
+one svn checkout for each contrib. Then proceed with configure, make, etc.
+
+To get updates at a later stage:
+
+   ./scripts/update-contribs.sh                       # all contribs
+   ./scripts/update-contribs.sh  ContribName          # just a specific contrib
+   ./scripts/update-contribs.sh  ContribName version  # specific version of a contrib
+
+The command always updates the top level directory. If "version" is
+"trunk", then you get the development area for the Contrib -- do this
+only if you're a developer of that contrib.
+
+For further information on development, see the file DEVEL-GUIDELINES.

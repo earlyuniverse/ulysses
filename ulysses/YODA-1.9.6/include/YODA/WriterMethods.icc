@@ -1,0 +1,89 @@
+// This file contains boilerplate code for static writer functions in all
+// classes inheriting from Writer. These methods just forward to the methods on
+// the Writer base class, but code duplication can't be avoided without a
+// preprocessor hack like this, AFAIK.
+
+/// @name Writing a single analysis object.
+/// @{
+
+/// Write out object @a ao to output stream @a stream.
+static void write(std::ostream& stream, const AnalysisObject& ao) {
+  create().write(stream, ao);
+}
+
+/// Write out pointer-like object @a ao to output stream @a stream.
+template <typename T>
+static typename std::enable_if<DerefableToAO<T>::value>::type //< -> void if valid
+write(std::ostream& stream, const T& ao, int precision=-1) { write(stream, *ao, precision); }
+
+/// Write out object @a ao to file @a filename.
+static void write(const std::string& filename, const AnalysisObject& ao, int precision=-1) {
+  const size_t lastdot = filename.find_last_of(".");
+  std::string fmt = Utils::toLower(lastdot == std::string::npos ? filename : filename.substr(lastdot+1));
+  const bool compress = (fmt == "gz");
+  Writer& w = create();
+  if (precision > 0) w.setPrecision(precision);
+  w.useCompression(compress);
+  w.write(filename, ao);
+}
+
+/// Write out pointer-like object @a ao to file @a filename.
+template <typename T>
+static typename std::enable_if<DerefableToAO<T>::value>::type //< -> void if valid
+write(const std::string& filename, const T& ao, int precision=-1) { write(filename, *ao, precision); }
+
+/// @}
+
+
+/// @name Writing multiple analysis objects by collection.
+/// @{
+
+template <typename RANGE>
+static typename std::enable_if<CIterable<RANGE>::value>::type
+write(std::ostream& stream, const RANGE& aos, int precision=-1) {
+  create().write(stream, std::begin(aos), std::end(aos), precision);
+}
+
+template <typename RANGE>
+static typename std::enable_if<CIterable<RANGE>::value>::type
+write(const std::string& filename, const RANGE& aos, int precision=-1) {
+  const size_t lastdot = filename.find_last_of(".");
+  std::string fmt = Utils::toLower(lastdot == std::string::npos ? filename : filename.substr(lastdot+1));
+  const bool compress = (fmt == "gz");
+  Writer& w = create();
+  if (precision > 0) w.setPrecision(precision);
+  w.useCompression(compress);
+  w.write(filename, std::begin(aos), std::end(aos));
+}
+
+/// @}
+
+
+/// @name Writing multiple analysis objects by iterator range.
+/// @{
+
+/// Write out the objects specified by start iterator @a begin and end
+/// iterator @a end to output stream @a stream.
+///
+/// @todo Add SFINAE trait checking for AOITER = DerefableToAO
+template <typename AOITER>
+static void write(std::ostream& stream, const AOITER& begin, const AOITER& end, int precision=-1) {
+  create().write(stream, begin, end, precision);
+}
+
+/// Write out the objects specified by start iterator @a begin and end
+/// iterator @a end to file @a filename.
+///
+/// @todo Add SFINAE trait checking for AOITER = DerefableToAO
+template <typename AOITER>
+static void write(const std::string& filename, const AOITER& begin, const AOITER& end, int precision=-1) {
+  const size_t lastdot = filename.find_last_of(".");
+  std::string fmt = Utils::toLower(lastdot == std::string::npos ? filename : filename.substr(lastdot+1));
+  const bool compress = (fmt == "gz");
+  Writer& w = create();
+  if (precision > 0) w.setPrecision(precision);
+  w.useCompression(compress);
+  w.write(filename, begin, end);
+}
+
+/// @}

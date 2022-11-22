@@ -1,0 +1,44 @@
+PYTHON setup.py build_ext --inplace
+PYTHON -c "import directive2; import directive3"
+PYTHON -c "import infile2; import infile3"
+
+######## setup.py ########
+
+from Cython.Build.Dependencies import cythonize
+from distutils.core import setup
+
+ext_modules = []
+
+# Test language_level specified in the cythonize() call
+ext_modules += cythonize("directive2.py", compiler_directives={'language_level': 2})
+ext_modules += cythonize("directive3.py", compiler_directives={'language_level': 3})
+
+# Test language_level specified in the source file. We give a
+# conflicting directive to cythonize() to check that the language_level
+# is correctly overridden when compiling
+ext_modules += cythonize("infile2.py", compiler_directives={'language_level': 3})
+ext_modules += cythonize("infile3.py", compiler_directives={'language_level': 2})
+
+setup(ext_modules=ext_modules)
+
+######## directive3.py ########
+
+import sys
+print("SUCCESS", file=sys.stdout)
+
+######## directive2.py ########
+
+print "SUCCESS"
+
+######## infile3.py ########
+
+# cython: language_level=3
+
+import sys
+print("SUCCESS", file=sys.stdout)
+
+######## infile2.py ########
+
+# cython: language_level=2
+
+print "SUCCESS"

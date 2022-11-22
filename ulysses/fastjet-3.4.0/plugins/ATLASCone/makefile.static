@@ -1,0 +1,28 @@
+# common fastjet definitions
+include ../../makefile.static
+
+CXXSRC = LorentzVector.cc CommonUtils.cc Jet.cc\
+	 JetConeFinderTool.cc JetSplitMergeTool.cc\
+         ATLASConePlugin.cc 
+OBJS = $(patsubst %.cc,%.o,$(CXXSRC)) 
+
+# fastjet includes
+FASTJET_INCLUDE = -I../../include
+INCLUDE += $(FASTJET_INCLUDE)
+
+all: libATLASConePlugin.a
+
+libATLASConePlugin.a: $(OBJS)
+	ar cru libATLASConePlugin.a $(OBJS)
+	ranlib libATLASConePlugin.a
+
+clean:
+	rm -f $(OBJS)
+
+distclean: clean
+	rm -f libATLASConePlugin.a *~
+
+# NB: only use "relative" includes here (others are too subject
+#     to change according to the system one is on...)
+depend:
+	makedepend  -f makefile.static $(FASTJET_INCLUDE) -I. -I./fastjet --   -- $(CXXSRC)

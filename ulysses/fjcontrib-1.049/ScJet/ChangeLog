@@ -1,0 +1,14 @@
+2013-05-06 <j.tseng1@physics.ox.ac.uk>
+	* added options to use mt (default) or pt instead of et
+	* (suggested by G Salam)
+	* updated example.ref for mt-based ScJet
+	* release candidate 1.1.0
+
+2013-04-28 <j.tseng1@physics.ox.ac.uk>
+	* reorder NEWS items
+	* remove sqrt and divisions from ScBriefJet
+	* (above suggested by G Salam)
+	* release candidate 1.0.1
+
+2013-04-26 <j.tseng1@physics.ox.ac.uk>
+	* Initial creation

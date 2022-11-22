@@ -1,0 +1,17 @@
+2017-09-06 Philip Ilten <philten@cern.ch>
+    Created warning when invalid seed returned in Extras
+    Added check for invalid seed of jet in Extras
+2017-09-04 Philip Ilten <philten@cern.ch>
+    Removed mutable keyword for seeds in Extras
+2017-08-29 Philip Ilten <philten@cern.ch>
+    Trivial code formatting
+2017-08-28 Jesse Thaler <jthaler@jthaler.net>
+    Adding in more comments and documentation
+    Changing choice of seeds in example to ensure larger number of constituents
+    Edited description() to give number of seeds
+    Made explicit how to use extras with dynamic_cast
+    Tweaked doxygen documentation, making it version 1.0.0
+2017-08-25 Philip Ilten <philten@cern.ch>
+    Updates to documentation and minor cleanup
+2017-07-25 Philip Ilten <philten@cern.ch>
+    Initial creation

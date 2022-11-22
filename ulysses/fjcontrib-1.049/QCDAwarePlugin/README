@@ -1,0 +1,44 @@
+QCD-aware truth jet clustering
+==============================
+
+The QCDAware clustering scheme is based on standard jet clustering algorithms,
+which are modified to only permit clusterings compatible with QCD (and, as an
+extension, QED), tracked via a flavour-label user index.
+
+The intended clustering inputs are the final partons which either undergo
+hadronization or, in the case of photons and leptons, are themselves stable.
+
+At each clustering step, the pseudojet pair undergoing combination is checked
+for compatibility with Standard Model QCD and QED interaction vertices; if the
+pair are indeed compatible, the pseudojets are combined, and the resulting
+pseudojet is given the appropriate flavor. All the allowed clusterings have
+unique flavour transformations, making the algorithm deterministic. The 4-gluon
+vertex is not considered due to the clustering limitation to 2->1 combinations.
+
+For instance, two pseudojets labeled respectively as an up-quark and gluon are
+allowed to cluster into an up-quark pseudojet; an up-quark and anti-up-quark may
+similarly cluster into a gluon pseudojet; however, there is no QCD vertex
+corresponding to the combination of up- and strange-quark pseudojets, so such a
+clustering is rejected by the algorithm. The distance measure used for the
+recombination is independent of the labeling.
+
+The result of the QCDAware clustering is, just as in traditional jet
+recombination algorithms, a collection of final pseudojets. However, each
+QCDAware pseudojet also carries with it a flavor label that depends on its
+constituents and clustering history.
+
+This algorithm is equivalent to the "bland" algorithm discussed in
+hep-ph/0601139 without the flavour-kt modifications to the distance
+measure and extended to allow for clustering photon radiation from
+leptons and quarks.
+
+
+Technical usage details
+-----------------------
+
+Currently the user_index of a pseudojet is used for the flavor label, in the PDG
+MC numbering scheme. The inputs to the algorithm should have user_indices set
+to the PDG ID code of the corresponding parton. The flavor label of the
+resulting pseudojets is also stored in their user_index variables. The
+QCDAwarePlugin and DistanceMeasure, which need to be instantiated by
+the user, belong to the QCDAwarePlugin namespace.

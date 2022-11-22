@@ -1,0 +1,81 @@
+#!/bin/bash
+#Adopted from
+#https://yoda.hepforge.org/trac/browser/bin/yoda-config.in
+#Docs from https://cmake.org/cmake/help/v3.2/command/configure_file.html
+## 
+#The line below assures at least some relocation.
+if [ "$(uname)" == "Darwin" ]; then
+PACKAGE_PREFIX_DIR=$(dirname $(dirname $(greadlink -f $0)))
+else
+PACKAGE_PREFIX_DIR=$(dirname $(dirname $(readlink -f $0)))
+fi
+tmp=$(echo $* | egrep -- '--\<help\>|-\<h\>')
+if test $# -eq 0 || test -n "$tmp"; then
+    echo "HepMC3-config: configuration tool for the HepMC3 library"
+    echo
+    echo "Usage: $( basename $0 ) [--help|-h] | "
+    echo "           [--{prefix,libdir,includedir,interfacesdir}] | "
+    echo "           [--{cxxflags,ldflags,libs}] | "
+    echo "           [--version]"
+    echo "Options:"
+    echo "  --help | -h   : show this help message"
+    echo
+    echo "  --prefix        : show the installation prefix"
+    echo "  --includedir    : show the path to the directory containing the HepMC3 headers"
+    echo "  --libdir        : show the path to the directory containing the HepMC3 libraries"
+    echo "  --interfacesdir : show the path to the directory containing the interfaces to HepMC3"
+    echo
+    echo "  --cflags|--cppflags : returns a '-I' string for insertion into CPPFLAGS or CXXFLAGS"
+    echo "  --ldflags|--libs    : returns a '-L/-l' string for insertion into LIBS or LIBADD"
+    echo "  --rootIO            : returns a '-L/-l' string for insertion into LIBS or LIBADD with rootIO support"
+    echo "  --search            : returns a '-L/-l' string for insertion into LIBS or LIBADD with search support"
+    echo "  --static            : returns a string for insertion into LIBS or LIBADD"
+    echo
+    echo "  --version           : returns the HepMC3 release version number"
+    exit 0
+fi
+
+OUT=""
+
+tmp=$( echo "$*" | egrep -- '--\<prefix\>')
+test -n "$tmp" && OUT="$OUT ${PACKAGE_PREFIX_DIR}"
+
+tmp=$( echo "$*" | egrep -- '--\<includedir\>')
+test -n "$tmp" && OUT="$OUT ${PACKAGE_PREFIX_DIR}/include"
+
+tmp=$( echo "$*" | egrep -- '--\<libdir\>')
+test -n "$tmp" && OUT="$OUT ${PACKAGE_PREFIX_DIR}/lib"
+
+tmp=$( echo "$*" | egrep -- '--\<interfacesdir\>')
+test -n "$tmp" && OUT="$OUT ${PACKAGE_PREFIX_DIR}/share/HepMC3/interfaces"
+
+tmp=$( echo "$*" | egrep -- '--\<cflags|cppflags|cxxflags\>')
+test -n "$tmp" && OUT="$OUT -I${PACKAGE_PREFIX_DIR}/include"
+
+
+tmp=$( echo "$*" | egrep -- '--\<static\>')
+if test -n "$tmp"; then
+
+tmp=$( echo "$*" | egrep -- '--\<ldflags|libs\>')
+OUT="$OUT ${PACKAGE_PREFIX_DIR}/lib/libHepMC3_static.a"
+
+tmp=$( echo "$*" | egrep -- '--\<search\>')
+test -n "$tmp" && OUT="$OUT ${PACKAGE_PREFIX_DIR}/lib/libHepMC3search_static.a"
+
+else
+
+tmp=$( echo "$*" | egrep -- '--\<ldflags|libs\>')
+test -n "$tmp" && OUT="$OUT -L${PACKAGE_PREFIX_DIR}/lib -lHepMC3"
+
+tmp=$( echo "$*" | egrep -- '--\<search\>')
+test -n "$tmp" && OUT="$OUT -L${PACKAGE_PREFIX_DIR}/lib -lHepMC3search"
+
+fi
+
+tmp=$( echo "$*" | egrep -- '--\<rootIO\>')
+test -n "$tmp" && OUT="$OUT -L${PACKAGE_PREFIX_DIR}/lib "
+
+tmp=$( echo "$*" | egrep -- '--\<version\>')
+test -n "$tmp" && echo 3.02.04 && exit 0
+
+echo $OUT

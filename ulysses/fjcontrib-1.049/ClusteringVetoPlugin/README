@@ -1,0 +1,13 @@
+The ClusteringVetoPlugin package is based on the physics described in:
+
+   Vetoed jet clustering: The mass-jump algorithm
+   Martin Stoll
+   arXiv:1410.4637
+
+It implements a terminating clustering veto in the sense that if a recombination
+step is vetoed, both jets do not further participate in jet clustering
+("terminating veto").
+The default veto function is the mass-jump veto as described in the paper. Any
+other veto function that takes two jets as arguments can be defined by the user.
+
+Usage is illustrated in example.cc.

@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+datarootdir=@datarootdir@
+
+Name: yoda
+Description: YODA data analysis library
+URL: https://yoda.hepforge.org
+Version: @VERSION@
+Libs: -L@libdir@ -lYODA
+Cflags: -I@includedir@

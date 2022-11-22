@@ -1,0 +1,80 @@
+# makefile to speed up "making" of plugins
+
+
+# the plugins enabled by default
+default: cdfcones-lib siscone-lib jade-lib eecambridge-lib nesteddefs-lib
+
+
+# all cxx plugins (pxcone left out as it needs fortran ibs)
+allcxx: gridjet default atlas-lib cms-lib doruni-lib dorunii-lib trackjet-lib
+
+# all plugins
+all: allcxx pxcone-lib
+
+
+atlas-lib:
+	cd ATLASCone && $(MAKE) -f makefile.static
+
+cdfcones-lib:
+	cd CDFCones && $(MAKE) -f makefile.static
+
+cms-lib:
+	cd CMSIterativeCone && $(MAKE) -f makefile.static
+
+doruni-lib:
+	cd D0RunICone && $(MAKE) -f makefile.static
+
+dorunii-lib:
+	cd D0RunIICone && $(MAKE) -f makefile.static
+
+eecambridge-lib:
+	cd EECambridge && $(MAKE) -f makefile.static
+
+jade-lib:
+	cd Jade && $(MAKE) -f makefile.static
+
+nesteddefs-lib:
+	cd NestedDefs && $(MAKE) -f makefile.static
+
+pxcone-lib:
+	cd PxCone && $(MAKE) -f makefile.static 
+
+siscone-lib:
+	cd SISCone && $(MAKE) -f makefile.static
+
+trackjet-lib:
+	cd TrackJet && $(MAKE) -f makefile.static
+
+gridjet-lib:
+	cd GridJet clean:clean: $(MAKE) -f makefile.static
+
+clean:
+	cd GridJet clean:clean: $(MAKE) -f makefile.static $(MAKECMDGOALS)
+
+	cd ATLASCone        && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd CDFCones         && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd CMSIterativeCone && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd D0RunICone       && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd D0RunIICone      && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd EECambridge      && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd Jade             && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd NestedDefs       && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd PxCone           && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd SISCone          && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd TrackJet         && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+
+distclean:
+	cd GridJet distclean:distclean: $(MAKE) -f makefile.static $(MAKECMDGOALS)
+
+	cd ATLASCone        && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd CDFCones         && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd CMSIterativeCone && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd D0RunICone       && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd D0RunIICone      && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd EECambridge      && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd Jade             && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd NestedDefs       && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd PxCone           && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd SISCone          && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	cd TrackJet         && $(MAKE) -f makefile.static $(MAKECMDGOALS)
+	rm -f *~

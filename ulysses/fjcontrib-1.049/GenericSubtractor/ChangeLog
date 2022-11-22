@@ -1,0 +1,282 @@
+2016-03-30  Gregory Soyez  <soyez@fastjet.fr>
+
+	* VERSION:
+	release of version 1.3.1
+
+2016-03-29  Gregory Soyez  <soyez@fastjet.fr>
+
+	* NEWS:
+	updated in preparation of v1.3.1 release
+
+	* GenericSubtractor.cc:
+	replaced an auto_ptr by a SharedPtr (following the deprecation of
+	auto_ptr in C++11)
+
+	* VERSION:
+	upped version number to 1.3.1-devel
+
+2015-09-21  Gregory Soyez  <soyez@fastjet.fr> + Gavin + Matteo
+
+	* NEWS:
+	* VERSION:
+	set version number to 1.3.0
+
+	* GenericSubtractor.{hh,cc}:
+	added a warning when rhom is non-zero and unused (FJ>=3.1)
+
+	* NEWS:
+	prepared for the release of GenericSubtractor v1.3.0
+
+	* GenericSubtractor.hh:
+	* GenericSubtractor.cc:
+	clarified comments and renamed a few things:
+	- added set_common_bge_for_rho_and_rhom() and deprecated
+	  use_common_bge_for_rho_and_rhom()
+	- added set_use_bge_rhom_rhom() to tweak how rho_m is obtained
+	  when GenericSubtractor has been constructed with two estimators
+	- added common_bge_for_rho_and_rhom() and use_bge_rhom_rhom()
+	  to retrieve the behaviour
+
+2015-09-10  Gregory Soyez  <soyez@fastjet.fr>
+
+	* GenericSubtractor.cc:
+	added GenericSubtractor::use_rhom_from_bge_rhom(bool value)
+	to allow the use of bge_rhom->rho_m() instead of bge_rhom->rho()
+	(FJ>=3.1 only)
+
+2015-09-03  Gregory Soyez  <soyez@fastjet.fr>
+
+	* GenericSubtractor.cc:
+	added support for the internal calculation of rhom for versions of
+	FJ >=3.1 and BackgroundEstimators which support an internal
+	calculation of rho_m.
+
+	* GenericSubtractor.hh (contrib):
+	updated the (doxygen) desciption of the class
+
+	* README:
+	added a description of teh GenericSubtraction usage (basic and advanced)
+
+2013-05-28  Gavin Salam  <gavin.salam@cern.ch>
+
+	* NEWS:
+	* VERSION:
+	release of version 1.2.0
+
+2013-05-16  Matteo Cacciari <cacciari@lpthe.jussieu.fr>
+
+        * VERSION
+	Bumped to 1.2-devel
+
+	* GenericSubtractor.hh|cc
+	Added constructor with rho and rhom values. Thanks to Peter Berta
+	for the suggestion.
+
+	Added methods to retrieve from GenericSubtractorInfo
+	the values of the rho and rhom used in the subtraction
+
+	* example.cc|ref
+	Fixed bug in the example (it was being passed a subtracted jet,
+	should have gotten an unsubtracted one), updated the reference
+	output
+
+2013-04-12  Gregory Soyez  <soyez@fastjet.fr>
+
+	* VERSION:
+	Release of version 1.1.0
+
+	* GenericSubtractor.cc (contrib):
+	corrected typo in comment
+
+2013-04-11  Gregory Soyez  <soyez@fastjet.fr>
+
+	* GenericSubtractor.cc (contrib):
+
+	Fixed the maximal rescaling for the ghosts so that the total pt
+	added to the jet is at most the jet pt (as the comment in the code
+	says). 
+
+	The previous version added a maxmimal amount equal to the jet pt
+	multiplied by the number of in-jet ghosts squared. This resulted
+	in poor derivative estimates and consequently poor subtraction.
+
+	[Thanks to David Miller and Peter Berta for reporting the issue]
+
+2013-02-07  Matteo Cacciari <cacciari@lpthe.jussieu.fr>
+
+        * VERSION
+	Release of version 1.0.0
+
+2013-02-06  Gavin SALAM  <salam@tycho.lpthe.jussieu.fr> + Matteo
+
+	* Makefile: 
+	fixed this to work with latest set of changes to build system
+
+2013-02-01  Gavin Salam  <gavin.salam@cern.ch>
+
+	* VERSION: 
+	* NEWS: 
+	upped version to 0.99.1
+
+	* Makefile:
+	now uses ../.Makefile.inc (if it exists) to get default variables
+
+2013-01-31  Gregory Soyez  <soyez@fastjet.fr>
+
+	* README:
+	added some text!
+
+	* Makefile:
+	pointed to the correct installation script location
+
+	* AUTHORS:
+	specified the correct email address
+
+	* COPYING:
+	specified the correct arXiv number for scientific reference
+
+2013-01-31  Gavin SALAM  <gavin.salam@cern.ch> + Matteo + Gregory
+
+	* moved reference outputs (for make check) from a ".out" to a
+	".ref" extension.
+
+2013-01-30  Gavin SALAM  <gavin.salam@cern.ch>
+
+	* NEWS: *** ADDED ***
+	prepared for 0.99 release
+
+	* Makefile:
+	update check to work with new check script location
+
+2013-01-28  Gregory Soyez  <soyez@fastjet.fr>
+	* SimpleGhostRescaler.hh:
+	* GenericSubtractor.hh:
+	* ShapeWithComponents.hh:
+	* ShapeWithPartition.hh
+	* ExampleShapes.{hh,cc}:
+	* example_with_components.cc:
+	* example.cc:
+	  included FastJet headers using "fastjet/..." rather than <fastjet/...>
+
+2013-01-28  Gregory Soyez  <soyez@fastjet.fr>
+
+	* example_with_components.cc:
+	  made use of the fact that NSubjettinessNumerator is a
+	  ShapeWithPartition in NSubjettinessRatio
+
+	* ExampleShapes.{cc,hh}:
+	  moved NSubjettinessNumerator to a ShapeWithPartition
+
+	* GenericSubtractor.cc:
+	  added support for ShapeWithPartition
+
+	* ShapeWithPartition.hh:
+	  removed unnecessary headers
+
+	* ExampleShapes.{hh,cc}:
+	  removed unnecessary headers; fixed a few warnings
+
+	* Makefile:
+	  fixed typos + updated dependencies
+
+	* ShapeWithPartition.hh:             *** ADDED ***
+	* Shapes.{hh|cc} --> ExampleShapes.{hh|cc}:
+	* example_with_components.cc:
+	* example.cc:
+	  Extracted the ShapeWithPartition class in a file of its own (and
+	  reworked it a little bit)
+	  Renamed Shapes (with the definitions of a series of shapes) into
+	  ExampleShapes. This now also contains the NSubjettinessNumerator
+	  used in one of the examples (that has been updated accordingly)
+
+
+2013-01-28  Gavin Salam  <gavin.salam@cern.ch> + Gregory
+
+	* ShapeWithComponents.hh (contrib):
+	ShapeWithComponents::component_shape has been made virtual and now
+	returns a pointer to a generic FunctionOfPseudoJet<double> *
+	(rather than a ComponentShape).
+	
+
+2012-12-17  Gregory Soyez  <soyez@fastjet.fr>
+
+	* Makefile (distclean):
+	added the missing .a extension to the name of te library to be
+	removed
+
+	* COPYING:
+	set the correct GPLv2 file (instead of a copy of what is in
+	FastJet and contains info avout the plugins)
+
+2012-12-12  Gregory Soyez  <soyez@fastjet.fr>
+
+	* Makefile (install):
+	  added a missing semicolon in the loop over headers to be installed
+
+2012-12-10  Gregory Soyez  <soyez@fastjet.fr>
+
+	* example.cc:
+	* example_with_components.cc:
+	  limited te precision to 4 decimal figures
+	  + reorganised a few details to make things clearer
+
+	* example_with_components.out:
+	* example.out:
+	  updated to reflect the changes above
+
+2012-12-08  Gregory Soyez  <soyez@fastjet.fr>
+
+	* example.cc:
+	the step size is now output as a comment
+
+2012-12-05  Gregory Soyez  <soyez@fastjet.fr>
+
+	* example_with_components.out:        *** ADDED ***
+	* example.out:                        *** ADDED ***
+	added expecteed outputs for "make check"
+
+	* Makefile:
+	  . added the check and distclean targets
+	  . cleaned a few details here and there (prefix, installed headers)
+
+	* example_with_components.cc:
+	used just the rho BGE (instead of twice the same BGE for rho and
+	rhom)
+
+2012-11-30  Gavin Salam  <gsalam@macth69.cern.ch> + Matteo Cacciari
+
+	* Makefile: 
+	separated out example and example_with_components targets
+
+	* Doxyfile:  *** ADDED ***
+
+	* GenericSubtractor.hh|cc: 
+        reworked the info class to have 1st, 2nd and 3rd order results,
+        and corresponding derivatives, with a uniform naming scheme +
+	worked on comments.
+
+	* SimpleGhostRescaler.hh:
+	worked on comments
+
+	* ShapeWithComponents.hh: 
+	worked on comments
+
+2012-11-30  Gregory Soyez  <soyez@fastjet.fr>
+
+	* GenericSubtractor.cc:
+	used jet_pt/n_ghost_in_jet as the maximal ghost scale used to
+	compute the derivative
+
+	* example.cc:
+	moved back to the use of just rho, neglecting rhom + added a
+	commented line about using a common one for rho and rhom
+
+	* example.cc:
+	now uses two different background estimators for rho and rhom.
+
+	* GenericSubtractor.{hh,cc}:
+	uses a BackgrounmdEstimatorBase rather than a
+	JetMedianBackgroundEstimator + allowed to compute both rho and
+	rhom from the same BackgroundEstimator (if only one is
+	specified)
+

@@ -1,0 +1,37 @@
+# common fastjet definitions
+include ../../makefile.static
+
+CXXSRC = EECambridgePlugin.cc 
+OBJS = $(patsubst %.cc,%.o,$(CXXSRC)) 
+
+# fastjet includes
+FASTJET_INCLUDE = -I../../include
+INCLUDE += $(FASTJET_INCLUDE)
+
+all: libEECambridgePlugin.a
+
+libEECambridgePlugin.a: $(OBJS)
+	ar cru libEECambridgePlugin.a $(OBJS)
+	ranlib libEECambridgePlugin.a
+
+clean:
+	rm -f $(OBJS)
+
+distclean: clean
+	rm -f libEECambridgePlugin.a *~
+
+# NB: only use "relative" includes here (others are too subject
+#     to change according to the system one is on...)
+depend:
+#	makedepend  -f Makefile $(FASTJET_INCLUDE) -I. -I./fastjet --   -- $(CXXSRC)
+	makedepend  -f makefile.static $(FASTJET_INCLUDE) -I. -I./fastjet --   -- $(CXXSRC)
+# DO NOT DELETE
+
+EECambridgePlugin.o: ../../include/fastjet/ClusterSequence.hh
+EECambridgePlugin.o: ../../include/fastjet/internal/DynamicNearestNeighbours.hh
+EECambridgePlugin.o: ../../include/fastjet/internal/numconsts.hh
+EECambridgePlugin.o: ../../include/fastjet/internal/base.hh
+EECambridgePlugin.o: ../../include/fastjet/PseudoJet.hh
+EECambridgePlugin.o: ../../include/fastjet/Error.hh
+EECambridgePlugin.o: ../../include/fastjet/JetDefinition.hh
+EECambridgePlugin.o: fastjet/EECambridgePlugin.hh

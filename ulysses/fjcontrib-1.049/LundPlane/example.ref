@@ -1,0 +1,24 @@
+# read an event with 354 particles
+# writing declusterings of primary and secondary plane to file jets.json
+#--------------------------------------------------------------------------
+#                         FastJet release 3.3.0
+#                 M. Cacciari, G.P. Salam and G. Soyez                  
+#     A software package for jet finding and analysis at colliders      
+#                           http://fastjet.fr                           
+#	                                                                      
+# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
+#                                                                       
+# FastJet is provided without warranty under the terms of the GNU GPLv2.
+# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
+# and 3rd party plugin jet algorithms. See COPYING file for details.
+#--------------------------------------------------------------------------
+LundGenerator with Recluster with new_jet_def = Longitudinally invariant Cambridge/Aachen algorithm with R = 1000 and E scheme recombination and keeping the hardest inclusive jet
+
+Lund coordinates ( ln 1/Delta, ln kt ) of declusterings of jet 0 are:
+(0.381818, -1.41338); (0.640225, -1.41382); (0.815003, -0.521976); (1.11695, -2.1319); (1.33942, -3.472); (1.52885, -2.46979); (1.56466, -0.0358016); (2.02807, -0.558102); (2.34917, 1.00406); (2.51877, -1.94794); (2.95973, -1.06118); (3.36119, -3.71927); (3.83009, -1.04409); (3.91026, 1.04294); (4.25234, -0.800966); (4.77749, -0.461738); (5.43338, -0.520936); (5.54091, -1.07405); (5.81939, -0.573153)
+
+Lund coordinates ( ln 1/Delta, ln kt ) of declusterings of jet 1 are:
+(0.108166, 0.409011); (0.478032, -0.762435); (0.5522, 1.69309); (0.814643, -0.89172); (0.87725, 0.291102); (1.17301, 0.430816); (1.46257, -2.02855); (2.04689, -3.19764); (2.19256, -0.828099); (2.86474, -1.09304); (2.98768, -1.21793); (3.3634, -0.355632); (4.17428, -0.227052); (4.59144, 0.645512); (4.86343, -2.29314); (5.8172, -2.47791)
+
+File jets.json written.

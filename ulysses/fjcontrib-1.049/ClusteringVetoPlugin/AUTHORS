@@ -1,0 +1,11 @@
+The ClusteringVetoPlugin FastJet contrib was written and is maintained and
+developed by:
+
+   Seng-Pei Liew <liew@hep-th.phys.s.u-tokyo.ac.jp>
+   Martin Stoll <stoll@hep-th.phys.s.u-tokyo.ac.jp>
+
+For physics details, see:
+
+   Vetoed jet clustering: The mass-jump algorithm
+   Martin Stoll
+   arXiv:1410.4637

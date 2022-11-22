@@ -1,0 +1,27 @@
+# BEGIN YODA_HISTO1D /Myhisto1
+LineColor=red is a good color
+Title=Ein Titel
+Total          Total           5    3    4    5    5
+Underflow      Underflow       6    3    2    7    44
+Overflow       Overflow        8    3    2    9    33
+1              2               1    2    3    4    11
+2              3               5    1    4    7    22
+# END YODA_HISTO1D
+
+# BEGIN YODA_HISTO1D /some/other/histo
+Total           Total           3    3    4    5    55
+Underflow       Underflow       6    3    2    7    44
+Overflow        Overflow        8    3    2    9    33
+3.4             4.2             1    2    3    4    11
+4.5             5.3             5    1    4    7    22
+# END YODA_HISTO1D
+
+# BEGIN YODA_PROFILE1D /path/to/histo
+Title=A profile histogram
+Path=/path/to/histo
+Underflow   Underflow  1 2 3 4 5 6 11 
+Overflow    Overflow   1 2 3 4 5 6 12 
+Total       Total      1 2 3 4 5 6 13 
+4           5          1 2 3 4 5 6 7
+5           6          1 2 3 4 5 6 7
+# END YODA_PROFILE1D

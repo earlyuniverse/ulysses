@@ -1,0 +1,24 @@
+README file for fastjet-X.Y.Z/fortran_wrapper
+---------------------------------------------
+
+This directory provides basic wrappers to fastjet's main pp sequential
+recombination algorithms and to SISCone so as to be able to access them
+from Fortran (or any other prehistoric language).
+
+fastjetfortran.cc
+        the file that does the wrapping
+
+fastjet_fortran_example.f
+        an example showing how to use it from a fortran main
+        (look at the first few lines for compilation and usage)
+
+Makefile.alt
+        for building (outside of the autotools framework)
+
+If you have installed fastjet (and it is in your path), then do
+
+> make -f Makefile.alt
+> ./fastjet_fortran_example < ../example/data/single-event.dat
+
+These wrappers are usually updated on request. If you need features
+that are not available, contact the authors for help.

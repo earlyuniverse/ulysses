@@ -1,0 +1,14 @@
+# Cluster this event with
+# 
+# ../fastjet_timing_plugins -midpoint -r 0.7 -incl 0 < cone-midpoint-problem-ev2.dat
+#
+# and compare the output to what you get with 
+#
+# ../fastjet_timing_plugins -midpoint -r 0.7 -incl 0 < cone-midpoint-problem-ev1.dat
+#
+# which lacks the soft particle
+ 4.000000000000000e+02  0.000000000000000e+00  0.000000000000000e+00  4.000000000000000e+02
+ 1.100000000000000e+02  0.000000000000000e+00  7.397603280415953e+01  1.325611309149182e+02
+ 9.000000000000000e+01  0.000000000000000e+00  2.161315626191299e+02  2.341214478858930e+02
+# the soft particle
+ 1.100000000000000e+00  0.000000000000000e+00  1.379242352923605e+00  1.764173876945876e+00

@@ -1,0 +1,530 @@
+2020-02-23  Peter Berta  <peter.berta@cern.ch>
+
+	* VERSION:
+	- Set version number to 1.4.5
+
+	* ConstituentSubtractor.cc
+	* IterativeConstituentSubtractor.cc
+	- Further removal of C++11 extensions which were missed previously (std::end and std::begin)
+
+
+2019-07-15  Peter Berta  <peter.berta@cern.ch>
+
+	* VERSION:
+	- Set version number to 1.4.4
+
+	* ConstituentSubtractor.hh
+	* IterativeConstituentSubtractor.hh
+	- Removed C++11 extensions
+
+
+
+	
+
+2019-07-09  Peter Berta  <peter.berta@cern.ch>
+
+	* VERSION:
+	- Set version number to 1.4.3
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh
+	* IterativeConstituentSubtractor.cc
+	* IterativeConstituentSubtractor.hh
+	- Removed C++11 extensions
+	- Changed the way how the user should specify that he/she wants to do delta_m correction. Now, additionally the "set_do_mass_correction" function must be called
+	- Updated information about the treatment of massive inputs.
+
+	
+	* example_event_wide.cc
+	* example_iterative.cc
+	- Updated information about the treatment of massive inputs. No changes in the code
+
+
+	* example_jet_by_jet.cc
+	- small updates to the commented lines
+
+
+	
+2019-07-04  Peter Berta  <peter.berta@cern.ch>
+
+	* VERSION:
+	- Set version number to 1.4.2
+
+	* example_event_wide.cc
+	* example_iterative.cc
+	* ConstituentSubtractor.hh
+	-  Updated information about the treatment of massive inputs. No changes in the code
+
+
+
+2019-06-21  Peter Berta  <peter.berta@cern.ch>
+
+	* VERSION:
+	- Set version number to 1.4.1
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh
+	-  Updated the treatment of additional background estimator for rho_m. Currently in ConstituentSubtractor, only such rho_m background estimators are supported which have member function rho_m(), i.e. the result from member function has_rho_m() is true (which is available since fastjet version 30100).
+
+
+	
+
+2019-06-19  Peter Berta  <peter.berta@cern.ch>
+
+	* VERSION:
+	- Set version number to 1.4.0
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh
+	- Added more possibilities for treatment of massive particles and information about them	
+	- Using value _zero_pt=1e-40 for particles with corrected pt of 0 and value _zero_mass=1e-50 for particles with corrected mass of 0.
+	- Added possibility to use particle selector - all particles which pass the particle selector are corrected, while the particles which do not pass, are returned unmodified
+	- Updated description
+
+	* IterativeConstituentSubtractor.cc
+	- Updated description
+	- Added possibility to use particle selector
+	
+	* example_event_wide.ref
+	* example_event_wide.cc
+	- Renamed from example_whole_event.cc(ref)
+	- Now setting the masses to zero
+	- Added example to use particle selector
+	- Added detailed explanation what options are available for massive particles
+	
+	* example_iterative.ref
+	* example_iterative.cc
+	- Added detailed explanation what options are available for massive particles
+	- Now setting the masses to zero in the ICS correction
+	- Added example how to use particle selector
+
+	* example_jet_by_jet.ref
+	* example_jet_by_jet.cc
+	- Renamed from example.cc(ref)
+	- Now setting the masses to zero
+
+
+2019-03-28  Peter Berta  <peter.berta@cern.ch>
+
+	* VERSION:
+	- Set version number to 1.3.2
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh
+	- Added functions for possible usage of information about hard proxies
+	- Added function to set if the user wants to keep the original masses (i.e. no mass subtraction and no setting to zero). By default, the masses are set to zero.
+	- Added instructions, how can the masses be treated, at the beggining of ConstituentSubtractor.hh
+	- Added new function set_common_bge_for_rho_and_rhom() which should be used when the user wants to do mass subtraction with the same background estimator as for pt subtraction. This replaces the set_common_bge_for_rho_and_rhom(bool value=true) function which should be not used anymore. Currently both function give the same results. The function set_common_bge_for_rho_and_rhom(bool value=true) will be removed in the future.
+	- Updated ConstituentSubtractor::description
+	- Speed optimization
+	
+
+	
+	* IterativeConstituentSubtractor.cc
+	* IterativeConstituentSubtractor.hh
+	- Added functions for possible usage of information about hard proxies
+
+	
+	* example_whole_event_iterative.cc
+	* example_whole_event.cc
+	- Added information how can the masses be treated and examples
+	- Added examples how to use the information about hard proxies
+
+
+	* example.cc
+	* example_background_rescaling.cc
+	* example_whole_event_using_charged_info.cc
+	- Usage of new function set_common_bge_for_rho_and_rhom()
+
+	
+	* example_whole_event.ref
+	* example.ref
+	* example_whole_event_using_charged_info.ref
+	- Updated references because the ConstituentSubtractor::description was updated
+
+	
+
+2018-06-28  Peter Berta  <peter.berta@cern.ch>
+
+	* VERSION:
+	- Set version number to 1.3.1
+
+	* example_whole_event_iterative.cc
+	* example_whole_event.cc
+	* example_background_rescaling.cc
+	* example_background_rescaling.ref
+	- updated comments
+	
+
+
+
+2018-06-25  Peter Berta  <peter.berta@cern.ch>
+
+	* VERSION:
+	- Set version number to 1.3.0
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh
+	- Removed the functions related to the so-called "sequential" correction (renamed and put it in IterativeConstituentSubtractor.hh/.cc)
+	- Added function with name "initialize" and "set_max_eta" which should be used for the whole event correction, see example example_whole_event.cc
+
+	* example_whole_event.cc
+	- Updated usage of the whole event correction. The users are encouraged to update to this new usage. So far the old and new usage have the same behaviour.
+
+	* example_whole_event_sequential.cc
+	* example_whole_event_sequential.ref
+	- Removed.
+
+	* IterativeConstituentSubtractor.cc
+	* IterativeConstituentSubtractor.hh
+	* example_whole_event_iterative.cc
+	* example_whole_event_iterative.ref
+	- New files
+
+	* Makefile
+	- Added the compilation of the two new files and updated name for the example
+
+	
+	
+2018-06-12  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.2.8
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh
+	- Added new function: clean_ghosts. Now when setting new selector, the current ghosts are removed - then when doing subtraction, new ghosts are constructed.
+	- Updated sequential CS:
+		- Added possibility to perform CS procedure any  number of times (previously only twice). Now, the maximal distance and alphas should be specified as vectors using function "set_sequential_parameters"
+		- Added possibility to remove the unsubtracted ghosts (proxies) from the previous CS procedure for the next application of CS procedure
+
+
+	* example_whole_event_sequential.cc
+	* example_whole_event_sequential.ref
+	* Makefile
+	- Added example for the sequential CS
+
+
+
+
+2018-05-04  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.2.7
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh
+	- Added possibility to perform whole event correction in a certain phase space defined by input Selector
+	- Added possibity to change the grid size for GridMedianBackgroundEstimator when using charged info - the default value is now 0.5
+	- Faster correction in case the distance is ConstituentSubtractor::angle
+
+	* example_whole_event.cc
+	* example_whole_event_using_charged_info.cc
+	- Updated examples
+
+	* example_whole_event.ref
+	* example_whole_event_using_charged_info.ref
+	- Updated references to correspond to updated examples
+
+	
+
+
+2018-05-03  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.2.6
+
+	* example.cc
+	* example_whole_event.cc
+	* example_background_rescaling.cc
+	* example_whole_event_using_charged_info.cc
+	* functions.hh
+	- Updated examples and added more comments
+
+	* example.ref
+	* example_whole_event.ref
+	* example_background_rescaling.ref
+	* example_whole_event_using_charged_info.ref
+	- Updated references to correspond to updated examples
+
+	
+
+2018-04-11  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.2.5
+
+	* ConstituentSubtractor.cc
+	- Fixed bug causing seg fault in ATLAS. The seg fault happened very rarely for events in which the particle with minimal or maximal rapidity had  had rapidity of special value (dependent on the parameters of ConstituentSubtractor).
+
+	* functions.hh
+	- In read_event added possibility to read event in format (pt, rap, phi, pid, charge) assuming zero masses.
+
+2017-12-18  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.2.4
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh
+	- Added function set_remove_zero_pt_and_mtMinusPt_particles. When set to true, all particles are kept in the output. If set to false (default), the particles with zero pt and zero mtMinusPt are removed.
+	
+	* Makefile
+	- Added back the test example_whole_event_using_charged_info. 
+
+	* example_whole_event_using_charged_info.cc
+	* example_whole_event_using_charged_info.ref
+	- using set_remove_zero_pt_and_mtMinusPt_particles(false), printing more digits for the output, and changed the reference. Now this test is successful also for Gavin Salam.
+
+	
+2017-09-08  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.2.3
+
+	* ConstituentSubtractor.cc
+        - In the previous version the zero pt massive corrected particles had pt set to 1e-200. This caused a warning when the active area was used during clustering. Now, the zero pt is set to 1e-50, which removed the warning.
+
+	* Makefile
+	- Temporarily removed the test example_whole_event_using_charged_info. The reason is that it gives different output particles when running on MacOS 10.12.6, Apple LLVM version 8.1.0 (clang-802.0.42) as Gavin Salam found. The difference is tiny: one zero pt and zero mass particle appears additionally when running on MAC, which has no impact on the performance of the correction. 
+
+	
+2017-08-21  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.2.2
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh
+          - Added function set_max_standardDeltaR for backward compatibility. It was replaced in version 1.1.3 by function set_max_distance. In this version, it does the same as the function set_max_distance.
+	  - Further speed improvement for whole event subtraction (especially for small _max_distance parameters, such as 0.25)
+
+	
+
+
+2017-08-07  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.2.1
+
+	* ConstituentSubtractor.cc
+	- Fixed bug for the distance enum ConstituentSubtractor::angle. Previously, the optimized rapidity ranges were used also for this distance type which was wrong. Now, the whole rapidity range is used (without optimization).
+	- Checking if ghosts are constructed for the jet-by-jet subtraction. In case they are constructed, error is thrown since such ConstituentSubtractor should be used only for whole event subtraction, and not jet-by-jet.
+
+
+
+2017-07-20  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.2.0
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh
+	- Important change for the output corrected particles in case of correction of massive particles. The corrected zero pt particles with non-zero corrected delta_m (massive particles in rest) are now included in the output. Previously, all the zero pt corrected particles were discarded. Now, only the zero pt and zero delta_m corrected particles are discarded. The corrected particles with zero pt and non-zero delta_m are kept (their pt is set to very small value (1e-200 GeV)). This should have better performance for jet energy and jet mass. If the user wants, he/she can still discard those zero pt particles in his/her own code, e.g. by requiring particles with pt > 1e-100 GeV.
+	- Implemented changes to significantly increase the speed of the CS algorithm for the whole event subtraction. The performance is exactly the same. Only the speed is much higher. For small values of _max_distance parameter, the speed is now ~10-times higher. For larger values of the _max_distance parameter, the speed is ~2-times higher.
+	
+	* RescalingClasses.cc
+	* RescalingClasses.hh:
+	- Added new rescaling classes:
+		- BackgroundRescalingYPhiFromRoot - rescaling of background using Root TH2 histogram binned in rapidity vs azimuth
+		- BackgroundRescalingYPhiUsingVectorForY - rescaling of background for heavy ions - using eliptic flow parameters and rapidity dependence recorded in a vector<double>
+		- BackgroundRescalingYPhiUsingVectors - rescaling of background using objcet vector<vector<double> > containing the rapidity vs azimuth dependence
+	
+	* example_background_rescaling.cc
+	- Added more examples for usage of rescaling classes
+
+	* example_background_rescaling.ref
+	* example.ref
+	* example_whole_event.ref
+	* example_whole_event_using_charged_info.ref
+	- Updated example outputs due to the inclusion of massive zero pt corrected particles in the output.
+	        
+
+	
+
+2017-07-11  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.1.6
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh
+	- Implemented suggestion from Marta Verweij:
+		- Added new functions: "get_ghosts" and "get_ghosts_area". They return the vector of ghosts and the corresponding ghost areas used for whole event subtraction.
+		- Changed the function "construct_ghosts_uniformly" to be public
+        	- Now the user does not need to provide the BackgroundEstimator to CS, but he/she can do background estimation independently and then assign the estimated background to ghosts. The procedure is the following:
+			- construct the ghosts with function "construct_ghosts_uniformly"
+			- get them with functions "get_ghosts" and "get_ghosts_area"
+			- do background estimation independently and assign the corresponding background estimates to ghosts
+			- use the function "do_subtraction" to subtract the modified ghosts from real particles.
+	
+	
+	* RescalingClasses.cc
+	* RescalingClasses.hh:
+	- Added new rescaling class template BackgroundRescalingYFromRootPhi - useful mainly for heavy ion events. The rapidity dependance is taken from a Root TH1 object provided by the user. The next parameters are used to parametrize the eliptic flow.
+
+	
+	* example_background_rescaling.cc
+	- Added example for usage of the new rescaling class BackgroundRescalingYFromRootPhi (commented at the beginning of the macro).
+	
+
+	
+2017-01-25  Gavin Salam  <gavin.salam@cern.ch>
+
+	* VERSION:
+	updated VERSION to 1.1.5
+
+	* Makefile:
+	- resolved issue with make fragile-shared, caused by repeated
+	SRCS lines in the Makefile. Also removed other duplicates.
+
+2017-01-20  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.1.4
+
+	* ConstituentSubtractor.cc
+	- fixed rounding issues for zero masses, when doing the correction of term mtMinusPt
+	- more precise evaluation of corrected 4-momenta, which affected the mass of corrected particles with low masses
+	-  added new function set_do_mass_subtraction 
+	
+	* ConstituentSubtractor.hh
+	- fixed initialization of member variable "_do_mass_subtraction"
+	- added new function set_do_mass_subtraction 
+	
+	* example_whole_event.ref, example_whole_event.cc:
+	- updated reference file. Added also all corrected particles.
+
+	* example_whole_event_using_charged_info.ref, example_whole_event_using_charged_info.cc:
+	- updated reference file. Added also all corrected particles.
+
+
+	
+2016-11-14  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	- Set version number to 1.1.3
+
+	* ConstituentSubtractor.cc
+	* ConstituentSubtractor.hh:
+	- Fixed bug in "do_subtraction" function for the unsubtracted background proxies.
+	- Added new function "sequential_subtraction" - for testing purposes so far, example will be added later. The ConstituentSubtraction is performed twice: first with small maximal allowed deltaR distance, then the background proxies are again uniformly redistributed and the ConstituentSubtraction runs second time with higher allowed maximal deltaR
+	- Added new function "set_distance_type". With this function, the user can change the definition of distance between particles and background proxies. There are two possibilities using enums Distance: deltaR (longitudinal Lorentz invariant  distance in rapidity vs. phi) or angle (in Euclidean space). The default distance is deltaR, i.e. the same definition of distance as in previous versions.
+	
+	* Makefile:
+	- Removed dependence on Root. Using template in RescalingClasses now.
+
+	* RescalingClasses.cc
+	* RescalingClasses.hh:
+	- Removed dependence on Root for the rescaling using TH1 histogram. Using template now. Also the name of the class changed. Old name: BackgroundRescalingYTH1. New name: BackgroundRescalingYFromRoot
+	- Changed the name of the rescaling class for heavy ion events. Old name: BackgroundRescalingYPhiHeavyIon. New name: BackgroundRescalingYPhi. Also the description of the rescaling function is updated.
+	
+	* example_rescaling_using_TH1.cc
+	* example_rescaling_using_TH1.ref:
+	- Removed
+
+	* example_background_rescaling.cc
+	* example_background_rescaling.ref:
+	- Added new example for usage of Heavy Ion background rescaling function
+	- The file example_background_rescaling.cc contains also commented example for usage of rapidity rescaling according to root's TH1 distribution
+	
+	* example_whole_event.cc:
+	- Updated this example with usage of the "set_distance_type" function.
+	
+2016-03-11  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	set version number to 1.1.2
+
+	* Makefile:
+	- added CXXFLAGS and LDFLAGS in case the "ROOTSYS" variable is defined from ROOT. In case it is not defined, the standard usage still works, just the RescalingClasses are not compiled. 
+
+	
+	* RescalingClasses.cc:
+	* RescalingClasses.hh:
+	- New files: contain classes for rho estimation rescaling. Two classes were added:
+		- BackgroundRescalingYTH1 - input is a TH1 object (stabdard histogram in ROOT) containg the actual rapidity dependence of backgound pt
+		- BackgroundRescalingYPhiHeavyIon - input are 8 parameters. The first four parameters parametrize the elliptic flow. The next four parameters parametrize the rapidity dependence using two Gaussian distributions
+
+	
+	* example_rescaling_using_TH1.cc:
+	* example_rescaling_using_TH1.ref:
+	- New files: example in which the ConstituentSubtractor is used for the whole event subtraction using rapidity rescaling for the rho estimation. The input for rapidity rescaling is a TH1 object
+
+	
+	
+
+2016-02-09  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	set version number to 1.1.1
+
+        * ConstituentSubtractor.hh:
+	* ConstituentSubtractor.cc:
+	- Faster algorithm for subtraction in the "do_subtraction" member function.
+	- New member function: subtract_event_using_charged_info
+		- whole event subtraction
+		- 4 additional inputs: two vectors of PseudoJets for charged background and charged signal, and two doubles, charged background scale (CBS) and charged signal scale (CSS)
+		- the scales CBS and CSS scale the input charged particles. Useful if one assumes correlation between charged and neutral particles or in case the inputs from calorimeter are miscalibrated wrt tracks. In case CBS=CSS=0, the input charged particles are not used. In case CBS=CSS=1, the input charged particles are not scaled. Recommending to try several combinations for CBS and CSS from range [0.8, 1.5].
+		- the background estimation is built in this function using GridMedianBackgroundEstimator with possibility to rescale
+		- see example file "example_whole_event_using_charged_info.cc" for usage
+
+	
+	* example_whole_event_using_charged_info.cc:
+	* example_whole_event_using_charged_info.ref:
+	- New files: example in which the ConstituentSubtractor is used for the whole event subtraction using tracking information for charged particles
+
+
+	* functions.h:
+	- Updated function "read_event". Now, obtaining also the vectors of charged particles originating from signal and background.
+
+
+
+
+	
+2015-11-05  Peter Berta  <berta@ipnp.troja.mff.cuni.cz>
+
+	* VERSION:
+	set version number to 1.1.0
+
+	* Makefile:
+	- added "-fPIC" CXX flag
+
+	
+        * ConstituentSubtractor.hh:
+	* ConstituentSubtractor.cc:
+	- updated output for result(PseudoJet): copying the "user_index" from the input jet and its constituents to the output corrected jet and its constituents
+	- discarded the original max_deltaR parameter, and replaced it by parameter max_standardDeltaR defined as  standardDeltaR=sqrt(deltay^2 + deltaphi^2). This new parameter restricts the usage of ghost-particle pairs which have too large distance standardDeltaR, i.e. not the distance deltaR which is the standardDeltaR multiplied by other factors as in the previous version.
+	- added a new multiplicative factor (sin(theta_i))^polarAngleExp into the definition of distance for a ghost-particle pair. Angle theta_i is the polar angle of partile i. The polarAngleExp is a free parameter with default value polarAngleExp=0, i.e. the default definition of deltaR has not changed wrt previous version. It can be changed using set_polarAngleExp member function
+	- changed the structure of the package and its member functions
+		- the standard usage with result(PseudoJet) is the same and it gives the same results as in previous version
+		- new member functions are available to simplify the whole event subtraction: subtract_event, set_background_estimator, set_scalar_background_density, see example file example_whole_event.cc
+	- similar changes as in GenericSubtractor due to FJ>=3.1:
+		- added set_common_bge_for_rho_and_rhom() and removed use_common_bge_for_rho_and_rhom()
+		- added set_use_bge_rhom_rhom() to tweak how rho_m is obtained  when ConstituentSubtractor has been constructed with two estimators
+	        - altered common_bge_for_rho_and_rhom() and added use_bge_rhom_rhom() to retrieve the behaviour
+        	- added a warning when rhom is non-zero and unused
+	- Updated the terminology:
+		- ghosts - soft particles distributed with high density
+		- background proxies - particles used in the "do_subtraction" member function. They can be obtained from ghosts or in other way. Previously, these particles were also called "ghosts"
+
+	
+	
+	
+	* example_whole_event.cc:
+	* example_whole_event.ref:
+	-new files: example in which the ConstituentSubtractor is used for the whole event
+
+
+	* functions.h:
+	-new file: contains useful functions for the example files
+
+	* example.hh:
+	-removed. Content moved to file functions.h
+	
+
+	
+2014-04-06  Peter Berta <berta@ipnp.troja.mff.cuni.cz>
+
+        * VERSION
+        Release of version 1.0.0

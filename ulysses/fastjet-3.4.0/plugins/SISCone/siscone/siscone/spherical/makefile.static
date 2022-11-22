@@ -1,0 +1,64 @@
+CC      = g++
+LIBOUT  = libsiscone_spherical.a
+CFLAGS  = -Wall -g -O3 -ffast-math -I../..
+
+LDFLAGS = -lm #-lprofiler -lpthread -ltcmalloc
+ifeq ($(shell whoami),salam)
+  # needed for Gavin to include tcmalloc
+  LDFLAGS += -L/ada1/lpthe/salam/software/local/lib
+endif
+
+OBJS    = geom_2d.o momentum.o hash.o\
+          vicinity.o protocones.o split_merge.o siscone.o
+
+SRCS = $(patsubst %.o,%.cpp,$(OBJS))
+
+
+%.o: %.cpp %.h
+	$(CC) -c $(CFLAGS) $<
+
+%.o: %.cpp
+	$(CC) -c $(CFLAGS) $<
+
+all: $(OBJS)
+	ar cru $(LIBOUT) $(OBJS)
+	ranlib $(LIBOUT)
+
+.PHONY: clean
+
+clean:
+	rm -f *.o *~
+
+
+# note the -Y option below avoids including all the standard
+# include directories (which change from one system to another)
+depend:
+	makedepend  -I../.. -f makefile.static -- -Y  -- $(SRCS)
+# DO NOT DELETE
+
+geom_2d.o: geom_2d.h ../../siscone/defines.h ../../siscone/geom_2d.h
+geom_2d.o: ../../siscone/defines.h
+momentum.o: momentum.h ../../siscone/reference.h geom_2d.h
+momentum.o: ../../siscone/defines.h ../../siscone/geom_2d.h
+momentum.o: ../../siscone/defines.h
+hash.o: hash.h momentum.h ../../siscone/reference.h geom_2d.h
+hash.o: ../../siscone/defines.h ../../siscone/geom_2d.h
+hash.o: ../../siscone/defines.h
+vicinity.o: vicinity.h ../../siscone/vicinity.h momentum.h
+vicinity.o: ../../siscone/reference.h geom_2d.h ../../siscone/defines.h
+vicinity.o: ../../siscone/geom_2d.h ../../siscone/defines.h
+vicinity.o: ../../siscone/quadtree.h
+protocones.o: ../../siscone/defines.h ../../siscone/siscone_error.h
+protocones.o: ../../siscone/circulator.h protocones.h momentum.h
+protocones.o: ../../siscone/reference.h geom_2d.h ../../siscone/geom_2d.h
+protocones.o: ../../siscone/defines.h vicinity.h ../../siscone/vicinity.h
+protocones.o: ../../siscone/quadtree.h hash.h
+split_merge.o: ../../siscone/siscone_error.h split_merge.h
+split_merge.o: ../../siscone/defines.h geom_2d.h ../../siscone/geom_2d.h
+split_merge.o: ../../siscone/defines.h momentum.h ../../siscone/reference.h
+siscone.o: ../../siscone/config.h ../../siscone/ranlux.h
+siscone.o: ../../siscone/siscone_error.h ../../siscone/defines.h momentum.h
+siscone.o: ../../siscone/reference.h geom_2d.h ../../siscone/geom_2d.h
+siscone.o: ../../siscone/defines.h siscone.h protocones.h vicinity.h
+siscone.o: ../../siscone/vicinity.h ../../siscone/quadtree.h hash.h
+siscone.o: split_merge.h

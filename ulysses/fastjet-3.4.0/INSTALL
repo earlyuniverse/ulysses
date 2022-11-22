@@ -1,0 +1,280 @@
+-------------------------------------
+Installation instructions for FastJet
+------------------------------------- 
+
+These instructions for installation from an untarred FastJet release
+tarball. For additional steps needed from a git clone, see below.
+
+FastJet can be configured, built and installed using the standard
+sequence
+
+% ./configure [options]
+% make
+% make check   (optional)
+% make install
+
+
+The full list of configuration options can be obtained with ./configure --help. 
+Some useful ones include:
+
+   --prefix=<where-you-wish-to-install>   (default=/usr/local)
+                    specify location where FastJet will be installed
+                    The library and plugins will be installed in
+                    ${prefix}/lib while the headers will be placed in
+                    ${prefix}/include/fastjet
+
+   --disable-static
+   --enable-static  disable/enable construction of static libraries
+                    (enabled by default)
+
+   --disable-shared
+   --enable-shared  disable/enable construction of shared libraries
+                    (enabled by default)
+
+   --enable-pyext   enable the python interface (default=no)
+
+   --enable-cgal    enable use of CGAL libraries, which are needed 
+                    for the N ln N version of the k_t algorithm and
+                    N^{3/2} version of anti-k_t; relevant mainly if you
+                    expect to have N>15000.
+
+   --with-cgaldir=directory
+                    For CGAL >= 3.4 tells it where to look for CGAL, if
+                    it's not in a standard place.
+
+   --with-cgalmakefile=makefile
+                    For CGAL <= 3.3.x specify location of CGAL
+                    Makefile (which contains info on correct
+                    compilation flags when using CGAL).  In the
+                    absence of this flag, the environment variable
+                    $(CGAL_MAKEFILE) will be used to locate the CGAL
+                    Makefile. If this is absent too, the default
+                    location (/usr/share/cgal/cgal.mk) is used.
+
+   --with-cgal-boostdir=dir
+   --with-cgal-gmpdir=dir
+   --with-cgal-mpfrdir=dir
+                    specifies user-defined locations for CGAL
+                    dependencies (Boost, GMP and MPFR)
+
+   --enable-cgal-header-only
+                    specified that one is working with a header-only
+                    version of CGAL. Use this (instead of
+                    --enable-cgal) if you have CGAL v5.
+                    This will hopefully be auto-detected in a future
+                    version of FastJet. 
+   
+   --enable-allcxxplugins    (default=no)
+                    enable all C++ plugins, but not the Fortran ones
+
+   --enable-allplugins       (default=no)
+                    enable all plugins, including the Fortran ones
+                    (PxCone). 
+
+   --enable-siscone          (default=yes)
+                    enables the SISCone plugin
+
+   --enable-cdfcones         (default=yes)
+                    enables the CDFJetClu and CDFMidPoint plugins
+
+   --enable-d0runiicone      (default=no)
+                    enables the D0RunIICone (also known as
+                    ILConeAlgorithm within D0)
+
+   --enable-pxcone           (default=no)
+                    enables the PxCone plugin (note this is in f77,
+                    and so you may have to deal with C++/f77
+                    compatibility issues)
+
+   etc.             many more plugins available: --help option lists
+                    them
+
+
+As well as installing the libraries and headers, "make install" also
+installs ${prefix}/bin/fastjet-config; assuming this is in your path,
+then you can compile a program that uses fastjet as follows
+
+% g++ myprog.cc `fastjet-config --cxxflags --libs --plugins` -o myprog
+
+The --plugins option is only needed if you want access to plugins.
+If shared libraries are built, they will be used by default. You can
+still switch to the static libraries by adding the --shared=no option.
+Other examples of the usage of this are given in the Makefile.alt file
+in the example directory.
+
+
+Note on the --enable-foo usage
+------------------------------
+Each --enable-foo option can also be specified using --enable-foo=yes. 
+If, instead you want to disable the  option, you can use --enable-foo=no 
+or --disable-foo.
+
+
+Note for git users
+------------------
+
+If you clone FastJet from the git repository, you first need to set up
+the SISCone submodule 
+
+% git submodule init
+% git submodule update
+
+Then you should generate all configuration files. This is done using
+
+% ./autogen.sh [configure options]
+
+or, alternatively,
+
+% autoreconf --install
+% cd plugins/SISCone/siscone; autoreconf --install; cd ../../..
+% ./configure [configure options]
+
+Remarks: 
+
+- a version of libtool >= 1.5 is needed. On older version of Mac OSX the
+  GNU libtool should be installed.
+- adding '--force' to the list of autoreconf arguments will overwrite
+  the INSTALL file with the default version
+- using the autogen.sh script automatically runs ./configure 
+  (with the specified options)
+- on some systems, config.h from git (and a corresponding file in the SISCone
+  release) may get overwritten. It is usually safe to restore the
+  original git versions with "git checkout config.h". 
+   
+
+======================================================================
+OLD (NON-AUTOTOOLS) BUILD SYSTEM
+======================================================================
+
+These instructions are obsolete.
+
+------------
+Quick method
+------------
+
+Run the following to build FastJet and its plugins and to test them.
+
+% ./test-static.sh
+
+(NB: this no longer works as of FastJet 2.4, but the files have been
+left in place in case somebody prefers a non-autotools solution and
+wishes to update it.)
+
+------------------
+Longer description
+------------------
+
+To make it possible to have two build systems in parallel, the
+makefiles for the old system are named makefile.static -- you should
+tell make to use them explicitly with the "-f makefile.static" option.
+
+As a first step the user should decide whether or not they want to
+have access to the N ln N algorithms for the kt algorithm, based on
+the Computational Geometry Algorithms Library (CGAL).
+
+If the user does not wish to use it, he or she should ensure that the
+Makefile in the top directory has the line
+
+USE_CGAL = no
+
+Otherwise it should read
+
+USE_CGAL = yes
+
+In that case the user should first download CGAL from
+http://www.cgal.org/ and then compile and install it. Under linux, she
+or he will have to ensure that an environment variable CGAL_MAKEFILE
+points to the Makefile generated by CGAL at install time, containing
+various definitions of locations of include files. CGAL will encourage
+the user to set this variable during the install process.
+
+Then in the src/ directory do
+
+%  make -f makefile.static
+%  make -f makefile.static install
+
+which places the fastjet library in lib/. 
+
+To build the cone jet-finder plugins, you should go to the plugin
+directory and type
+  
+%  make -f makefile.static
+%  make -f makefile.static pxcone      
+                   // OPTIONAL --  if you want fortran pxcone plugin
+                   // to be compiled too -- make sure you also set
+                   // G77LIBDIR in the main Makefile
+
+To run the example program cd to the example directory and do
+
+%  make -f makefile.static fastjet_example
+%  ./fastjet_example < data/single-event.dat
+
+The output (without CGAL) should be 
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#--------------------------------------------------------------------------
+#                      FastJet release 2.3-beta0
+#            Written by M. Cacciari, G.P. Salam and G. Soyez            
+#              http://www.lpthe.jussieu.fr/~salam/fastjet                  
+#                                                                          
+# Longitudinally invariant Kt, anti-Kt, and inclusive Cambridge/Aachen  
+# clustering using fast geometric algorithms, with area measures and optional
+# external jet-finder plugins.                                          
+# Please cite Phys. Lett. B641 (2006) [hep-ph/0512210] if you use this code.
+#                                                                          
+# This package uses T.Chan's closest pair algorithm, Proc.13th ACM-SIAM 
+# Symp. Discr. Alg, p.472 (2002), S.Fortune's Voronoi algorithm and code .
+#-------------------------------------------------------------------------
+Ran Longitudinally invariant kt algorithm with R = 1 and E scheme recombination
+Strategy adopted by FastJet was N2Tiled
+
+Printing inclusive jets with pt > 5 GeV
+---------------------------------------
+jet #        rapidity             phi              pt  n constituents
+    0     -0.86730713      2.90511470    983.38727662       35
+    1      0.22380471      6.04226446    910.28808604       52
+    2     -1.16520657      6.04589034     70.78886044       48
+    3     -2.34731970      1.25431317     10.72317440       18
+    4     -1.19479918      0.80734483      8.29342805       15
+    5     -1.71897064      4.01955399      8.16413672        9
+    6     -4.71909257      4.09173629      5.57326514       15
+    7      3.42713139      5.74362063      5.17254118       13
+    8     -4.83615264      2.20502275      5.02711586       12
+
+Printing exclusive jets with dcut = 25 GeV^2
+--------------------------------------------
+jet #        rapidity             phi              pt  n constituents
+    0     -0.86730713      2.90511470    983.38727662       35
+    1      0.22093749      6.02911715    898.62586887       29
+    2     -1.16520657      6.04589034     70.78886044       48
+    3      0.36257181      0.54763129     16.65531147       23
+    4     -2.34731970      1.25431317     10.72317440       18
+    5     -1.19479918      0.80734483      8.29342805       15
+    6     -1.71897064      4.01955399      8.16413672        9
+    7     -4.71909257      4.09173629      5.57326514       15
+    8      3.42713139      5.74362063      5.17254118       13
+    9     -4.83615264      2.20502275      5.02711586       12
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Additionally the example/ directory contains the following other
+programs
+
+- ktjet_example
+        same example program, but written with ktjet, to illustrate
+        similarities and differences with fastjet_example. For
+        compilation to work please set the KTJET_INCLUDE and
+        KTJET_LIBRARY variables in the fastjet main Makefile.
+
+- ktjet_timing
+- fastjet_timing_plugins
+        programs for testing output and timings of the two programs --
+        may be run with a variety of command-line options to control
+        behaviour -- see the beginning of fastjet_timing_plugins.cc for
+        further information.
+
+- fastjet_areas
+        example program for evaluating the areas of the jets in 
+        a single event (it reads in the same input file as fastjet_example)
+
+- A number of examples named 01-XXX.cc, 02-YYY.cc, etc, where FastJet features
+  are illustrated in increasing order of complexity.

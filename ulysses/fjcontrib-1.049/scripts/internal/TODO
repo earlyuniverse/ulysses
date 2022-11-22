@@ -1,0 +1,58 @@
+Plans/ideas for improvements to fjcontrib:
+------------------------------------------
+
+- scripts/update-contribs.sh ContribName
+  has some option to list available versions
+  
+- some ability for contribs to require a minimal FJ version?
+
+- get an fjcontrib-config script working
+
+----------------------------------------------------------------------
+Older/obsolete things
+---------------------
+
+For a first release
+
+- check each contribution:
+  
+- release them
+
+- decide/set version number of full contrib
+
+- tools for checking content of release???
+
+
+---------------------
+
+
+
+- fjcontrib-config (--libs | ...) ???
+  g++ `fjcontrib-config --cxxflags` 
+  That could also hold version information
+
+   overall package version: 0.001
+   contribs:
+    JetFFMoments      1.0.1
+    GenericSubtractor trunk@revision
+
+Questions:
+----------
+ - make-release.sh: do we want to check that we're in the trunk?
+
+
+Mailing lists
+--------------------
+- <fastjet@projects.hepforge.org> [=Gregory,Matteo,Gavin + possible volunteers]
+
+  anyone can write to it, subscriptions are restricted 
+
+- current <fastjet-announce@projects.hepforge.org> is used to make announcements
+  about it
+
+- <fastjet-contrib-authors@projects.hepforge.org>
+
+  - it's for the librarians to contact contrib authors
+  - anyone signed up can write to it (or just librarians?)
+  - only those who have requested write access to the svn get signed up to it
+

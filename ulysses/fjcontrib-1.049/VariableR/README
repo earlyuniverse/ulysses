@@ -1,0 +1,72 @@
+The VariableR package is based on the physics described in:
+
+   Jets with Variable R.
+   David Krohn, Jesse Thaler, and Lian-Tao Wang.
+   JHEP 0906:059 (2009), arXiv:0903.0392.
+
+---
+
+Since version 1.2, one uses the following constructor for creating a
+VariableRPlugin (see the VariableRplugin.hh header file for more
+details, thanks to Nikola Whallon for feedback and a prototype version
+with faster clustering times)
+
+   VariableRPlugin(double rho, double min_r, double max_r,
+                   ClustType clust_type,
+                   bool precluster=false,
+                   Strategy strategy=VARIABLE_R_DEFAULT_STRATEGY);
+
+with
+
+   rho  : mass parameter of VR algorithm, where the effective radius is R~rho/pT.
+   min_r: minimum allowed jet radius
+   max_r: maximum allowed jet radius
+   
+   clust_type: AKTLIKE, CALIKE, KTLIKE, for determining the cluster ordering.
+               For generalized-kt-like behavior, you can enter an arbitrary double
+               which is matched to the p value of generalized kt.
+               Recommended usage is AKTLIKE = -1.0  
+   precluster: true to build small kT jets of size min_r before applying VR
+   strategy  : specify the internal clustering strategy. NNFJN2Tiled, the default
+               for FastJet>=3.2.0 is expected to be faster. Other options are
+               NNFJN2Plain, NNH, and Native. For FastJet<3.2.0, or when
+               pre-clustering is requested, the Native strategy is used by default.
+
+
+The VariableRPlugin can be used via the standard FastJet plugin mechanism.
+
+Note that pre-clustering is deprecated: one should rather use the
+FastJet NestedDefs plugin along the following lines:
+
+   #include <fastjet/NestedDefs.hh>
+   #include <fastjet/contrib/VariableRPlugin.hh>
+
+   std::list<JetDefinition> jet_defs;
+   jet_defs.push_back(JetDefinition(kt_algorithm, min_r));
+   contrib::VariableRPlugin vr_plugin(rho,min_r,max_r,clust_type);
+   jet_defs.push_back(JetDefinition(&vr_plugin));
+
+   NestedDefsPlugin nd_plugin(jet_defs);
+   JetDefinition jet_def(&nd_plugin);
+
+For backwards compatibility with Version 1.0, we define the AKTVR and CAVR
+classes with fewer options (plus a KTVR for consistency).  These are available
+in the VariableR.hh header.
+
+   AKTVR(double rho, double max_r):  variable-R anti-kT algorithm
+   CAVR(double rho, double max_r):   variable-R Cambridge-Aachen algorithm
+   KTVR(double rho, double max_r):   variable-R kT algorithm
+
+---
+
+Note:
+- Version 1.2 is based on the NNFJN2Tiled and NNFJN2Plain pairwise
+  clustering classes available in FastJet>=3.2.0. For earlier versions
+  of FastJet (or when pre-clustering is requested), one reverts back to
+  David Krohn's implementation ("Native" strategy)
+- Version 1.1 is based on a new clustering code written by David
+  Krohn, which should be faster than the previous version.
+- Version 1.0 had a CoreJetAlgorithm, which allowed the definition of
+  generic pairwise recombination scheme.  This functionality is now
+  available in the FastJet NNH class, so CoreJetAlgorithm is no longer
+  needed.

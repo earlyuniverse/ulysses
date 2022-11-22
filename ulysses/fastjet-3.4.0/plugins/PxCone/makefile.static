@@ -1,0 +1,35 @@
+
+# common fastjet definitions
+include ../../makefile.static
+
+
+CXXSRC = PxConePlugin.cc 
+F77SRC = pxcone.f
+OBJS = $(patsubst %.cc,%.o,$(CXXSRC)) $(patsubst %.f,%.o,$(F77SRC))
+
+# fastjet includes
+INCLUDE += -I../../include
+
+libPxConePlugin.a: $(OBJS)
+	ar cru libPxConePlugin.a $(OBJS)
+	ranlib libPxConePlugin.a
+
+clean:
+	rm -f $(OBJS)
+
+distclean: clean
+	rm -f libPxConePlugin.a *~
+
+depend:
+	makedepend -f makefile.static $(INCLUDE) -I. --   -- $(CXXSRC) $(F77SRC)
+
+# DO NOT DELETE
+
+PxConePlugin.o: fastjet/PxConePlugin.hh
+PxConePlugin.o: ../../include/fastjet/JetDefinition.hh
+PxConePlugin.o: ../../include/fastjet/internal/numconsts.hh
+PxConePlugin.o: ../../include/fastjet/internal/base.hh
+PxConePlugin.o: ../../include/fastjet/PseudoJet.hh
+PxConePlugin.o: ../../include/fastjet/ClusterSequence.hh
+PxConePlugin.o: ../../include/fastjet/internal/DynamicNearestNeighbours.hh
+PxConePlugin.o: ../../include/fastjet/Error.hh pxcone.h

@@ -1,0 +1,252 @@
+#! /usr/bin/env python
+
+"""\
+%(prog)s <cmds>
+
+Make and fill a YODA histogram from plain text file/stream input.
+
+e.g.
+cat foo.dat | %(prog)s h1 10 0. 100. out foo.yoda
+cat foo2.dat | %(prog)s prof2 10 0. 100. 5 -10 10 show
+
+
+Command syntax:
+
+  The first command must be the histogram type, chosen from the list
+    hist1 hist2 prof1 prof2
+  or the corresponding abbreviations
+    h1 h2 p1 p2.
+  Each of these must be followed by a list of numbers defining bin
+  edges: a 3-tuple of x3 = nxbins xlow xhigh for 1D histogram types
+  and a 6 tuple of x3 y3 for 2D histogram types.
+  To book with logarithmic binning, use the xlogbins,ylogbins with
+  boolean arguments.
+
+  Remaining commands all take a single argument. They allow specifying
+  the histogram path:
+    path /mypath
+  the plot and axis titles:
+    title 'Foo bar'
+    xlabel '$p_T$ [GeV]'
+    ylabel '$N$'
+  using lin/log axis plotting measures:
+    logx yes
+    logy 0
+  general annotations (can be used multiple times):
+    ann 'Foo=bar'
+  and input output file/stdout:
+    in -  (default)
+    out 'foo.yoda'
+    show yes
+
+
+TODO:
+ * Automatically treat '-' as a minus sign in cmds list (with argparse?)
+ * Also allow explicit lists of bin edges as parseable strings on command line?
+ * Default printout/write and auto-true vals for show, log*, etc.
+ * How to determine bin range in advance?... must need two passes??
+ * Add plotting later: plot params nx lx ux palette linecolor linestyle legend ticks on this or yodaplot interface?
+ * Multiple datasets / histos? How???
+ * Data column spec & using eval to do math manipulations
+"""
+
+from __future__ import print_function
+
+import yoda
+import sys, math, numbers
+
+import argparse
+parser = argparse.ArgumentParser(usage=__doc__)
+parser.add_argument("CMDS", nargs="+", help="list of histogram-specification commands")
+#parser.add_option('-o', '--output', default='-', dest='OUTPUT_FILE')
+args = parser.parse_args()
+
+class Binning:
+
+    # TODO: Also allow explicit lists of bin edges as parseable strings
+
+    def __init__(self, nbins, low, high, measure="LIN"):
+        try:
+            self.nbins = int(nbins)
+            self.low = float(low)
+            self.high = float(high)
+            self.measure = str(measure)
+        except:
+            raise Exception("Couldn't construct a binning from arguments: " +
+                            ", ".join([str(nbins), str(low), str(high)]) + " and " +str(measure))
+
+    def binedges(self):
+        if self.nbins <= 0:
+            raise Exception("Your histogram must have at least one bin!")
+        if self.measure == "LIN":
+            return yoda.linspace(self.nbins, self.low, self.high)
+        elif self.measure == "LOG":
+            if self.low <= 0 or self.high <= 0:
+                raise Exception("Can't have a zero or negative logarithmic bin distribution")
+            return yoda.logspace(self.nbins, self.low, self.high)
+        else:
+            raise Exception("Unknown histogram bin measure: " + self.measure)
+
+    @classmethod
+    def checkargs(cls, args):
+        """Check that there are enough args in a sequence to be passed to the Binning
+        constructor and that the types of the first three are suitable."""
+        if len(args) < 3:
+            return False
+        try:
+            n = int(args[0])
+            if n < 1:
+                return False
+            l = float(args[1])
+            h = float(args[2])
+        except:
+            return False
+        return True
+
+
+def error(msg, rtncode=1):
+    "A convenient way to exit with a standard error message format"
+    sys.stderr.write("ERROR: " + msg + "\n")
+    sys.exit(rtncode)
+
+
+## Copy the args: we're going to modify them
+tmpargs = list(args.CMDS)
+
+
+## First arg must be the run mode, so we detect and normalize that first
+MODE = tmpargs[0].lower()
+if MODE in ["h", "h1", "hist", "hist1"]:
+    MODE = "hist1"
+elif MODE in ["p", "p1", "prof", "prof1"]:
+    MODE = "prof1"
+elif MODE in ["h2", "hist2"]:
+    MODE = "hist2"
+elif MODE in ["p2", "prof2"]:
+    MODE = "prof2"
+elif MODE in ["s", "s2", "scat", "scat2"]:
+    MODE = "scat2"
+else:
+    raise Exception("Unknown histogramming mode: " + MODE)
+
+
+## Now process binning instructions
+# TODO: Also allow explicit lists of bin edges as parseable strings
+del tmpargs[0]
+XBINNING = None
+YBINNING = None
+if MODE in ["hist1", "prof1"]:
+    if not Binning.checkargs(tmpargs):
+        error("1D histograms need 3 numeric binning arguments: nbins, lowedge, highedge")
+    XBINNING = Binning(*tmpargs[:3])
+    del tmpargs[:3]
+elif MODE in ["hist2", "prof2"]:
+    if len(tmpargs) < 6 or not Binning.checkargs(tmpargs) or not Binning.checkargs(tmpargs[3:]):
+        error("2D histograms need 2 x 3 numeric binning arguments: nbins, lowedge, highedge for each of the x and y directions in turn")
+    XBINNING = Binning(*tmpargs[:3])
+    del tmpargs[:3]
+    YBINNING = Binning(*tmpargs[:3])
+    del tmpargs[:3]
+elif MODE in ["scat2"]:
+    pass
+
+
+## Break remaining args into cmds, as a dict[cmd] -> [cmdargs]
+cmds = {}
+while tmpargs:
+    cmd = tmpargs[0].lower()
+    try:
+        if cmd == "ann":
+            cmds.setdefault("ann", []).append(tmpargs[1])
+        else:
+            cmds[cmd] = tmpargs[1]
+    except:
+        sys.stderr.write("Value missing for command '%s'\n" % cmd)
+    del tmpargs[:2]
+    # TODO: For now all commands take single-value arguments... maybe this will always be the case?
+    # TODO: We avoid enforcing specific allowed commands for now.
+    # ## Single-arg commands
+    # if cmd in ["path", "title", "xlabel", "ylabel", "logx", "logy",
+    #            "xlogbins", "ylogbins",
+    #            "show", "in", "out"]:
+    #     cmds[cmd] = tmpargs[1]
+    #     del tmpargs[:2]
+    # else:
+    #     error("unknown command '%s'\n" % cmd)
+# print(cmds)
+
+
+## Apply log binning measure(s) if needed
+if XBINNING:
+    XBINNING.measure = "LOG" if yoda.util.as_bool(cmds.get("xlogbins", False)) else "LIN"
+if YBINNING:
+    YBINNING.measure = "LOG" if yoda.util.as_bool(cmds.get("ylogbins", False)) else "LIN"
+
+
+## Make the histo object
+h = None
+if MODE == "hist1":
+    h = yoda.Histo1D(XBINNING.binedges())
+elif MODE == "prof1":
+    h = yoda.Profile1D(XBINNING.binedges())
+elif MODE == "hist2":
+    h = yoda.Histo2D(XBINNING.binedges(), YBINNING.binedges())
+elif MODE == "prof2":
+    h = yoda.Profile2D(XBINNING.binedges(), YBINNING.binedges())
+elif MODE == "scat2":
+    h = yoda.Scatter2D()
+else:
+    raise Exception("Unknown histogramming mode: " + MODE)
+
+
+## Set more annotations, etc.
+h.setPath(cmds.get("path", "/hist1"))
+if "title" in cmds:
+    h.setAnnotation("Title", cmds.get("title"))
+if "xlabel" in cmds:
+    h.setAnnotation("XLabel", cmds.get("xlabel"))
+if "ylabel" in cmds:
+    h.setAnnotation("YLabel", cmds.get("ylabel"))
+if "logx" in cmds:
+    h.setAnnotation("LogX", int(yoda.util.as_bool(cmds.get("logx"))) )
+if "logy" in cmds:
+    h.setAnnotation("LogY", int(yoda.util.as_bool(cmds.get("logy"))) )
+if "ann" in cmds:
+    for kv in cmds.get("ann"):
+        try:
+            k, v = kv.split("=", 1)
+            h.setAnnotation(k, v)
+        except:
+            print("Couldn't set annotation from arg '%s'" % kv)
+
+
+## Read the input and fill the histo
+INPUT = cmds.get("in", "-")
+import fileinput
+for line in fileinput.input(INPUT):
+    if not line.strip(): continue
+    vals = [float(x) for x in line.strip().split()]
+    if MODE == "scat2":
+        # TODO: Multiple errors and asymm errors
+        h.addPoint(*vals)
+    else:
+        if MODE == "hist1":
+            assert len(vals) in [1,2]
+        elif MODE in ["prof1", "hist2"]:
+            assert len(vals) in [2,3]
+        elif MODE == "prof2":
+            assert len(vals) in [3,4]
+        h.fill(*vals)
+
+
+## Show the histogram on the terminal
+if yoda.util.as_bool(cmds.get("show", False)):
+    yoda.writeFLAT([h], "-")
+
+
+## Write output to the chosen output file (including - for stdout)
+OUTPUT = cmds.get("out", "hist.yoda")
+if OUTPUT == "-":
+    yoda.writeYODA([h], OUTPUT)
+else:
+    yoda.write([h], OUTPUT)

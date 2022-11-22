@@ -1,0 +1,190 @@
+The EnergyCorrelator package is based on the physics described in:
+
+   Energy Correlation Functions for Jet Substructure.
+   Andrew J. Larkoski, Gavin Salam, and Jesse Thaler.
+   JHEP 1306, 108 (2013)
+   arXiv:1305.0007.
+
+Additional information and a new observable formed from the 
+energy correlation functions was described in
+
+   Power Counting to Better Jet Observables.
+   Andrew J. Larkoski, Ian Moult, and Duff Neill.
+   JHEP 1412, 009 (2014) 
+   arXiv:1409.6298.
+
+Additional observables based on generalizations of the energy
+correlation functions are described in
+
+   New Angles on Energy Correlation Functions.
+   Ian Moult, Lina Necib, and Jesse Thaler.
+   arXiv:1609.07483.
+
+This FastJet-contrib package contains a number of classes derived from
+FunctionOfPseudoJet<double>.
+
+----------------------------------------------------------------------------
+
+The core classes from 1305.0007, and defined since version 1.0, are:
+
+EnergyCorrelator(int N, double beta, Measure measure)
+
+  Called ECF(N,beta) in arXiv:1305.0007.  Corresponds to the N-point
+  correlation function, with beta the angular exponent, while measure
+  = pt_R (default) or E_theta sets how energies and angles are
+  determined.
+
+EnergyCorrelatorRatio(int N, double beta, Measure measure)
+
+  Called r_N^(beta) in arXiv:1305.0007.  
+  Equals ECF(N+1,beta)/ECF(N,beta).
+
+EnergyCorrelatorDoubleRatio(int N, double beta, Measure measure)
+
+  Called C_N^(beta) in arXiv:1305.0007.  Equals r_N/r_{N-1}.  This 
+  observable provides good boosted N-prong object discrimination.
+  (N=1 for quark/gluon, N=2 for boosted W/Z/H, N=3 for boosted top)
+  Also given in EnergyCorrelatorCseries as of version 1.2.
+
+----------------------------------------------------------------------------
+
+The D2 observable from 1409.6298, as well as C1 and C2 alias classes, were
+added in version 1.1:
+
+EnergyCorrelatorC1(double beta, Measure measure)
+
+  This calculates the double ratio observable C_1^(beta) which is
+  useful for quark versus gluon discrimination.
+
+EnergyCorrelatorC2(double beta, Measure measure)
+
+  This calculates the double ratio observable C_2^(beta) which is
+  useful for boosted W/Z/H identification.
+
+EnergyCorrelatorD2(double beta, Measure measure)
+
+  Called D_2^(beta) in arXiv:1409.6298.  
+  Equals ECF(3,beta)*ECF(1,beta)^3/ECF(2,beta)^3.  
+  This is the recommended function for boosted 2-prong object
+  discrimination (boosted W/Z/H).
+
+----------------------------------------------------------------------------
+
+Generalized energy correlators were introduced in 1609.07483 and appear in
+version 1.2.  They are defined in the class:
+
+EnergyCorrelatorGeneralized(int angles, int N, double beta, Measure measure)
+
+  Called {}_v e_n^{(beta)} in 1609.07483, but will be denoted here as
+  ECFG(angles,N,beta), where v=angles and n=N.  As for EnergyCorrelator,
+  beta is the angular exponent, while measure = pt_R (default) or E_theta
+  sets how energies and angles are determined.  The integer angles
+  determines the number of angles in the observable.  The choice angles=-1
+  sets angles = N choose 2, which corresponds to the N-point
+  normalized (dimensionless) correlation function, with 
+  ECFN(N,beta) = ECFG(N choose 2,N,beta) = ECF(N,beta)/ECF(1,beta)^N
+  
+From the generalized correlators, a variety of useful ratios are defined.
+They are mainly organized by series, with special values highlighted for
+recommended usage.
+
+----------------------------------------------------------------------------
+
+EnergyCorrelatorGeneralizedD2(double alpha, double beta, Measure measure)
+
+  Called D_2^(alpha, beta) in arXiv:1609.07483  
+  Equals ECFN(3,alpha)/ECFN(2,beta)^(3 alpha/beta).  
+  Useful for groomed 2-prong object tagging. We recommend the use of alpha=1
+  and beta=2. 
+
+----------------------------------------------------------------------------
+  
+EnergyCorrelatorNseries(int i, double beta, Measure measure)
+
+  Called N_i^(beta) in arXiv:1609.07483  
+  Equals ECFG(2,n+1,beta)/ECFN(1,n,beta)^2.  
+
+EnergyCorrelatorN2(double beta, Measure measure)
+
+  Called N_2^(beta) in arXiv:1609.07483  
+  Equals ECFG(2,3,beta)/ECFG(1,2,beta)^2. 
+  Useful for groomed and ungroomed 2-prong object tagging.
+ 
+EnergyCorrelatorN3(double beta, Measure measure)
+
+  Called N_3^(beta) in arXiv:1609.07483  
+  Equals ECFG(2,4,beta)/ECFG(1,3,beta)^2.  
+  Useful for groomed 3-prong object tagging.
+
+----------------------------------------------------------------------------
+
+EnergyCorrelatorMseries(int i, double beta, Measure measure)
+
+  Called M_i^(beta) in arXiv:1609.07483  
+  Equals ECFG(1,n+1,beta)/ECFG(1,n,beta).  
+
+EnergyCorrelatorM2(double beta, Measure measure)
+
+  Called M_2^(beta) in arXiv:1609.07483  
+  Equals ECFG(1,3,beta)/ECFG(1,2,beta).
+  Useful for groomed 2-prong object tagging.
+
+
+----------------------------------------------------------------------------
+
+EnergyCorrelatorUseries(int i, double beta, Measure measure)
+
+  Called U_i^(beta) in arXiv:1609.07483  
+  Equals ECFG(1,n+1,beta).  
+
+EnergyCorrelatorU1(double beta, Measure measure)
+
+  Called U_1^(beta) in arXiv:1609.07483  
+  Equals ECFG(1,2,beta).
+  Useful for quark vs. gluon discrimination.
+
+EnergyCorrelatorU2(double beta, Measure measure)
+
+  Called U_2^(beta) in arXiv:1609.07483  
+  Equals ECFG(1,3,beta).
+  Useful for quark vs. gluon discrimination.
+
+EnergyCorrelatorU3(double beta, Measure measure)
+
+  Called U_3^(beta) in arXiv:1609.07483  
+  Equals ECFG(1,4,beta).
+  Useful for quark vs. gluon discrimination.
+----------------------------------------------------------------------------
+
+The argument Measure in each of the above functions sets how energies
+and angles are defined in the observable.  The measure 
+  
+  pt_R
+
+uses hadron collider coordinates (transverse momenta and boost-invariant 
+angles). The "energy" in this case is defined as the pT of the jet, 
+and the "angle" is the distance between the jets in phi, eta space.
+
+The measure
+
+  E_theta
+
+uses particle energies and angles and is appropriate for e+e-
+collider applications. The "energy" is the jet energy and the angle
+between 2 jets is computed from the dot product of the 3 vectors p1 and p2.
+
+The measure
+
+  E_inv
+
+uses particle energies and angles and is also appropriate for e+e-
+collider applications. In this case “theta” is replaced by Mandelstam 
+invariants with the same behavior in the collinear limits, leading to a more 
+calculation friendly observables. The "energy" is defined as the jet energy
+and the "angle squared" is defined as  (2p_i \cdot p_j/E_i E_j), 
+where p_i,p_j are the momenta of the jets i adn j, and E_i, E_j are their
+respective energies.
+
+General usage is shown in the example.cc program, and recommended usage 
+is shown in example_basic_usage.cc.
+
