@@ -23,7 +23,7 @@ jsonschema==3.2.0
 jupyter==1.0.0
 jupyter-client==5.3.5
 jupyter-console==5.2.0
-jupyter-core==4.6.3
+jupyter-core==4.11.2
 line-profiler==3.1.0
 MarkupSafe==1.1.1
 mistune==0.8.4
