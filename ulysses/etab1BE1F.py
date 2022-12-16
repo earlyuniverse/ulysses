@@ -44,7 +44,7 @@ class EtaB_1BE1F(ulysses.ULSBase):
         epstt = np.real(self.epsilon1ab(2,2))
         epsmm = np.real(self.epsilon1ab(1,1))
         epsee = np.real(self.epsilon1ab(0,0))
-
+        print(epstt, (epstt+epsmm+epsee))
         k       = np.real(self.k1)
         y0      = np.array([0+0j,0+0j], dtype=np.complex128)
 

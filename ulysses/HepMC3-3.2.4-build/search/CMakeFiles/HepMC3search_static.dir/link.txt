@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc ../outputs/lib/libHepMC3search-static.a CMakeFiles/HepMC3search_static.dir/src/Relatives.cc.o CMakeFiles/HepMC3search_static.dir/src/Selector.cc.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib ../outputs/lib/libHepMC3search-static.a
