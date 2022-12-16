@@ -142,8 +142,13 @@ def fast_RHS(z, y, Fmat, M2, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec
     # RHS matrices
     RN_mat      =  np.array([[y[0], y[1]], [y[2], y[3]]], dtype=np.complex128)
     RNb_mat     =  np.array([[y[4], y[5]], [y[6], y[7]]], dtype=np.complex128)
+    #Diagonal matrix of the lepton chemical potentials
     mud_mat     =  np.diag([y[8], y[9], y[10]])
     mu_mat      = 2 * chi_mat @ mud_mat
+    
+    #Vector of the lepton chemical potentials
+    mud_vec     =  np.array([y[8], y[9], y[10]], dtype =np.complex128)
+    mu_vec      = 2 * chi_mat @ mud_vec
 
     # matrices appearing in Eqs
     FmatH               = np.transpose(np.conjugate(Fmat))
@@ -237,11 +242,11 @@ def fast_RHS(z, y, Fmat, M2, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec
     for i in range(3):
         eqtns[8+i] = cons_2 * (M0/Tew) * (
                 - 0.5 * G0 * (F_RN_Fdagger[i][i] - Fstar_RNb_Ftrans[i][i])
-                +       G1 * F_Fdagger[i][i]* mu_mat[i][i]
-                - 0.5 * G2 * (F_RN_Fdagger[i][i] + Fstar_RNb_Ftrans[i][i]) * mu_mat[i][i]
+                +       G1 * F_Fdagger[i][i]* mu_vec[i]
+                - 0.5 * G2 * (F_RN_Fdagger[i][i] + Fstar_RNb_Ftrans[i][i]) * mu_vec[i]
                 + 0.5 * S0 * (Fstar_M_RN_M_Ftrans[i][i] - F_M_RNb_M_Fdagger[i][i])
-                +       S1 * F_M_M_Fdagger[i][i] * mu_mat[i][i]
-                - 0.5 * S2 * (Fstar_M_RN_M_Ftrans[i][i] + F_M_RNb_M_Fdagger[i][i]) * mu_mat[i][i]
+                +       S1 * F_M_M_Fdagger[i][i] * mu_vec[i]
+                - 0.5 * S2 * (Fstar_M_RN_M_Ftrans[i][i] + F_M_RNb_M_Fdagger[i][i]) * mu_vec[i]
             )
 
 
@@ -277,9 +282,15 @@ def fast_averaged_RHS(z, y, Fmat, M2, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_
 
     RN_mat      =  np.diag([y[0], y[1]])
     RNb_mat     =  np.diag([y[2], y[3]])
+    
+    #Diagonal matrix of the lepton chemical potentials
     mud_mat     =  np.diag([y[4], y[5], y[6]])
-
     mu_mat      =  2. * chi_mat @ mud_mat
+    
+    #Vector of the lepton chemical potentials
+    mud_vec     =  np.array([y[4], y[5], y[6]])
+    mu_vec      =  2. * chi_mat @ mud_vec
+    
 
     # matrices appearing in Eqs
     FmatH               = np.transpose(np.conjugate(Fmat))
@@ -360,11 +371,11 @@ def fast_averaged_RHS(z, y, Fmat, M2, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_
     for i in range(3):
         eqtns[4+i] = cons_2 * (M0/Tew) * (
                 - 0.5 * G0 * (F_RN_Fdagger[i][i] - Fstar_RNb_Ftrans[i][i])
-                +       G1 * F_Fdagger[i][i]* mu_mat[i][i]
-                - 0.5 * G2 * (F_RN_Fdagger[i][i] + Fstar_RNb_Ftrans[i][i]) * mu_mat[i][i]
+                +       G1 * F_Fdagger[i][i]* mu_vec[i]
+                - 0.5 * G2 * (F_RN_Fdagger[i][i] + Fstar_RNb_Ftrans[i][i]) * mu_vec[i]
                 + 0.5 * S0 * (Fstar_M_RN_M_Ftrans[i][i] - F_M_RNb_M_Fdagger[i][i])
-                +       S1 * F_M_M_Fdagger[i][i] * mu_mat[i][i]
-                - 0.5 * S2 * (Fstar_M_RN_M_Ftrans[i][i] + F_M_RNb_M_Fdagger[i][i]) * mu_mat[i][i]
+                +       S1 * F_M_M_Fdagger[i][i] * mu_vec[i]
+                - 0.5 * S2 * (Fstar_M_RN_M_Ftrans[i][i] + F_M_RNb_M_Fdagger[i][i]) * mu_vec[i]
             )
 
     return eqtns
@@ -471,7 +482,7 @@ class EtaB_ARS(ulysses.ULSBase):
             print(colored("Info: zosc = {}".format(zosc), 'red'))
 
             ys = solve_ivp(lambda t, z: self.RHS(t, z, Fmat, self.M2, dMval, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr),
-                           [1.e-6, 1], y0, method='BDF', rtol=1e-7, atol=1.e-10)
+                           [1.e-6, 1], y0, method='BDF', rtol=1e-7, atol=1e-10)
             
             t, muD1, muD2, muD3 = [ys.t,ys.y[8], ys.y[9], ys.y[10]]
         
@@ -505,13 +516,12 @@ class EtaB_ARS(ulysses.ULSBase):
             t_2, muD1_2, muD2_2, muD3_2 = [solARS.t, solARS.y[4], solARS.y[5], solARS.y[6]]
             t,   muD1,    muD2, muD3 = [np.concatenate((t_1,t_2), axis=0), np.concatenate((muD1_1, muD1_2) , axis=0), np.concatenate((muD2_1, muD2_2), axis=0), np.concatenate((muD3_1, muD3_2), axis=0)]
                 
-        YB_sol  = np.abs(muD1[-1] + muD2[-1] + muD3[-1])
+        YB_sol  = np.real(muD1[-1] + muD2[-1] + muD3[-1])
         
-        plt.plot(t, np.abs(muD1), label=r"$\mu_1$")
-
-        plt.plot(t, np.abs(muD2), label=r"$\mu_2$")
-        plt.plot(t, np.abs(muD3), label=r"$\mu_3$")
-        plt.xlabel(r"$x$", fontsize=16)#x=T_{ew}/T
+        plt.plot(t, np.abs(muD1), label=r"$|\mu_e|$")
+        plt.plot(t, np.abs(muD2), label=r"$|\mu_\mu|$")
+        plt.plot(t, np.abs(muD3), label=r"$|\mu_\tau|$")
+        plt.xlabel(r"$T_{\rm{ew}}/T$", fontsize=16)#z=T_{ew}/T in this module
         plt.legend(loc='lower right', fontsize=16)
         plt.ylabel(r"$|\mu|$",  fontsize=16)
         plt.show()
