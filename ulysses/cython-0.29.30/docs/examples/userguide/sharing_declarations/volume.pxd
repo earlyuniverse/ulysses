@@ -1,1 +1,0 @@
-cdef float cube(float)
