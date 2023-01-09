@@ -181,6 +181,14 @@ class ULSBase(object):
         self.ys[:, self.flavourindices()] = ys[:, self.flavourindices()].real
         self.ys[:,-1] = self.normfact*np.sum(self.ys[:,self.flavourindices()], axis=1)
 
+
+    def setEvolDataPBH(self, ys):
+        self.ys = ys
+        #self.ys = np.empty((len(self.zs), max(self.flavourindices()) + 2))
+        #self.ys[:,0] = self.zs
+        #self.ys[:, self.flavourindices()] = ys[:, self.flavourindices()].real
+        #self.ys[:,-1] = self.normfact*np.sum(self.ys[:,self.flavourindices()], axis=1)
+
         
         
     @property
