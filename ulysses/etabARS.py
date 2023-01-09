@@ -564,12 +564,18 @@ class EtaB_ARS_INTERP(EtaB_ARS):
 
         M2_f  = os.path.join(data_dir, "./data/Log_M.txt")
         z2_f  = os.path.join(data_dir, "./data/Log_z.txt")
+        
         S0M_f = os.path.join(data_dir, "./data/s0log_massdep.txt")
         S1M_f = os.path.join(data_dir, "./data/s1log_massdep.txt")
         S2M_f = os.path.join(data_dir, "./data/s2log_massdep.txt")
 
         M2tab  = np.loadtxt(M2_f, skiprows=0)
         z2tab  = np.loadtxt(z2_f, skiprows=0)
+        
+        G0Mtab = np.loadtxt(G0M_f, skiprows=0)
+        G1Mtab = np.loadtxt(G1M_f, skiprows=0)
+        G2Mtab = np.loadtxt(G2M_f, skiprows=0)
+        
         S0Mtab = np.loadtxt(S0M_f, skiprows=0)
         S1Mtab = np.loadtxt(S1M_f, skiprows=0)
         S2Mtab = np.loadtxt(S2M_f, skiprows=0)
@@ -583,7 +589,6 @@ class EtaB_ARS_INTERP(EtaB_ARS):
     def G1_fun(self,z): return interpolate.splev(math.log(z), self.G1Int_, der=0)
 
     def G2_fun(self,z): return interpolate.splev(math.log(z), self.G2Int_, der=0)
-
 
     def S0_M_fun(self,M, z):
 
@@ -611,6 +616,44 @@ class EtaB_ARS_INTERP(EtaB_ARS):
             M = 100.
 
         return self.S2MInt_(np.log(M), np.log(z))[0,0]
+    
+    #Mass-dependent G0, G1, G2 functions. Use these to include the sub-leading non-relativistic contributions to G0, G1 and G2.
+   
+    G0M_f = os.path.join(data_dir, "./data/g0log_massdep.txt")
+    G1M_f = os.path.join(data_dir, "./data/g1log_massdep.txt")
+    G2M_f = os.path.join(data_dir, "./data/g2log_massdep.txt")
+    
+    self.G0MInt_ = RectBivariateSpline(M2tab, z2tab, G0Mtab) # 2-D Interpolation
+    self.G1MInt_ = RectBivariateSpline(M2tab, z2tab, G1Mtab) # 2-D Interpolation
+    self.G2MInt_ = RectBivariateSpline(M2tab, z2tab, G2Mtab) # 2-D Interpolation
+    
+    def G0_M_fun(self,M, z):
+
+        if M < 0.1:
+            M = 0.1
+        elif M > 100.:
+            M = 100.
+
+        return self.G0MInt_(np.log(M), np.log(z))[0,0]
+
+    def G1_M_fun(self,M, z):
+
+        if M < 0.1:
+            M = 0.1
+        elif M > 100.:
+            M = 100.
+
+        return self.G1MInt_(np.log(M), np.log(z))[0,0]
+
+    def G2_M_fun(self,M, z):
+
+        if M < 0.1:
+            M = 0.1
+        elif M > 100.:
+            M = 100.
+
+        return self.G2MInt_(np.log(M), np.log(z))[0,0]
+
 
     def RHS(self, z, y, Fmat, M2, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr):
 
