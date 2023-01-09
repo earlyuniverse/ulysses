@@ -5,7 +5,7 @@ import math
 from odeintw import odeintw
 import matplotlib.pyplot as plt
 from numpy.lib.function_base import meshgrid
-from scipy.integrate import quad, solve_ivp, simpson, trapezoid
+from scipy.integrate import quad, solve_ivp, simpson
 from scipy.special import zeta, kn
 from numba import njit
 

@@ -9,6 +9,7 @@ from scipy.interpolate import interp1d, RectBivariateSpline
 from scipy.integrate import quad, ode, solve_ivp, odeint
 from scipy.special import zeta
 import math
+import os
 plt.rcParams['text.usetex'] = True
 from termcolor import colored
 #import numba
@@ -546,7 +547,7 @@ class EtaB_ARS_INTERP(EtaB_ARS):
         #                 Integrated Rates            #
         #---------------------------------------------#
 
-        import os
+        
         data_dir = os.path.dirname(ulysses.__file__)
       
         G0_f = os.path.join(data_dir, "./data/g0log.dat")
@@ -572,6 +573,15 @@ class EtaB_ARS_INTERP(EtaB_ARS):
         M2tab  = np.loadtxt(M2_f, skiprows=0)
         z2tab  = np.loadtxt(z2_f, skiprows=0)
         
+        #Mass-dependent G0, G1, G2 functions. Use these to include the sub-leading non-relativistic contributions to G0, G1 and G2.
+        
+
+        G0M_f = os.path.join(data_dir, "./data/g0log_massdep.txt")
+        G1M_f = os.path.join(data_dir, "./data/g1log_massdep.txt")
+        G2M_f = os.path.join(data_dir, "./data/g2log_massdep.txt")
+        
+      
+     
         G0Mtab = np.loadtxt(G0M_f, skiprows=0)
         G1Mtab = np.loadtxt(G1M_f, skiprows=0)
         G2Mtab = np.loadtxt(G2M_f, skiprows=0)
@@ -583,7 +593,11 @@ class EtaB_ARS_INTERP(EtaB_ARS):
         self.S0MInt_ = RectBivariateSpline(M2tab, z2tab, S0Mtab) # 2-D Interpolation
         self.S1MInt_ = RectBivariateSpline(M2tab, z2tab, S1Mtab) # 2-D Interpolation
         self.S2MInt_ = RectBivariateSpline(M2tab, z2tab, S2Mtab) # 2-D Interpolation
-
+        
+        self.G0MInt_ = RectBivariateSpline(M2tab, z2tab, G0Mtab) # 2-D Interpolation
+        self.G1MInt_ = RectBivariateSpline(M2tab, z2tab, G1Mtab) # 2-D Interpolation
+        self.G2MInt_ = RectBivariateSpline(M2tab, z2tab, G2Mtab) # 2-D Interpolation
+ 
     def G0_fun(self,z): return interpolate.splev(math.log(z), self.G0Int_, der=0)
 
     def G1_fun(self,z): return interpolate.splev(math.log(z), self.G1Int_, der=0)
@@ -617,16 +631,7 @@ class EtaB_ARS_INTERP(EtaB_ARS):
 
         return self.S2MInt_(np.log(M), np.log(z))[0,0]
     
-    #Mass-dependent G0, G1, G2 functions. Use these to include the sub-leading non-relativistic contributions to G0, G1 and G2.
-   
-    G0M_f = os.path.join(data_dir, "./data/g0log_massdep.txt")
-    G1M_f = os.path.join(data_dir, "./data/g1log_massdep.txt")
-    G2M_f = os.path.join(data_dir, "./data/g2log_massdep.txt")
-    
-    self.G0MInt_ = RectBivariateSpline(M2tab, z2tab, G0Mtab) # 2-D Interpolation
-    self.G1MInt_ = RectBivariateSpline(M2tab, z2tab, G1Mtab) # 2-D Interpolation
-    self.G2MInt_ = RectBivariateSpline(M2tab, z2tab, G2Mtab) # 2-D Interpolation
-    
+      
     def G0_M_fun(self,M, z):
 
         if M < 0.1:
