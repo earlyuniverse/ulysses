@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
   name = 'ulysses',
-  version = '1.0.2',
+  version = '2.0.2',
   description = 'ULYSSES: Universal LeptogeneSiS Equation Solver',
   url = 'https://github.com/earlyuniverse/ulysses',
   author = 'Alessandro Granelli, Christopher Leslie, Yuber Perez Gonzalez, Brian Shuve,  Holger Schulz, Jessica Turner, Rosie Walker',
@@ -14,6 +14,7 @@ setup(
     'matplotlib',
     'pymultinest',
     'progressbar',
+    'python-dateutil',
     'termcolor',
     'tqdm'  
     # 'numba',
