@@ -423,12 +423,6 @@ class EtaB_ARS(ulysses.ULSBase):
         self.M1 = 0.
         self.m  = 0.
 
-        self.x1 *= -1.
-        self.y1 *= -1.
-
-        self.delta *= -1.
-        self.a21   *= -1.
-
         Fmat     = np.delete(self.h, 0, 1)
 
         if 30. <= self.M2 and self.M2 < 100.:

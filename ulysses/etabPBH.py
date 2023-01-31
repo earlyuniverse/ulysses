@@ -171,9 +171,11 @@ class EtaB_PBH(ulysses.ULSBase):
 
     def shortname(self): return "1BE1F_PBH"
 
-    def flavourindices(self): return [1]
+    def evolname(self): return "a"
 
-    def flavourlabels(self): return ["$NBL$"]
+    def flavourindices(self): return [1, 2]
+
+    def flavourlabels(self): return ["$N^{\\rm B-L}_{\\rm TH}$", "$N^{\\rm B-L}_{\\rm PBH}$"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -502,4 +504,9 @@ class EtaB_PBH(ulysses.ULSBase):
 
         etaB = nb[-1]
 
+        dat = np.array([10.**xBE, np.real(N1RTBE), np.real(N1RBBE), np.real(nb)])
+
+        dat = dat.T
+                        
+        self.setEvolDataPBH(dat)
         return etaB
