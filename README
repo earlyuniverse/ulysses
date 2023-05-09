@@ -7,7 +7,7 @@ bin/ contains run-time scripts that work the ulysses library
     uls-nest: Perform multidimensional parameter scan using multinest
     uls-models: Display available physics models
 
-doc/ conatains sphinx documentation source files
+doc/ contains sphinx documentation source files
 
 examples/ contains example parameter cards
 
