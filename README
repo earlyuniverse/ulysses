@@ -3,6 +3,7 @@ Directory structure:
 bin/ contains run-time scripts that work the ulysses library
     uls-calc: Perform single point evaluation
     uls-scan: Perform line-scan in parameter space
+    uls-scan2D: Perform the 2D scan in the parameter space
     uls-nest: Perform multidimensional parameter scan using multinest
     uls-models: Display available physics models
 
