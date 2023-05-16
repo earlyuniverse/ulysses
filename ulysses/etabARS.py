@@ -143,13 +143,12 @@ def fast_RHS(z, y, Fmat, M2, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec
     # RHS matrices
     RN_mat      =  np.array([[y[0], y[1]], [y[2], y[3]]], dtype=np.complex128)
     RNb_mat     =  np.array([[y[4], y[5]], [y[6], y[7]]], dtype=np.complex128)
-    #Diagonal matrix of the lepton chemical potentials
-    mud_mat     =  np.diag([y[8], y[9], y[10]])
-    mu_mat      = 2 * chi_mat @ mud_mat
     
     #Vector of the lepton chemical potentials
     mud_vec     =  np.array([y[8], y[9], y[10]], dtype =np.complex128)
     mu_vec      = 2 * chi_mat @ mud_vec
+    #Diagonal matrix of the lepton chemical potentials
+    mu_mat     =  np.diag([mu_vec[0], mu_vec[1], mu_vec[2]])
 
     # matrices appearing in Eqs
     FmatH               = np.transpose(np.conjugate(Fmat))
@@ -284,13 +283,11 @@ def fast_averaged_RHS(z, y, Fmat, M2, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_
     RN_mat      =  np.diag([y[0], y[1]])
     RNb_mat     =  np.diag([y[2], y[3]])
     
-    #Diagonal matrix of the lepton chemical potentials
-    mud_mat     =  np.diag([y[4], y[5], y[6]])
-    mu_mat      =  2. * chi_mat @ mud_mat
-    
     #Vector of the lepton chemical potentials
-    mud_vec     =  np.array([y[4], y[5], y[6]])
-    mu_vec      =  2. * chi_mat @ mud_vec
+    mud_vec     =  np.array([y[8], y[9], y[10]], dtype =np.complex128)
+    mu_vec      = 2 * chi_mat @ mud_vec
+    #Diagonal matrix of the lepton chemical potentials
+    mu_mat     =  np.diag([mu_vec[0], mu_vec[1], mu_vec[2]])
     
 
     # matrices appearing in Eqs
