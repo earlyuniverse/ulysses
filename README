@@ -37,5 +37,5 @@ uls−calc −m 3DME examples/3N3NF.dat −o evolution.pdf
 Please, see the manual for more details and cite the following papers if you use ULYSSES for your purposes. 
 For version 1:  https://doi.org/10.1016/j.cpc.2020.107813 [arXiv:2007.09150]
 For version 2:  arXiv:2301.05722
-
+Sphinx documentation: https://ulysses-universal-leptogenesis-equation-solver.readthedocs.io/en/latest/
 
