@@ -19,3 +19,23 @@ ulysses/ contains the library files
     ulsbase.py: Base class all calculators are derived from
     etab*.py: Concrete implementations of physics models
 
+Basic installation guidelines:
+
+# Installation from within the source tree
+git clone https :// github.com/ earlyuniverse /ulysses.git
+cd ulysses
+pip install . −−user
+
+# Installation with pip or pip3 from pypi.org
+pip install ulysses −−user
+
+Basic usage examples:
+
+#Computes the BAU with the module 3DMES and produces a plot of the evolution in the file evolution.pdf
+uls−calc −m 3DME examples/3N3NF.dat −o evolution.pdf
+
+Please, see the manual for more details and cite the following papers if you use ULYSSES for your purposes. 
+For version 1:  https://doi.org/10.1016/j.cpc.2020.107813 [arXiv:2007.09150]
+For version 2:  arXiv:2301.05722
+
+
