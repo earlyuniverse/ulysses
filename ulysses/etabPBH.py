@@ -79,7 +79,7 @@ def FBEqs(x, v, nphi, M1, M2, M3, eps, d1, w1, N1Req, dPBH1, WashDL2, xilog10):
     drRADdx  = - (FSM/FT) * (dM_GeVdx/M_GeV) * 10**xff * rPBH
     drPBHdx  = + (dM_GeVdx/M_GeV) * rPBH
     
-    dTdx     = - (Tp/Del) * (1.0 - (bh.gstarS(Tp)/bh.gstar(Tp))*(drRADdx/(4.*rRAD)))
+    dTdx     = - (Tp/Del) * (1.0 - (bh.gstar(Tp)/bh.gstarS(Tp))*(drRADdx/(4.*rRAD)))
 
     #----------------------------------------#
     #              RH neutrinos              #
