@@ -28,7 +28,7 @@ description     = "ULYSSES: Universal LeptogeneSiS Equation Solver"
 readme          = "README.md"
 license         = "MIT"
 license-files   = ["LICENSE"]
-requires-python = ">=3.8"
+requires-python = ">=3.9,<3.13"
 authors = [
     {name = "Alessandro Granelli"},
     {name = "Christopher Leslie"},
@@ -42,20 +42,22 @@ authors = [
 # Lower bounds ensure pre-built wheels exist for all supported Python versions,
 # preventing fallback to source builds that require extra system headers.
 dependencies = [
-    "numpy>=1.22",
-    "scipy>=1.7",
+    "numpy>=1.22,<2.0",       # numba requires numpy<2.0
+    "scipy>=1.9",
     "matplotlib>=3.5",
-    "pymultinest>=2.11",
     "progressbar>=2.5",
     "pandas>=1.5",
     "python-dateutil>=2.8",
     "termcolor>=1.1",
     "tqdm>=4.60",
-    "numba>=0.55",
+    "numba>=0.56,<0.61",      # 0.56+ for cfunc stability; <0.61 until numpy2 support confirmed
     "mpmath>=1.2",
     "mpltern>=0.4",
     "multiprocess>=0.70.12",
 ]
+
+[project.optional-dependencies]
+nest = ["pymultinest>=2.11"]  # optional: not available on Windows
 
 [project.urls]
 Homepage   = "https://github.com/earlyuniverse/ulysses"

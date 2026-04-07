@@ -68,22 +68,24 @@ setup(
     include_package_data=True,
     
     install_requires=[
-        'numpy',
-        'scipy',
-        'matplotlib',
-        'pymultinest',
+        'numpy>=1.22,<2.0',      # numba requires numpy<2.0
+        'scipy>=1.9',
+        'matplotlib>=3.5',
         'progressbar',
         'pandas',
         'python-dateutil',
         'termcolor',
-        'tqdm',  
-        'numba',
+        'tqdm',
+        'numba>=0.56,<0.61',     # 0.56+ for cfunc stability; <0.61 until numpy2 support confirmed
         'mpmath',
         'mpltern',
-        'multiprocess'
+        'multiprocess',
     ],
-    
-    python_requires='>3.6.0',
+    extras_require={
+        'nest': ['pymultinest'],  # optional: not available on Windows
+    },
+
+    python_requires='>=3.9,<3.13',  # numba supports 3.9-3.12 as of 0.59
     scripts=['bin/uls-calc', 'bin/uls-scan', 'bin/uls-nest', 'bin/uls-models', 'bin/uls-scan2D'],
     
     # This triggers the cmake build for the NumbaQuadpack subfolder
