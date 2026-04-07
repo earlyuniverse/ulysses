@@ -1,16 +1,10 @@
 """
 etab1BE1F_DM_FreezeIn.py — Freeze-in dark matter + leptogenesis.
 
-Extends the standard 1BE1F leptogenesis model (arXiv:2007.09150, eqs. 4-5)
-with a third Boltzmann equation tracking a dark matter particle X produced
+Extends the standard 1BE1F leptogenesis model with a third Boltzmann equation tracking a dark matter particle X produced
 via freeze-in from N1 decays through a dark sector coupling lambda.
 
-Physics
--------
-The BEs solved are:
 
-    dN1/dz     = -D(k,z) * (N1 - N1eq)                         [unchanged]
-    dNBL/dz    =  eps * D(k,z) * (N1 - N1eq) - W(k,z) * NBL   [unchanged]
     dN_DM/dz   =  Br_dark * D(k,z) * (N1 - N1eq)               [new]
 
 where Br_dark = (Gamma_dark / Gamma_total) is the branching ratio of N1
@@ -20,15 +14,6 @@ its equilibrium abundance is effectively zero, so no washout term appears.
 The dark partial width is parametrised as
 
     Gamma_dark = lambda^2 * M1 / (8*pi)
-
-which has the same dimension as the SM partial width Gamma_N1 that is
-already encoded in D1(k,z).  The total width is Gamma_total = Gamma_SM + Gamma_dark,
-and we rescale D accordingly.
-
-In the decoupled approximation (FIMP regime, lambda << Yukawa) the leptogenesis
-sector is solved first and the N1 trajectory is reused to source N_DM.
-This keeps the leptogenesis result identical to 1BE1F and adds negligible
-overhead.
 
 Runcard additions
 -----------------
@@ -42,9 +27,9 @@ If absent, defaults of lam=0 and m_dm=M1/10 are used (safe fallback).
 
 Outputs
 -------
-EtaB   — standard baryon asymmetry eta_B   (unchanged, for scan compatibility)
-Y_DM   — DM yield  n_DM / s
-OmDMh2 — Omega_DM h^2
+N_B-L  — standard B-L number density 
+EtaB   — standard baryon asymmetry eta_B   
+N_DM   — Dark Matter number density
 """
 
 import ulysses
@@ -62,15 +47,6 @@ from scipy.special import kn
 def fast_RHS_FreezeIn(y0, d_sm, d_dark, w1, n1eq, epstt, epsmm, epsee):
     """
     Right-hand side for freeze-in leptogenesis + DM system.
-
-    Parameters
-    ----------
-    y0          : [N1, NBL, N_DM]
-    d_sm        : SM decay parameter D (already includes H factors)
-    d_dark      : dark decay parameter D_dark = Br_dark * D_total
-    w1          : washout parameter W
-    n1eq        : N1 equilibrium abundance
-    epstt, epsmm, epsee : flavour CP asymmetries
     """
     N1   = y0[0]
     NBL  = y0[1]
@@ -88,19 +64,6 @@ def fast_RHS_FreezeIn(y0, d_sm, d_dark, w1, n1eq, epstt, epsmm, epsee):
 # ---------------------------------------------------------------------- #
 
 class EtaB_1BE1F_DM_FreezeIn(ulysses.ULSBase):
-    """
-    Freeze-in DM + 1BE1F leptogenesis.
-
-    Boltzmann equations for non-resonant leptogenesis with one decaying
-    sterile neutrino (1BE1F) extended by a freeze-in dark matter equation.
-    DM is produced by N1 decays through a dark sector coupling lambda.
-    Flavour effects are neglected (same assumption as 1BE1F).
-
-    New runcard parameters
-    ----------------------
-    lam   : dark coupling  (default 0)
-    m_dm  : DM mass in GeV (default M1/10)
-    """
 
     def shortname(self): return "1BE1F_DM_FreezeIn"
 
@@ -130,17 +93,8 @@ class EtaB_1BE1F_DM_FreezeIn(ulysses.ULSBase):
         Gamma_dark = lambda^2 * M1 / (8*pi)
         Gamma_SM   is encoded via the decay parameter k1 = Gamma_SM / H(z=1)
 
-        We compute the ratio Gamma_dark / (Gamma_SM + Gamma_dark).
-        Gamma_SM = k1 * H(z=1) where H(z=1) = M1^2 / (M_Pl * ...) but
-        since we only need the ratio we use:
-
-            Br_dark = (lam^2 / (8*pi)) / (tilde_m1 / v^2 + lam^2 / (8*pi))
-
-        where tilde_m1 = k1 * (8*pi*v^2*H*) / M1^2, i.e. the effective
-        neutrino mass.  In practice we work with the already-computed
-        self.k1 (= Gamma_SM / H*) and note:
-
-            k_dark = lambda^2 * M1 / (8*pi*H*)
+        Br_dark = (lam^2 / (8*pi)) / (tilde_m1 / v^2 + lam^2 / (8*pi))
+        k_dark = lambda^2 * M1 / (8*pi*H*)
 
         so  Br_dark = k_dark / (k1 + k_dark).
         """
