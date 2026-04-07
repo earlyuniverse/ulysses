@@ -1,0 +1,4 @@
+recursive-include ulysses *.txt
+recursive-include ulysses *.dat
+recursive-include ulysses *.npz
+recursive-include ulysses *.csv
