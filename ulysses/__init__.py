@@ -32,7 +32,6 @@ from ulysses.etabARS_3RHN             import EtaB_ARS_3RHN
 from ulysses.etabPBH                  import EtaB_PBH
 
 from ulysses.etab1BE1F_DM_freezein    import EtaB_1BE1F_DM_FreezeIn
-from ulysses.etab1BE1F_RHN_DM         import EtaB_1BE1F_RHN_DM
 
 testpars = {
         'delta' :270,
