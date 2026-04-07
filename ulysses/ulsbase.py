@@ -766,7 +766,7 @@ class ULSBase(object):
         """
         M         = self.DM
         t         = np.log(M[0,0]/self.MH)
-        DStemp    = 0.1*k1*(1+t*(z**2)*np.log(1+8.77298/(t*z)))
+        DStemp    = 0.11399*k1*(1+t*(z**2)*np.log(1+8.77298/(t*z)))
         return DStemp
 
     def D2(self, k,z):
@@ -1185,7 +1185,7 @@ class ULSBase(object):
         Gamma   = (self.M1**2/self.MP)*np.sqrt(2*np.pi/3)*np.sqrt((np.pi**2)*self.gstar/30)*(1+epstot)*d/z
 
         #calculate (decay rate)/(mass splitting)
-        return Gamma/(M2-M1)
+        return Gamma/(self.M2-self.M1)
 
     @property
     def Gamma1(self):
