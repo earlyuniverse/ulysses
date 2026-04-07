@@ -80,7 +80,7 @@ cd ulysses
 ```
 3. Install the package in editable mode using pip:
 ```bash
-pip install. --user
+pip install . --user
 ```
 ### 🔧 Environment Setup (optional)
 
