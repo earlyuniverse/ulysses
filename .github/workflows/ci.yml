@@ -7,7 +7,8 @@ on:
     branches: [main, master]
 
 jobs:
-  test:
+  test-editable:
+    name: Editable install (${{ matrix.os }}, py${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -31,8 +32,51 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get install -y cmake
 
-      - name: Install package
+      - name: Install package (editable)
         run: pip install -e .
+
+      - name: Smoke test — 1BE1F
+        run: uls-calc -m 1BE1F examples/1N1F.dat
+
+      - name: Smoke test — 2BE1F
+        run: uls-calc -m 2BE1F examples/2N1F.dat
+
+      - name: Smoke test — 1BE1F IO
+        run: uls-calc -m 1BE1F examples/1N1FIO.dat
+
+      - name: Smoke test — resonant leptogenesis
+        run: uls-calc -m 2RES examples/Res.dat
+
+  test-standard:
+    name: Standard install (${{ matrix.os }}, py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install CMake (macOS)
+        if: runner.os == 'macOS'
+        run: brew install cmake
+
+      - name: Install CMake (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y cmake
+
+      - name: Build wheel
+        run: pip wheel . --no-deps -w dist/
+
+      - name: Install from wheel
+        run: pip install dist/*.whl
 
       - name: Smoke test — 1BE1F
         run: uls-calc -m 1BE1F examples/1N1F.dat
