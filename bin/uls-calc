@@ -145,7 +145,7 @@ if __name__=="__main__":
     op.add_option("-o", "--output",    dest="OUTPUT",           default=None, type=str, help="Output file name for evolution plots/data --- if not provided, only calculate etaB (default: %default)")
     op.add_option("-v", "--debug",     dest="DEBUG",            default=False, action="store_true", help="Turn on some debug messages")
     op.add_option("-m", "--model",     dest="MODEL",            default="1DME", help="Selection of of model (default: %default)")
-    op.add_option("--zrange",          dest="ZRANGE",           default="0.1,100,1000", help="Ranges and steps of the evolution variable (default: %default)")
+    op.add_option("--zrange",          dest="ZRANGE",           default="0.1,30,500", help="Ranges and steps of the evolution variable (default: %default)")
     op.add_option("--inv",             dest="INVORDERING",      default=False, action='store_true', help="Use inverted mass ordering (default: %default)")
     op.add_option("--loop",            dest="LOOP",             default=False, action='store_true', help="Use loop-corrected Yukawa (default: %default)")
     op.add_option("--zcut",            dest="ZCUT",             default="1.0",  help="Set cut value for stitching in ARS model")
