@@ -58,6 +58,10 @@ if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(cquadpack m)
 endif()
 
-set_target_properties(cquadpack PROPERTIES SUFFIX ".so")
+# Use platform-default shared library suffix:
+#   Linux  → libcquadpack.so
+#   macOS  → libcquadpack.dylib
+#   Windows → cquadpack.dll
+# Do NOT force ".so" here — driver.py expects the platform-native name.
 install(TARGETS cquadpack DESTINATION ${CMAKE_SOURCE_DIR}/NumbaQuadpack/)
 
