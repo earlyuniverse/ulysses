@@ -32,6 +32,24 @@ class build_ext(build_ext_orig):
             return
         super().build_extension(ext)
 
+    def copy_extensions_to_source(self):
+        # Editable installs try to copy built .so files back to the source tree.
+        # CMakeExtension outputs (libcquadpack.so/.dylib) are already written
+        # directly to NumbaQuadpack/ by cmake, so exclude them from the copy step.
+        original = self.extensions
+        self.extensions = [e for e in self.extensions if not isinstance(e, CMakeExtension)]
+        super().copy_extensions_to_source()
+        self.extensions = original
+
+    def get_outputs(self):
+        # Regular wheel builds collect outputs from get_outputs() to include in
+        # the wheel. CMakeExtension produces a plain C library (covered by
+        # package_data), not a Python .so, so remove its expected path from outputs.
+        outputs = super().get_outputs()
+        cmake_paths = {self.get_ext_fullpath(e.name)
+                       for e in self.extensions if isinstance(e, CMakeExtension)}
+        return [o for o in outputs if o not in cmake_paths]
+
     def build_cmake(self, ext):
         build_temp = pathlib.Path(self.build_temp)
         build_temp.mkdir(parents=True, exist_ok=True)
