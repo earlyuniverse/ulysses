@@ -101,7 +101,7 @@ def Nl_lstore(fn_store, yn_vals, zs):
     def Nlrhs(z, Nl, eps, K):
         data = np.array([z, Nl[0], eps], np.float64)
         integral = dqags(ynintegral_ptr, 1e-9, 300., data,
-                                epsrel=1e-10, epsabs=1e-10)
+                                epsrel=1e-10, epsabs=1e-10)[0]
         # 4.80822761 = 4 * zeta(3)
         return -z * z * K / 4.80822761 * integral
 
