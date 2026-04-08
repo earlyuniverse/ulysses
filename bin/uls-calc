@@ -246,6 +246,8 @@ if __name__=="__main__":
         D=LEPTO.evolData
         if opts.OUTPUT.endswith(".txt"):
             np.savetxt(opts.OUTPUT, D)
+        if opts.OUTPUT.endswith(".dat"):
+            np.savetxt(opts.OUTPUT, D)
         elif opts.OUTPUT.endswith(".csv"):
             np.savetxt(opts.OUTPUT, D, delimiter=",")
         else:

@@ -26,31 +26,25 @@ class build_ext(build_ext_orig):
         super().run()
 
     def build_cmake(self, ext):
-        # build_temp is where temporary files go
         build_temp = pathlib.Path(self.build_temp)
         build_temp.mkdir(parents=True, exist_ok=True)
-        
-        # extdir is where the final compiled library goes
-        extdir = pathlib.Path(self.get_ext_fullpath(ext.name))
-        extdir.mkdir(parents=True, exist_ok=True)
-        
+
+        # Build the library directly into the NumbaQuadpack source directory
+        # so that (a) editable installs work immediately, and (b) pip copies
+        # it to site-packages as package_data on a regular install.
+        pkg_dir = pathlib.Path(__file__).parent / "NumbaQuadpack"
+
         config = 'Debug' if self.debug else 'Release'
-        
-        # We point cmake to the subdirectory where CMakeLists.txt lives
         cmake_args = [
-            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + str(extdir.parent.absolute()),
-            '-DCMAKE_BUILD_TYPE=' + config
+            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + str(pkg_dir.absolute()),
+            '-DCMAKE_BUILD_TYPE=' + config,
         ]
-        
         build_args = ['--config', config]
 
         os.chdir(str(build_temp))
-        # Call cmake pointing to the sourcedir (NumbaQuadpack folder)
         self.spawn(['cmake', ext.sourcedir] + cmake_args)
         if not self.dry_run:
             self.spawn(['cmake', '--build', '.'] + build_args)
-        
-        # Return to the original directory so setuptools doesn't get lost
         os.chdir(str(pathlib.Path(__file__).parent.absolute()))
 
 # --- Combined Setup ---
@@ -63,9 +57,11 @@ setup(
     author='Alessandro Granelli, Christopher Leslie, Yuber Perez Gonzalez, Brian Shuve, Holger Schulz, Jessica Turner, Rosie Walker',
     author_email='jessicaturner.5390@gmail.com',
     
-    # find_packages will now pick up both 'ulysses' and 'NumbaQuadpack'
     packages=find_packages(),
     include_package_data=True,
+    package_data={
+        'NumbaQuadpack': ['*.so', '*.dylib', '*.dll'],
+    },
     
     install_requires=[
         'numpy>=1.22,<2.0',      # numba requires numpy<2.0

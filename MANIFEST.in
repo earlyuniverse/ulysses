@@ -2,3 +2,6 @@ recursive-include ulysses *.txt
 recursive-include ulysses *.dat
 recursive-include ulysses *.npz
 recursive-include ulysses *.csv
+recursive-include NumbaQuadpack *.so
+recursive-include NumbaQuadpack *.dylib
+recursive-include NumbaQuadpack *.dll

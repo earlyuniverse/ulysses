@@ -119,7 +119,7 @@ export PATH=$PATH:$ULYSSES/bin
 
 ## Quick Start
 
-### Step 1: Create a parameter file
+### Step 1: Create a parameter file (or use one of the example parameter files in examples/)
 
 ```ini
 # Lightest neutrino mass (log10, eV)
@@ -150,7 +150,7 @@ t23    43.27
 uls-calc -m 1BE1F examples/1N1F.dat -o evolution.pdf
 ```
 
-The terminal will display the ULYSSES banner, the model name, all input parameters, and the computed $\eta_B$, $Y_B$, and $\Omega_b h^2$.
+The terminal will display the ULYSSES banner, the model name, all input parameters, and the computed $\eta_B$, $Y_B$, and $\Omega_b h^2$, and an output file (evolution.pdf) will be created. One could stroe the output as a .txt, a .dat or a .csv file. 
 
 ---
 
