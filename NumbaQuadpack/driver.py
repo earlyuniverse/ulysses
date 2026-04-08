@@ -7,19 +7,14 @@ import numpy as np
 quadpack_sig = types.double(types.double,
                             types.CPointer(types.double))
 
-# Locate the compiled extension via Python's import machinery.
-# This works on all platforms regardless of the platform-specific suffix
-# (.cpython-310-x86_64-linux-gnu.so, .cp310-win_amd64.pyd, etc.)
-# Search every entry on sys.path for the compiled extension.
-# This finds it in site-packages even when the source directory is
-# earlier on sys.path (e.g. running a notebook from the repo root).
-import sys
-_candidates = []
-for _p in sys.path:
-    _candidates = [f for f in glob.glob(os.path.join(_p, 'NumbaQuadpack', 'libcquadpack.*'))
-                   if not f.endswith('.c')]
-    if _candidates:
-        break
+# Look for the compiled extension in the same directory as this file.
+# This works for all install modes:
+#   - regular install: driver.py and the .so are both in site-packages/NumbaQuadpack/
+#   - editable install: setuptools copies the .so into the source NumbaQuadpack/
+#   - build_ext --inplace: .so lands next to driver.py in the source tree
+_pkg_dir = os.path.dirname(os.path.abspath(__file__))
+_candidates = [f for f in glob.glob(os.path.join(_pkg_dir, 'libcquadpack.*'))
+               if not f.endswith('.c')]
 
 if not _candidates:
     raise ImportError(
