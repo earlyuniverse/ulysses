@@ -1,5 +1,70 @@
 import cmath
 import ulysses
+import sys
+
+
+_BANNER = r"""
+
+                              ##
+                              ###
+                           ###########   #
+                             #####             ######     ##
+                            #####            ####
+                          ###  #           ###      ############
+                        ####      ##     ###     ######      #######
+                        ###             ###    ###                 ###
+                        ##             ##    ###    ############     ##
+                       ##             ##    ##    ###          ####
+                       ##     ###    ###   ##  ###  ############   ###    #
+                    #####     ###    ###  ###  ## ### #####   ####   ##   #
+                  ####         ##     ##  ###  ## ############  ###   ##
+                               ##     ##    ##  ###########  ###  ##   ##
+                                ##     ##    ###   #########  ##  ##   ##
+                         ##     ###     ###    ######### ##   ##  ##   ##
+                                   ###      #############   ##   ###   ##
+                              ##    ####        #####     ###    ##
+                              ###      ####             ###    ###
+                              #####       ###############     ###
+                              ##  ##                        ###
+                              ##   ##                    ####      ###
+                              ##    ##             ######
+                              ##      ##                    #
+                              ##     ###      #
+                              ##    ###     ####
+                              ## ####    ######
+                              #####   ####  ###
+                       ###############      ##
+                                          ###
+                             #######    ####     ############  ##########
+                        ###########################        #######      #
+                                          ##
+
+                  ##    ##  ###  ####  ### #######   ######   ######  #######
+                  ##    ##  ###   ### ###  ###      ###       ##      ###  
+                  ##    ##  ###    #####    ######   ######   ######   ######
+                  ##    ##  ###     ###        ####      ###  ##           ###
+                  ########  ####### ###    ######## ########  ####### ########
+"""
+
+
+def print_banner(model_name=None, param_file=None, params=None, extra=None):
+    """Print the ULYSSES ASCII banner with optional run info."""
+    print(_BANNER)
+    if model_name is not None:
+        print("  Model    : {}".format(model_name))
+    if param_file is not None:
+        print("  Run card : {}".format(param_file))
+    if params:
+        print("  Parameters:")
+        col_width = max(len(k) for k in params)
+        for k, v in params.items():
+            print("    {:{w}s} = {}".format(k, v, w=col_width))
+    if extra:
+        for line in extra:
+            print("  " + line)
+    print("  " + "-" * 60)
+    sys.stdout.flush()
+
 
 
 def parseArgs(args):
