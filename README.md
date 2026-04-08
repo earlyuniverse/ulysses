@@ -51,18 +51,15 @@ with temperature parameter $z = M_1 / T$.
 - Plugin-based model extensions
 
 ### Version 2 (v2) – arXiv:2301.05722
-- **ARS** (low-scale) leptogenesis with 2 and 3 RHNs
+- **ARS** (low-scale) leptogenesis with 2 RHNs (`BEARS`, `BEARS_INTERP`)
 - **Primordial black hole** (PBH) leptogenesis
 - **Complete BEs** with full quantum statistics (Cases 2–4)
 - Preconfigured 2D scans for parameter space exploration
 
 ### Version 3 (v3) – This release
 - **Case S2**: Full phase-space Boltzmann equations including $\Delta L = 1$ scattering ($s$- and $t$-channel, $Nl \to qt$) via precomputed AB grids (arXiv:0907.0205)
-- **Freeze-in dark matter**: coupled evolution of a dark matter species produced from out-of-equilibrium RHN decays via a feeble dark-sector coupling
-- **RHN dark matter**: right-handed neutrino as a stable dark matter candidate
-- Updated neutrino oscillation parameters to **NuFit 6.1** (2025)
-- Terminal ASCII banner with run card summary on every execution
-
+- **ARS with 3 RHNs** (`BEARS_3RHN`): extension of the ARS mechanism to the three right-handed neutrino case
+- **Extended model interface** (`--extended` flag): allows models to declare extra parameters beyond the standard PMNS+CI set, opening the solver to coupled multi-sector scenarios; `1BE1F_DM_FreezeIn` serve as worked toy-model examples demonstrating freeze-in and RHN dark matter production
 ---
 
 ## Installation
@@ -233,12 +230,11 @@ uls-calc -m 1BE1F_DM_FreezeIn --extended examples/1N1F_dm.dat -o dm_evolution.pd
 |--------------|--------------|--------------------------------------------------|
 | `1BE1F_PBH`  | `PBH.dat`    | Leptogenesis from PBH evaporation                |
 
-### Dark matter
+### Dark matter (Toy model for extended flag interface)
 
 | Model                  | Example file   | Description                                              |
 |------------------------|----------------|----------------------------------------------------------|
 | `1BE1F_DM_FreezeIn`    | `1N1F_dm.dat`  | Freeze-in DM from RHN decays via feeble dark coupling    |
-| `1BE1F_RHN_DM`         | `1N1F.dat`     | RHN as stable dark matter candidate                      |
 
 ---
 
@@ -277,22 +273,6 @@ Please cite the relevant paper(s) for the features you use:
     volume = "291",
     pages = "108834",
     year = "2023"
-}
-```
-
-### Case S2 ($\Delta L=1$ scattering)
-```bibtex
-@article{HahnWoernle:2009,
-    author = "Hahn-Woernle, F. and Plumacher, M. and Wong, Y.Y.Y.",
-    title = "{Full Boltzmann equations for leptogenesis including scattering}",
-    eprint = "0907.0205",
-    archivePrefix = "arXiv",
-    primaryClass = "hep-ph",
-    doi = "10.1088/1475-7516/2009/08/028",
-    journal = "JCAP",
-    volume = "08",
-    pages = "028",
-    year = "2009"
 }
 ```
 
