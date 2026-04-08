@@ -62,6 +62,5 @@ endif()
 #   Linux  → libcquadpack.so
 #   macOS  → libcquadpack.dylib
 #   Windows → cquadpack.dll
-# Do NOT force ".so" here — driver.py expects the platform-native name.
 install(TARGETS cquadpack DESTINATION ${CMAKE_SOURCE_DIR}/NumbaQuadpack/)
 
