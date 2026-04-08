@@ -76,6 +76,7 @@ setup(
         'mpmath',
         'mpltern',
         'multiprocess',
+        'ipykernel'
     ],
     extras_require={
         'nest': ['pymultinest'],  # optional: not available on Windows
