@@ -1,32 +1,22 @@
 import ctypes as ct
-import numba as nb
+import importlib.util
 from numba import njit, types
 import numpy as np
-import os
-import platform 
 
 quadpack_sig = types.double(types.double,
                             types.CPointer(types.double))
 
-rootdir = os.path.dirname(os.path.realpath(__file__))+'/'
+# Locate the compiled extension via Python's import machinery.
+# This works on all platforms regardless of the platform-specific suffix
+# (.cpython-310-x86_64-linux-gnu.so, .cp310-win_amd64.pyd, etc.)
+_spec = importlib.util.find_spec('NumbaQuadpack.libcquadpack')
+if _spec is None or _spec.origin is None:
+    raise ImportError(
+        "NumbaQuadpack.libcquadpack extension not found. "
+        "Please reinstall ulysses: pip install ulysses"
+    )
 
-# Determine the correct library filename based on the OS
-system = platform.system()
-if system == "Windows":
-    lib_name = "cquadpack.dll"
-elif system == "Darwin": # macOS
-    lib_name = "libcquadpack.dylib"
-else: # Linux and others
-    lib_name = "libcquadpack.so"
-
-lib_path = os.path.join(rootdir, lib_name)
-
-# Check if file exists to give a better error message
-if not os.path.exists(lib_path):
-    raise ImportError(f"Could not find {lib_name} at {lib_path}. "
-                      "Please ensure the library was compiled correctly.")
-
-libquadpack = ct.CDLL(lib_path)
+libquadpack = ct.CDLL(_spec.origin)
 
 dqags_ = libquadpack.dqags
 dqags_.argtypes = [ct.c_void_p, ct.c_double, ct.c_double, ct.c_double, ct.c_double, \
