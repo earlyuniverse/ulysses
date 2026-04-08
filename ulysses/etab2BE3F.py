@@ -51,7 +51,7 @@ class EtaB_2BE3F(ulysses.ULSBase):
             self._n2eq    = self.N2Eq(z)
             self._currz=z
 
-        from numba import List
+        from numba.typed import List
         C=List()
         [C.append(c) for c in _C]
 

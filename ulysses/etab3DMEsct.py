@@ -94,7 +94,7 @@ class EtaB_3DMEsct(ulysses.ULSBase):
             self._n3eq    = self.N3Eq(zzz)
             self._currz=zzz
 
-        from numba import List
+        from numba.typed import List
         C=List()
         [C.append(c) for c in _C]
         W=List()

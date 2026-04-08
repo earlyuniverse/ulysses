@@ -52,7 +52,7 @@ class EtaB_2RESmix(ulysses.ULSBase):
             self._n2eq          = self.N2Eq(zzz)
             self._currz=zzz
 
-        from numba import List
+        from numba.typed import List
         C=List()
         [C.append(c) for c in _C]
         return fast_RHS(y0, eps2tt, eps2mm, eps2ee, eps1tt, eps1mm, eps1ee, C,self._d1,self._d2,self._w1,self._w2,self._n1eq,self._n2eq)

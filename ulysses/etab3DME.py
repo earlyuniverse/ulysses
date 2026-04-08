@@ -83,7 +83,7 @@ class EtaB_3DME(ulysses.ULSBase):
         N1, N2, N3, Ntt, Nmm, Nee, Ntm, Nte, Nme = y0
         (eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me) = ETA
         c1t,c1m,c1e,c2t,c2m,c2e,c3t,c3m,c3e = _C
-        from numba import List
+        from numba.typed import List
         C=List()
         [C.append(c) for c in _C]
 

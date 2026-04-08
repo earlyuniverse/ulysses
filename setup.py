@@ -25,6 +25,13 @@ class build_ext(build_ext_orig):
                     )
         super().run()
 
+    def build_extension(self, ext):
+        # CMakeExtension is fully handled by build_cmake() in run(); skip the
+        # normal setuptools C-extension build path which would fail with no sources.
+        if isinstance(ext, CMakeExtension):
+            return
+        super().build_extension(ext)
+
     def build_cmake(self, ext):
         build_temp = pathlib.Path(self.build_temp)
         build_temp.mkdir(parents=True, exist_ok=True)
@@ -76,7 +83,6 @@ setup(
         'mpmath',
         'mpltern',
         'multiprocess',
-        'ipykernel'
     ],
     extras_require={
         'nest': ['pymultinest'],  # optional: not available on Windows
