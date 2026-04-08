@@ -1,5 +1,6 @@
 import ctypes as ct
-import importlib.util
+import glob
+import os
 from numba import njit, types
 import numpy as np
 
@@ -9,14 +10,24 @@ quadpack_sig = types.double(types.double,
 # Locate the compiled extension via Python's import machinery.
 # This works on all platforms regardless of the platform-specific suffix
 # (.cpython-310-x86_64-linux-gnu.so, .cp310-win_amd64.pyd, etc.)
-_spec = importlib.util.find_spec('NumbaQuadpack.libcquadpack')
-if _spec is None or _spec.origin is None:
+# Search every entry on sys.path for the compiled extension.
+# This finds it in site-packages even when the source directory is
+# earlier on sys.path (e.g. running a notebook from the repo root).
+import sys
+_candidates = []
+for _p in sys.path:
+    _candidates = [f for f in glob.glob(os.path.join(_p, 'NumbaQuadpack', 'libcquadpack.*'))
+                   if not f.endswith('.c')]
+    if _candidates:
+        break
+
+if not _candidates:
     raise ImportError(
         "NumbaQuadpack.libcquadpack extension not found. "
-        "Please reinstall ulysses: pip install ulysses"
+        "Please reinstall: pip install ulysses"
     )
 
-libquadpack = ct.CDLL(_spec.origin)
+libquadpack = ct.CDLL(_candidates[0])
 
 dqags_ = libquadpack.dqags
 dqags_.argtypes = [ct.c_void_p, ct.c_double, ct.c_double, ct.c_double, ct.c_double, \
