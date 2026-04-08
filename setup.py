@@ -26,7 +26,7 @@ setup(
     include_package_data=True,
 
     install_requires=[
-        'numpy>=1.22,<2.0',      # numba requires numpy<2.0
+        'numpy>=1.22',
         'scipy>=1.9',
         'matplotlib>=3.5',
         'progressbar',
@@ -34,7 +34,7 @@ setup(
         'python-dateutil',
         'termcolor',
         'tqdm',
-        'numba>=0.56,<0.61',     # 0.56+ for cfunc stability; <0.61 until numpy2 support confirmed
+        'numba>=0.56',           # 0.56+ for cfunc stability; 0.61+ supports numpy2 and Python 3.13
         'mpmath',
         'mpltern',
         'multiprocess',
@@ -44,7 +44,7 @@ setup(
         'nest': ['pymultinest'],  # optional: not available on Windows
     },
 
-    python_requires='>=3.9,<3.13',  # numba supports 3.9-3.12 as of 0.59
+    python_requires='>=3.9,<3.14',  # numba 0.60 supports 3.9-3.12; 0.61+ adds 3.13
     scripts=['bin/uls-calc', 'bin/uls-scan', 'bin/uls-nest', 'bin/uls-models', 'bin/uls-scan2D'],
 
     ext_modules=[quadpack_ext],
