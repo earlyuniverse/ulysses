@@ -1,28 +1,43 @@
 import ctypes as ct
 import glob
 import os
+import sys
 from numba import njit, types
 import numpy as np
 
 quadpack_sig = types.double(types.double,
                             types.CPointer(types.double))
 
-# Look for the compiled extension in the same directory as this file.
-# This works for all install modes:
-#   - regular install: driver.py and the .so are both in site-packages/NumbaQuadpack/
-#   - editable install: setuptools copies the .so into the source NumbaQuadpack/
-#   - build_ext --inplace: .so lands next to driver.py in the source tree
-_pkg_dir = os.path.dirname(os.path.abspath(__file__))
-_candidates = [f for f in glob.glob(os.path.join(_pkg_dir, 'libcquadpack.*'))
-               if not f.endswith('.c')]
+# Search for the compiled extension. We first check the directory containing
+# this file (covers editable installs and build_ext --inplace), then fall back
+# to scanning all sys.path entries for a NumbaQuadpack/ sub-directory.
+# The fallback handles the case where Python loads driver.py from the source
+# tree (e.g. repo root in cwd) but the extension was installed into a venv's
+# site-packages — as happens with 'uv pip install .' or running from the repo
+# root after a regular 'pip install .'.
+def _find_libcquadpack():
+    search_dirs = [os.path.dirname(os.path.abspath(__file__))]
+    search_dirs += [os.path.join(p, 'NumbaQuadpack') for p in sys.path if p]
+    seen = set()
+    for d in search_dirs:
+        d = os.path.abspath(d)
+        if d in seen:
+            continue
+        seen.add(d)
+        hits = [f for f in glob.glob(os.path.join(d, 'libcquadpack.*'))
+                if not f.endswith('.c')]
+        if hits:
+            return hits[0]
+    return None
 
-if not _candidates:
+_ext_path = _find_libcquadpack()
+if _ext_path is None:
     raise ImportError(
         "NumbaQuadpack.libcquadpack extension not found. "
         "Please reinstall: pip install ulysses"
     )
 
-libquadpack = ct.CDLL(_candidates[0])
+libquadpack = ct.CDLL(_ext_path)
 
 dqags_ = libquadpack.dqags
 dqags_.argtypes = [ct.c_void_p, ct.c_double, ct.c_double, ct.c_double, ct.c_double, \
