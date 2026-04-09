@@ -20,7 +20,8 @@ class build_ext(_build_ext):
             if not os.path.exists(built):
                 continue
             dest = os.path.join('NumbaQuadpack', os.path.basename(built))
-            shutil.copy2(built, dest)
+            if os.path.abspath(built) != os.path.abspath(dest):
+                shutil.copy2(built, dest)
 
 c_sources = (
     glob.glob('NumbaQuadpack/src/*.c') +
