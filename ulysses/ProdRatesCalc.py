@@ -72,7 +72,7 @@ def save_rate_table(path, mass_gev, temperatures_gev):
 
 
 #CHANGE THIS ACCORDINGLY
-PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Data', 'ARS_rates_ULYSSES')
+PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'ARS_rates_ULYSSES')
 
 
 Npoints = 50
