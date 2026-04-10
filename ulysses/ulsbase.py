@@ -230,7 +230,6 @@ class ULSBase(object):
         fi = self.flavourindices()
         if not fi:
             return
-        print(len(self.zs))
         self.ys = np.empty((len(self.zs), max(fi) + 2))
         self.ys[:,0] = self.zs
         self.ys[:, fi] = ys[:, fi].real
