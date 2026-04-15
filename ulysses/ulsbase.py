@@ -99,9 +99,6 @@ class ULSBase(object):
         self.setZS()
         self.normfact = kwargs.get("normfact", 0.013)
 
-        #switch for the initial abundance of RHNs
-        self.initial_abundance = kwargs.get("initial_abundance", 0)  #1 for thermal initial abundance, 0 for vanishing initial abundance
-
         # INCLUDEd IN ULYSSESv3
         # Choose the parameterisation of the Yukawa matrix
 
@@ -111,9 +108,11 @@ class ULSBase(object):
         self.which_param = kwargs.get("which_param", 'euler')  # setter sets pnames
         self.evolname = "z"
 
-        # Initial abundance either thermal or vanishing. If none is given, vanishing will be assumed.
-        # THIS PARAMETER SHOULD BE IMPLEMENTED IN EACH MODULE
-        self.ia = (1.0 + 0j) if kwargs.get("IA") == 'TIA' else (0.0 + 0j)
+        #switch for the initial abundance of RHNs
+        self.initial_abundance = kwargs.get("initial_abundance", 0)  #1 for thermal initial abundance, 0 for vanishing initial abundance
+
+        #ARS parameter Lambda which controls the scale at which the fast modes in linear term are forced to enter quasi-static regime
+        self.Lambda = kwargs.get("Lambda", None)
 
         # Storage for the full parameter dict passed to setParams (includes extended params)
         self.pdict = {}
@@ -283,6 +282,8 @@ class ULSBase(object):
             Mass parameters are in specific units (see inline comments).
         """
         self.pdict = pdict
+        if "Lambda" in pdict:
+            self.Lambda = pdict["Lambda"]
         # Helper function to convert degrees to radians
         def deg_to_rad(key):
             return pdict[key] / 180 * np.pi
