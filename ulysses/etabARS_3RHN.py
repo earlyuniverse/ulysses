@@ -1035,7 +1035,7 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         gstaro      = 43 / 11  # Entropic effective degrees of freedom at present
         ToYb        = 45 * zeta3 / (gstaro * np.pi**4)
         ToOmegab    = mp * ngamma / rhoc
-        self.Lambda = 1e3
+        self.Lambda = 1e3 if self.Lambda is None else self.Lambda
         self.plot = False
         self.save_plot = False
         self.evolname = r"$T_{\rm{ew}}/T$"
