@@ -176,9 +176,8 @@ class EtaB_1BE1F_DM_FreezeIn(ulysses.ULSBase):
             (3.0 / 8.0) * x_safe**2 * kn(2, x_safe)
         )
 
-        # Append equilibrium column so setEvolDataExtended stores it
         ys_ext = np.column_stack([np.real(ys), N_DM_eq_vals])
-        self.setEvolDataExtended(ys_ext)
+        self.setEvolData(ys_ext)
 
         # DM outputs (stored for external access)
         N_DM_final   = ys[-1][2]

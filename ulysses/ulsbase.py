@@ -237,18 +237,6 @@ class ULSBase(object):
         self.ys[:, fi] = ys[:, fi].real
         self.ys[:,-1] = self.normfact*np.sum(self.ys[:, fi], axis=1)
 
-    def setEvolDataExtended(self, ys):
-        fi  = self.flavourindices()
-        ext = self.extendedindices()
-        if not fi:
-            return
-        self.ys = np.empty((len(self.zs), max(fi) + len(ext) + 3))
-        self.ys[:,0] = self.zs
-        self.ys[:, fi] = ys[:, fi].real
-        if ext:
-            self.ys[:, ext] = ys[:, ext].real
-        self.ys[:,-2] = ys[:, 0].real  # second to last column: RHN abundance
-        self.ys[:,-1] = self.normfact*np.sum(self.ys[:, fi], axis=1)  # etaB from flavour indices only
 
     #CHANGES TO BE INCLUDED in ULYSSESv3
     @property
