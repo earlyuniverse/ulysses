@@ -78,18 +78,23 @@ if __name__=="__main__":
 
     LEPTO.which_param = param
 
+    _OPTIONAL_PMNS = {'t12', 't13', 't23'}
+    _required_pnames = [p for p in LEPTO.pnames if p not in _OPTIONAL_PMNS]
+
     if LEPTO.extended_mode:
-        # Extended mode: all pnames must appear in FIX or RNG;
+        # Extended mode: required pnames must appear in FIX or RNG;
         # extra keys in FIX/RNG may be extended (model-specific) parameters
         covered = set(FIX.keys()) | set(RNG.keys())
-        for p in LEPTO.pnames:
+        for p in _required_pnames:
             if not p in covered:
                 print("Required parameter {} not provided in input file {}, exiting".format(p, args[0]))
                 sys.exit(1)
     else:
-        if len(FIX) + len(RNG) != len(LEPTO.pnames):
-            print("Error, the number of parameters needs to be {}, user supplied {}, exiting".format(len(LEPTO.pnames), len(FIX)+len(RNG)))
-            sys.exit(1)
+        covered = set(FIX.keys()) | set(RNG.keys())
+        for p in _required_pnames:
+            if p not in covered:
+                print("Parameter {} not provided in input file {}, exiting".format(p, args[0]))
+                sys.exit(1)
         for p in FIX.keys():
             if not p in LEPTO.pnames:
                 print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
@@ -106,6 +111,13 @@ if __name__=="__main__":
         print("No floating parameters specified in {}, exiting.".format(args[0]))
         sys.exit(1)
 
+    uls.tools.print_banner(
+        model_name=opts.MODEL,
+        param_file=pfile,
+        params={**FIX, **{k: "{} to {}".format(*v) for k, v in RNG.items()}},
+        extra=["zrange: zmin={}, zmax={}, steps={}".format(zmin, zmax, zsteps),
+               "multinest live points: {}".format(opts.POINTS)]
+    )
 
     # Output directory
     rank=0

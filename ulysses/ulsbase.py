@@ -300,14 +300,19 @@ class ULSBase(object):
             self._set_masses(pdict, log10_mass)
             self._set_manual_yukawa_matrix(pdict)
     
+    # NuFIT best-fit defaults for PMNS mixing angles (degrees)
+    _DEFAULT_T12 = 33.76
+    _DEFAULT_T13 =  8.62
+    _DEFAULT_T23 = 43.27
+
     def _set_common_angles(self, pdict, deg_to_rad):
         """Set angles common to all parameterisations."""
         self.delta = deg_to_rad('delta')
         self.a21 = deg_to_rad('a21')
         self.a31 = deg_to_rad('a31')
-        self.t12 = deg_to_rad('t12')
-        self.t23 = deg_to_rad('t23')
-        self.t13 = deg_to_rad('t13')
+        self.t12 = pdict.get('t12', self._DEFAULT_T12) / 180 * np.pi
+        self.t23 = pdict.get('t23', self._DEFAULT_T23) / 180 * np.pi
+        self.t13 = pdict.get('t13', self._DEFAULT_T13) / 180 * np.pi
     
     def _set_casas_ibarra_angles(self, pdict, deg_to_rad):
         """Set angles specific to standard Casas-Ibarra parameterisation."""

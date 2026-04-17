@@ -186,23 +186,26 @@ if __name__=="__main__":
 
     LEPTO.which_param = param
 
+    _OPTIONAL_PMNS = {'t12', 't13', 't23'}
+    _required_pnames = [p for p in LEPTO.pnames if p not in _OPTIONAL_PMNS]
+
     if LEPTO.extended_mode:
-        # Extended mode: all pnames must be present in FIX; extra keys are model-specific
-        for p in LEPTO.pnames:
+        # Extended mode: required pnames must be present in FIX; extra keys are model-specific
+        for p in _required_pnames:
             if not p in FIX:
                 print("Required parameter {} not provided in input file {}, exiting".format(p, args[0]))
                 sys.exit(1)
     else:
-        if len(FIX) != len(LEPTO.pnames):
-            print("Error, the number of parameters needs to be {}, user supplied {}, exiting".format(len(LEPTO.pnames), len(FIX)))
+        _supplied = {p for p in FIX if p in LEPTO.pnames}
+        _required_set = set(_required_pnames)
+        if not _required_set.issubset(_supplied):
+            for p in _required_pnames:
+                if p not in FIX:
+                    print("Parameter {} not provided in input file {}, exiting".format(p, args[0]))
             sys.exit(1)
         for p in FIX.keys():
             if not p in LEPTO.pnames:
                 print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
-                sys.exit(1)
-        for p in LEPTO.pnames:
-            if not p in FIX.keys():
-                print("Parameter {} not provided in input file {}, exiting".format(p, args[0]))
                 sys.exit(1)
     
     
