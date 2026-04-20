@@ -275,6 +275,13 @@ class ULSBase(object):
         self.pdict = pdict
         if "Lambda" in pdict:
             self.Lambda = pdict["Lambda"]
+        # Optional mass splittings in eV^2 — converted to GeV^2 internally
+        if "m2solar" in pdict:
+            self.msplit2_solar = pdict["m2solar"] * 1e-18
+        if "m2atm" in pdict:
+            self.msplit2_athm_normal = pdict["m2atm"] * 1e-18
+        if "m2atminv" in pdict:
+            self.msplit2_athm_invert = pdict["m2atminv"] * 1e-18
         # Helper function to convert degrees to radians
         def deg_to_rad(key):
             return pdict[key] / 180 * np.pi
@@ -300,19 +307,30 @@ class ULSBase(object):
             self._set_masses(pdict, log10_mass)
             self._set_manual_yukawa_matrix(pdict)
     
-    # NuFIT best-fit defaults for PMNS mixing angles (degrees)
-    _DEFAULT_T12 = 33.76
-    _DEFAULT_T13 =  8.62
-    _DEFAULT_T23 = 43.27
+    # NuFIT best-fit defaults for PMNS mixing angles (degrees), normal / inverted ordering
+    _DEFAULT_T12_NO = 33.76
+    _DEFAULT_T13_NO =  8.62
+    _DEFAULT_T23_NO = 43.27
+    _DEFAULT_T12_IO = 33.76
+    _DEFAULT_T13_IO =  8.65
+    _DEFAULT_T23_IO = 48.15
+
+    # Parameters recognised in param files but not required (silently defaulted)
+    _OPTIONAL_PARAMS = {'t12', 't13', 't23', 'm2solar', 'm2atm', 'm2atminv'}
 
     def _set_common_angles(self, pdict, deg_to_rad):
         """Set angles common to all parameterisations."""
         self.delta = deg_to_rad('delta')
         self.a21 = deg_to_rad('a21')
         self.a31 = deg_to_rad('a31')
-        self.t12 = pdict.get('t12', self._DEFAULT_T12) / 180 * np.pi
-        self.t23 = pdict.get('t23', self._DEFAULT_T23) / 180 * np.pi
-        self.t13 = pdict.get('t13', self._DEFAULT_T13) / 180 * np.pi
+        if self.ordering == 0:
+            self.t12 = pdict.get('t12', self._DEFAULT_T12_NO) / 180 * np.pi
+            self.t23 = pdict.get('t23', self._DEFAULT_T23_NO) / 180 * np.pi
+            self.t13 = pdict.get('t13', self._DEFAULT_T13_NO) / 180 * np.pi
+        else:
+            self.t12 = pdict.get('t12', self._DEFAULT_T12_IO) / 180 * np.pi
+            self.t23 = pdict.get('t23', self._DEFAULT_T23_IO) / 180 * np.pi
+            self.t13 = pdict.get('t13', self._DEFAULT_T13_IO) / 180 * np.pi
     
     def _set_casas_ibarra_angles(self, pdict, deg_to_rad):
         """Set angles specific to standard Casas-Ibarra parameterisation."""

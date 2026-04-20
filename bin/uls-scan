@@ -98,8 +98,8 @@ if __name__=="__main__":
     pscan = list(RNG.keys())[0]
     pmin, pmax = RNG[pscan]
 
-    _OPTIONAL_PMNS = {'t12', 't13', 't23'}
-    _required_pnames = [p for p in LEPTO.pnames if p not in _OPTIONAL_PMNS]
+    _optional = LEPTO._OPTIONAL_PARAMS
+    _required_pnames = [p for p in LEPTO.pnames if p not in _optional]
 
     if LEPTO.extended_mode:
         # Extended mode: required pnames must appear in FIX or as the scan parameter;
@@ -116,7 +116,7 @@ if __name__=="__main__":
                 print("Parameter {} not provided in input file {}, exiting".format(p, args[0]))
                 sys.exit(1)
         for p in FIX.keys():
-            if not p in LEPTO.pnames:
+            if p not in LEPTO.pnames and p not in _optional:
                 print("Parameter {} in input file {} not recognised, exiting".format(p, args[0]))
                 sys.exit(1)
         if not pscan in LEPTO.pnames:
