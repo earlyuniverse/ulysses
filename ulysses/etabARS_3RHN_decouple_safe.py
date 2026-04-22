@@ -441,16 +441,7 @@ def compute_linearised_coefficients(Fmat, M_mat, chi_mat, Dm2_mat, n3_decoupled=
 
     #We are writing the equations in terms of rn-1, therefore, there is an additional matrix, which is simply L, and needs to be multiplied by fact only
     if n3_decoupled:
-        # When N3 is decoupled (Y_alpha3=0), project out the N3 row/column from each
-        # Gell-Mann basis matrix before computing coefficients.  This ensures the
-        # expanding-universe source term (A_L @ y + C_col) contributes exactly zero
-        # to d(rN33)/dx when rN33=0, eliminating the spurious drift of rN33.
-        def _gm_proj(m):
-            m_p = np.copy(m)
-            m_p[2, :] = 0.0
-            m_p[:, 2] = 0.0
-            return GellMann_coefficients_decoupled(m_p)
-        L_gm = [_gm_proj(l) + _gm_proj(l) + [0]*3 for l in L]
+        L_gm = [GellMann_coefficients_decoupled(l) + GellMann_coefficients_decoupled(l) + [0]*3 for l in L]#[_gm_proj(l) + _gm_proj(l) + [0]*3 for l in L]
     else:
         L_gm = [GellMann_coefficients(l) + GellMann_coefficients(l) + [0]*3 for l in L]
 
@@ -1067,9 +1058,11 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         #     stiffness; zero it so the regulator matrix stays well-conditioned.
         # (2) The A_L and C_col terms must be projected onto the 2-neutrino subspace
         #     so the expanding-universe source contributes exactly zero to d(rN33)/dx.
-        n3_decoupled = np.linalg.norm(Fmat[:, 2]) < 1e-20
+        n3_decoupled = np.linalg.norm(Fmat[:, 2]) < 1e-17
+        print 
         if n3_decoupled:
             deltaM2_31 = 0.0
+            Fmat[:, 2] = 0.0
 
         Dm2_mat     = np.diag([0, deltaM2_21, deltaM2_31])
 
@@ -1082,8 +1075,7 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         # Precompute the C_col source vector.  When N3 is decoupled use the
         # projected identity diag(1,1,0) so the source is consistent with A_L.
         if n3_decoupled:
-            I3_proj = np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,0.]], dtype=np.complex128)
-            C_col_precomp = np.array(GellMann_coefficients(I3_proj) + GellMann_coefficients(I3_proj) + [0.,0.,0.], dtype=np.complex128)
+            C_col_precomp = np.array(GellMann_coefficients_decoupled(np.identity(3)) + GellMann_coefficients_decoupled(np.identity(3)) + [0.,0.,0.], dtype=np.complex128)
         else:
             C_col_precomp = np.array(GellMann_coefficients(np.identity(3)) + GellMann_coefficients(np.identity(3)) + [0.,0.,0.], dtype=np.complex128)
 
