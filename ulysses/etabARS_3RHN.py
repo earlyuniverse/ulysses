@@ -516,7 +516,7 @@ def compute_linearised_coefficients(Fmat, M_mat, chi_mat, Dm2_mat):
         Bvec_G2.append(b_G2 + np.transpose(b_G2))
         Bvec_S2.append(b_S2 + np.transpose(b_S2))
 
-    for s in range(0, 9):
+    for k in range(0, 9):
         bb_G2    = np.array([0]*18 + [0]*3+
                             [0]*18 + [0]*3+
                             [0]*18 + [0]*3+
