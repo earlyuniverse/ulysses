@@ -185,6 +185,20 @@ def GellMann_coefficients(M):
     return [c0, c1, c2, c3, c4, c5, c6, c7, c8]
 
 
+#use this if n3 is decoupled
+def GellMann_coefficients_decoupled(M):
+    c0 = (1/3) * (M[0][0] + M[1][1])   # + M[2][2])
+    c1 = (1/2) * (M[0][1] + M[1][0])
+    c2 = (1j/2) * (M[0][1] - M[1][0])
+    c3 = (1/2) * (M[0][0] - M[1][1])
+    c4 = 0   #(1/2) * (M[0][2] + M[2][0])
+    c5 = 0   #(1j/2) * (M[0][2] - M[2][0])
+    c6 = 0   #(1/2) * (M[1][2] + M[2][1])
+    c7 = 0   #(1j/2) * (M[1][2] - M[2][1])
+    c8 = (np.sqrt(3)/6) * (M[0][0] + M[1][1] )   #- 2*M[2][2])
+    return [c0, c1, c2, c3, c4, c5, c6, c7, c8]
+
+
 """
 ATTEMPT: Define all the quantities that do not depend on x outside of the RHS. This makes the code faster.
 """
@@ -435,7 +449,7 @@ def compute_linearised_coefficients(Fmat, M_mat, chi_mat, Dm2_mat, n3_decoupled=
             m_p = np.copy(m)
             m_p[2, :] = 0.0
             m_p[:, 2] = 0.0
-            return GellMann_coefficients(m_p)
+            return GellMann_coefficients_decoupled(m_p)
         L_gm = [_gm_proj(l) + _gm_proj(l) + [0]*3 for l in L]
     else:
         L_gm = [GellMann_coefficients(l) + GellMann_coefficients(l) + [0]*3 for l in L]
@@ -529,7 +543,7 @@ def compute_linearised_coefficients(Fmat, M_mat, chi_mat, Dm2_mat, n3_decoupled=
         Bvec_G2.append(b_G2 + np.transpose(b_G2))
         Bvec_S2.append(b_S2 + np.transpose(b_S2))
 
-    for s in range(0, 9):
+    for k in range(0, 9):
         bb_G2    = np.array([0]*18 + [0]*3+
                             [0]*18 + [0]*3+
                             [0]*18 + [0]*3+
