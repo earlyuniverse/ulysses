@@ -425,10 +425,11 @@ def compute_linearised_coefficients(Fmat, M_mat, chi_mat, Dm2_mat):
     
 
     #We are writing the equations in terms of rn-1, therefore, there is an additional matrix, which is simply L, and needs to be multiplied by fact only
-    L_gm = [GellMann_coefficients(l) + GellMann_coefficients(l) + [0]*3 for l in L]
-
-    A_L  = np.transpose(np.array(L_gm[0]+L_gm[1]+L_gm[2]+L_gm[3]+L_gm[4]+L_gm[5]+L_gm[6]+L_gm[7]+L_gm[8] +
-                                  L_gm[0]+L_gm[1]+L_gm[2]+L_gm[3]+L_gm[4]+L_gm[5]+L_gm[6]+L_gm[7]+L_gm[8] +
+    L_gm_rN  = [GellMann_coefficients(l) + [0]*9  + [0]*3 for l in L]
+    L_gm_rNb = [[0]*9 + GellMann_coefficients(l)  + [0]*3 for l in L]
+    
+    A_L  = np.transpose(np.array(L_gm_rN[0]+L_gm_rN[1]+L_gm_rN[2]+L_gm_rN[3]+L_gm_rN[4]+L_gm_rN[5]+L_gm_rN[6]+L_gm_rN[7]+L_gm_rN[8] +
+                                  L_gm_rNb[0]+L_gm_rNb[1]+L_gm_rNb[2]+L_gm_rNb[3]+L_gm_rNb[4]+L_gm_rNb[5]+L_gm_rNb[6]+L_gm_rNb[7]+L_gm_rNb[8] +
                                   [0]*21 + [0]*21 + [0]*21, dtype=np.complex128).reshape(21,21))
     
 
