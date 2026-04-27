@@ -2,6 +2,7 @@
 from scipy.special import kn
 import ulysses
 import numpy as np
+import warnings
 from odeintw import odeintw
 from numba import jit, njit
 import matplotlib.pyplot as plt
@@ -812,35 +813,46 @@ def compute_linearised_coefficients(Fmat, M_mat, chi_mat, Dm2_mat):
 #-------------------------------------------------------------------------------------#
 import time
 
+# Max mass above which, rates are extrapolated via the scaling gamma(M,T) ~ (M/Mx)*gamma(Mx, T*Mx/M).
+_M_tab_max = 50000.0  # GeV
+
 @njit
-def set_rates(z, Mav, T,set_rates_kn2):
-    # print("wow")
+def set_rates(z, Mav, T, set_rates_kn2):
 
     Tew = 131.7
-    x = Tew/T
+    x   = Tew / T
 
-    h0      = interp_one_over_y0(z)#np.pi**2/(18*zeta(3))
-    hLNC    = interp_hp(z)#np.pi**2/(144*zeta(3))#
-    #the M dependence is moved to the definition of the interaction Hamiltonian
-    hLNV    = interp_hm(z)/(Mav**2)#The dependence over 1/T^2 is kept inside hLNV\
+    h0   = interp_one_over_y0(z)
+    hLNC = interp_hp(z)
+    # M dependence moved to the interaction Hamiltonian definition
+    hLNV = interp_hm(z) / (Mav**2)
 
-    #Relativistic valeus: 
-    G0_rel = 0.013296432287963416#G0_M_fun(M[0,0], x) #9.15e-3
-    G1_rel = 0.006737226958120181e-2#7.29e-3
-    S0_rel = 0.0432819999972177/T**2 
-    S1_rel = 2.5e-2/T**2
+    # Relativistic values (unused but kept for reference)
+    G0_rel = 0.013296432287963416
+    G1_rel = 0.006737226958120181e-2
+    S0_rel = 0.0432819999972177 / T**2
+    S1_rel = 2.5e-2 / T**2
 
-    G0      = G0_M_fun(Mav, x)
-    
-    G1      = G1_M_fun(Mav, x) * 2/(z**2 * set_rates_kn2)
+    # For M beyond the table, rescale: gamma(M,T) ~ (M/Mx)*gamma(Mx, T*Mx/M)
+    # which in x-space becomes: evaluate at M_ref and x_eff = x*(M/M_ref)
+    if Mav > _M_tab_max:
+        M_ref   = _M_tab_max
+        x_eff   = x * Mav / M_ref
+        m_scale = Mav / M_ref
+    else:
+        M_ref   = Mav
+        x_eff   = x
+        m_scale = 1.0
 
-    #the M dependence is moved to the various coefficients of the DMEs
-    S0      = S0_M_fun(Mav, x) /(Mav**2) #The dependence over 1/T^2 is kept inside S0
-    S1      = S1_M_fun(Mav, x) * 2/(z**2 * set_rates_kn2) /(Mav**2) #The dependence over 1/T^2 is kept inside S1
+    G0 = m_scale * G0_M_fun(M_ref, x_eff)
+    G1 = m_scale * G1_M_fun(M_ref, x_eff) * 2 / (z**2 * set_rates_kn2)
+    # M dependence moved to the DME coefficients; 1/Mav**2 uses the physical mass
+    S0 = m_scale * S0_M_fun(M_ref, x_eff) / (Mav**2)
+    S1 = m_scale * S1_M_fun(M_ref, x_eff) * 2 / (z**2 * set_rates_kn2) / (Mav**2)
 
-    #The non-linear terms here do not include the non-relativistic corrections
-    G2      = -2.19e-3 
-    S2      = -1.651e-2 /T**2
+    # Non-linear terms (no non-relativistic corrections)
+    G2 = -2.19e-3
+    S2 = -1.651e-2 / T**2
 
     return h0, hLNC, hLNV, G0, G1, S0, S1, G2, S2
 
@@ -1003,9 +1015,11 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         ToYb        = 45 * zeta3 / (gstaro * np.pi**4)
         ToOmegab    = mp * ngamma / rhoc
         self.Lambda = 1e3 if self.Lambda is None else self.Lambda
-        #for ARS
-        self.xmin = 1e-6 if self.xmin is None else self.xmin
-        self.xmax = np.min([1, 20*131.7/self.M1]) if self.xmax is None else self.xmax
+        # Resolve integration bounds; xmax=None means physics-motivated default
+        x_start     = 1e-6 if self._xmin is None else self._xmin
+        x_end       = float(np.min([1, 20 * Tew / self.M1])) if self._xmax is None else self._xmax
+        self.plot   = False if self.plot is None else self.plot
+        self.save_plot = False
 
         self.evolname = r"$T_{\rm{ew}}/T$"
 
@@ -1014,6 +1028,37 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         dMval_21    = self.M2 - self.M1
         dMval_31    = self.M3 - self.M1
 
+        # --- Validity warnings ---
+        masses       = np.array([self.M1, self.M1 + dMval_21, self.M1 + dMval_31])
+
+        # RHN i is considered decoupled if all Yukawa couplings |h_{alpha,i}| < 1e-16
+        active       = [np.max(np.abs(Fmat[:, i])) >= 1e-16 for i in range(3)]
+        active_pairs = [(i, j) for i, j in [(0, 1), (0, 2), (1, 2)] if active[i] and active[j]]
+
+        # Warning 1: mass splitting O(1) of the mass for any non-decoupled pair
+        for i, j in active_pairs:
+            dM   = abs(masses[i] - masses[j])
+            Mmax = min(masses[i], masses[j])
+            if dM > Mmax:
+                warnings.warn(
+                    "Large mass splitting: |M{} - M{}| = {:.3e} GeV > max(M{}, M{}) = {:.3e} GeV. "
+                    "The ARS equations assume quasi-degenerate RHNs and may be unreliable.".format(
+                        i + 1, j + 1, dM, i + 1, j + 1, Mmax),
+                    UserWarning, stacklevel=2)
+
+        # Warning 2: T_osc >= T_2flav for any non-decoupled pair
+        T_2flav     = 1e9  # GeV
+        if active_pairs:
+            dMs          = [(abs(masses[i] - masses[j]), i, j) for i, j in active_pairs]
+            dM_max, ia, ib = max(dMs, key=lambda v: v[0])
+            Mbar_max     = 0.5 * (masses[ia] + masses[ib])
+            T_osc        = (dM_max * Mbar_max * self.MP / (9.96 * np.sqrt(gss))) ** (1. / 3.)
+            if T_osc >= T_2flav:
+                warnings.warn(
+                    "T_osc = {:.3e} GeV >= T_2flav = {:.3e} GeV (dominant pair: N{}, N{}). "
+                    "etabARS_3RHN may be inadequate: RHN oscillations begin before the "
+                    "2-flavour regime ends.".format(T_osc, T_2flav, ia + 1, ib + 1),
+                    UserWarning, stacklevel=2)
 
         #initial conditions for the Gell-Mann coefficients for (rhoN-Neq)/Neq0 and (rhoNbar-Neq)/Neq0 and the chemical potentials
         y0          = np.array([(self.initial_abundance-1.)]*3 + [0] * 6 +
@@ -1048,11 +1093,12 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         Bvec_S2_fact2 = np.array(Bvec_S2_fact2, dtype=np.complex128)
         I21 = np.identity(21)
 
+        t_eval      = np.geomspace(x_start, x_end, self._xsteps)
         ys          = solve_ivp(lambda x, q: self.RHS(x, q, self.M1, Tew, M0, self.Lambda,
                                                        A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
                                                        C_col_precomp,
                                                        Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn(1,self.M1*x/Tew),kn(2,self.M1*x/Tew),I21),
-                                                       [self.xmin, self.xmax], y0, method='BDF', jac = lambda x, q: self.Jac_for_RHS(x,kn(1,self.M1*x/Tew),kn(2,self.M1*x/Tew),I21, A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
+                                                       [x_start, x_end], y0, method='BDF', t_eval=t_eval, jac = lambda x, q: self.Jac_for_RHS(x,kn(1,self.M1*x/Tew),kn(2,self.M1*x/Tew),I21, A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
                                                                                                          C_col_precomp, Lambda = self.Lambda)[0], atol=1e-13, rtol = 1e-6, max_step = 0.1)
 
         t, muD1, muD2, muD3             = [ys.t, ys.y[18], ys.y[19], ys.y[20]]
@@ -1155,8 +1201,8 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
             plt.show()
             plt.close()
 
-        evol_joint = np.array([t,np.abs((rN1_minus_id + 1) * Neq),np.abs((rN2_minus_id + 1) * Neq), np.abs((rN3_minus_id + 1) * Neq), np.real(rN1_minus_id - rNbar1_minus_id) * Neq, 
-                               np.real(rN2_minus_id - rNbar2_minus_id) * Neq, np.real(rN3_minus_id - rNbar3_minus_id) * Neq, np.real(muD1), np.real(muD2), np.real(muD3)])
+        evol_joint = np.array([t,np.abs((rN1_minus_id*3/8+Neq)),np.abs((rN2_minus_id*3/8+Neq)), np.abs((rN3_minus_id*3/8+Neq)), np.real(rN1_minus_id - rNbar1_minus_id) * 3/8, 
+                               np.real(rN2_minus_id - rNbar2_minus_id) * 3/8, np.real(rN3_minus_id - rNbar3_minus_id) * 3/8, np.real(muD1), np.real(muD2), np.real(muD3)])
         
         evol_joint = np.transpose(evol_joint)
 

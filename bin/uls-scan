@@ -50,6 +50,8 @@ if __name__=="__main__":
     op.add_option("-m", "--model",     dest="MODEL",       default="1DME", help="Selection of of model (default: %default)")
     op.add_option("-n", "--n-scan",    dest="NSCAN",       default=30, type=int, help="Number of point to scan (default: %default)")
     op.add_option("--zrange",          dest="ZRANGE",      default="0.1,100,1000", help="Ranges and steps of the evolution variable (default: %default)")
+    op.add_option("--lambda",          dest="LAMBDA",      default="1e3", help="ARS parameter Lambda which controls the scale at which the fast modes in linear term are forced to enter quasi-static regime (default: %default)")
+    op.add_option("--xrange",          dest="XRANGE",      default="1e-6,None,500", help="Ranges and steps of the ARS evolution variable (default: 1e-6,min([1, 20*131.7/M1]),500)")
     op.add_option("--inv",             dest="INVORDERING", default=False, action='store_true', help="Use inverted mass ordering (default: %default)")
     op.add_option("--loop",            dest="LOOP",        default=False, action='store_true', help="Use loop-corrected Yukawa (default: %default)")
     op.add_option("--zcut",            dest="ZCUT",        default="1.0",  help="Set cut value for stitching in ARS model")
@@ -76,10 +78,27 @@ if __name__=="__main__":
     assert(zmin<zmax)
     assert(zsteps>0)
 
+    def try_float(v):
+        try:
+            return float(v)
+        except Exception:
+            return None
+
+    xmin, xmax, xsteps = opts.XRANGE.split(",")
+    xmin=try_float(xmin)
+    xmax=try_float(xmax)
+    xsteps=int(xsteps)
+
+    if xmax is not None:
+        assert(xmin<xmax)
+    assert(xsteps>0)
+
     pfile, gdict = ulysses.tools.parseArgs(args)
 
     LEPTO = ulysses.selectModel(opts.MODEL,
             zmin=zmin, zmax=zmax, zsteps=zsteps,
+            xmin=xmin, xmax=xmax, xsteps=xsteps,
+            Lambda=float(opts.LAMBDA),
             ordering=int(opts.INVORDERING),
             loop=opts.LOOP,
             debug=opts.DEBUG,

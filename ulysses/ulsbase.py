@@ -79,11 +79,16 @@ class ULSBase(object):
         # Flags
         self.debug = kwargs.get("debug", False)
 
-        # Parameters of the solver
+        # Parameters of the z-solver (standard leptogenesis)
         self._zmin = kwargs.get("zmin", 0.001)
         self._zmax = kwargs.get("zmax", 1000)
         self._zsteps = kwargs.get("zsteps", 1000)
         self._currz = self.zmin
+
+        # Parameters of the x-solver (ARS); xmax=None means auto from M1
+        self._xmin = kwargs.get("xmin", None)
+        self._xmax = kwargs.get("xmax", None)
+        self._xsteps = kwargs.get("xsteps", 500)
 
         # Model switches
         self.ordering = kwargs.get("ordering", 0)
@@ -98,6 +103,7 @@ class ULSBase(object):
         self.ys = None
         self.setZS()
         self.normfact = kwargs.get("normfact", 0.013)
+        #ARS helpers
         self.normfact_ars = (28/79) * np.pi**2 / (27 * 6 * 1.2020569)
         self.plot = None
 
@@ -216,6 +222,15 @@ class ULSBase(object):
 
     @property
     def zcut(self): return self._zcut
+
+    @property
+    def xmin(self): return self._xmin
+
+    @property
+    def xmax(self): return self._xmax
+
+    @property
+    def xsteps(self): return self._xsteps
 
     def setEvolData(self, ys):
         fi = self.flavourindices()
