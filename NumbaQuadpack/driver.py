@@ -16,8 +16,18 @@ quadpack_sig = types.double(types.double,
 # site-packages — as happens with 'uv pip install .' or running from the repo
 # root after a regular 'pip install .'.
 def _find_libcquadpack():
+    import sysconfig
+    native_suffix = sysconfig.get_config_var('EXT_SUFFIX') or ''
+
     search_dirs = [os.path.dirname(os.path.abspath(__file__))]
     search_dirs += [os.path.join(p, 'NumbaQuadpack') for p in sys.path if p]
+
+    # Collect ALL candidates across every search directory before choosing.
+    # This avoids returning a foreign-platform .so from the source tree when
+    # the correctly compiled native extension lives further down in sys.path
+    # (e.g. site-packages), which happens when the repo root is on sys.path
+    # via an editable install .pth file or Jupyter's working-directory injection.
+    all_hits = []
     seen = set()
     for d in search_dirs:
         d = os.path.abspath(d)
@@ -25,10 +35,14 @@ def _find_libcquadpack():
             continue
         seen.add(d)
         hits = [f for f in glob.glob(os.path.join(d, 'libcquadpack.*'))
-                if not f.endswith('.c')]
-        if hits:
-            return hits[0]
-    return None
+                if not f.endswith('.c') and not f.endswith('.h')]
+        all_hits.extend(hits)
+
+    if not all_hits:
+        return None
+    # Prefer the file whose suffix exactly matches this Python interpreter.
+    native = [f for f in all_hits if f.endswith(native_suffix)]
+    return native[0] if native else all_hits[0]
 
 _ext_path = _find_libcquadpack()
 if _ext_path is None:
