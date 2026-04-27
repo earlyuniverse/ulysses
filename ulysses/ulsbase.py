@@ -98,6 +98,8 @@ class ULSBase(object):
         self.ys = None
         self.setZS()
         self.normfact = kwargs.get("normfact", 0.013)
+        self.normfact_ars = (28/79) * np.pi**2 / (27 * 6 * 1.2020569)
+        self.plot = None
 
         # INCLUDEd IN ULYSSESv3
         # Choose the parameterisation of the Yukawa matrix
@@ -230,12 +232,15 @@ class ULSBase(object):
 
     def setEvolDataARS(self, ys):
         fi = self.flavourindices()
+        ext = self.extendedindices()
         if not fi:
             return
-        self.ys = np.empty((len(self.zs), max(fi) + 2))
+        self.ys = np.empty((len(self.zs), max(fi) + len(ext) + 2))
         self.ys[:,0] = self.zs
+        if ext:
+            self.ys[:, ext] = ys[:, ext].real
         self.ys[:, fi] = ys[:, fi].real
-        self.ys[:,-1] = self.normfact*np.sum(self.ys[:, fi], axis=1)
+        self.ys[:,-1] = self.normfact_ars*np.sum(self.ys[:, fi], axis=1)
 
 
     #CHANGES TO BE INCLUDED in ULYSSESv3
