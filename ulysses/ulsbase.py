@@ -258,6 +258,14 @@ class ULSBase(object):
         self.ys[:,-1] = self.normfact_ars*np.sum(self.ys[:, fi], axis=1)
 
 
+    def setEvolDataPBH(self, ys):
+        fi  = self.flavourindices()
+        ext = self.extendedindices()
+        if not fi:
+            return
+        self.ys = ys
+
+
     #CHANGES TO BE INCLUDED in ULYSSESv3
     @property
     def evolData(self):
