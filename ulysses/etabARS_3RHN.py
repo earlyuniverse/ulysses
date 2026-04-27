@@ -100,9 +100,6 @@ def commutator(X, Y):
 def anticommutator(X, Y):
     return X @ Y + Y @ X
 
-
-
-
 @njit
 def explicit_anticommutator(X, Y, R):
     """
@@ -131,57 +128,59 @@ def diagdiag(mat):
 #The Gel-Mann matrices and the 3x3 identity
 # @njit
 def gellmann_matrices():
-    lambda0 = np.array([[1, 0, 0],
+      
+    lambda1 = np.array([[1, 0, 0],
+                        [0, 0, 0],
+                        [0, 0, 0]], dtype=np.complex128)
+    
+    lambda2 = np.array([[0, 0, 0],
                         [0, 1, 0],
+                        [0, 0, 0]], dtype=np.complex128)
+    
+    lambda3 = np.array([[0, 0, 0],
+                        [0, 0, 0],
                         [0, 0, 1]], dtype=np.complex128)
     
-    lambda1 = np.array([[0, 1, 0],
+    lambda4 = np.array([[0, 1, 0],
                         [1, 0, 0],
                         [0, 0, 0]], dtype=np.complex128)
 
-    lambda2 = np.array([[0, -1j, 0],
+    lambda5 = np.array([[0, -1j, 0],
                         [1j, 0, 0],
                         [0, 0, 0]], dtype=np.complex128)
 
-    lambda3 = np.array([[1, 0, 0],
-                        [0, -1, 0],
-                        [0, 0, 0]], dtype=np.complex128)
-
-    lambda4 = np.array([[0, 0, 1],
+    lambda6 = np.array([[0, 0, 1],
                         [0, 0, 0],
                         [1, 0, 0]], dtype=np.complex128)
 
-    lambda5 = np.array([[0, 0, -1j],
+    lambda7 = np.array([[0, 0, -1j],
                         [0, 0, 0],
                         [1j, 0, 0]], dtype=np.complex128)
 
-    lambda6 = np.array([[0, 0, 0],
+    lambda8 = np.array([[0, 0, 0],
                         [0, 0, 1],
                         [0, 1, 0]], dtype=np.complex128)
 
-    lambda7 = np.array([[0, 0, 0],
+    lambda9 = np.array([[0, 0, 0],
                         [0, 0, -1j],
                         [0, 1j, 0]], dtype=np.complex128)
 
-    lambda8 = np.array([[1/np.sqrt(3), 0, 0],
-                        [0, 1/np.sqrt(3), 0],
-                        [0, 0, -2/np.sqrt(3)]], dtype=np.complex128)
+    return [lambda1, lambda2, lambda3, lambda4, lambda5, lambda6, lambda7, lambda8, lambda9]
 
-    return [lambda0, lambda1, lambda2, lambda3, lambda4, lambda5, lambda6, lambda7, lambda8]
 
 #this function takes an hermitian matrix and give the coeffients of the decomposition in terms of the Gell-Mann matrices
 @njit
 def GellMann_coefficients(M):
-    c0 = (1/3) * (M[0][0] + M[1][1] + M[2][2])
-    c1 = (1/2) * (M[0][1] + M[1][0])
-    c2 = (1j/2) * (M[0][1] - M[1][0])
-    c3 = (1/2) * (M[0][0] - M[1][1])
-    c4 = (1/2) * (M[0][2] + M[2][0])
-    c5 = (1j/2) * (M[0][2] - M[2][0])
-    c6 = (1/2) * (M[1][2] + M[2][1])
-    c7 = (1j/2) * (M[1][2] - M[2][1])
-    c8 = (np.sqrt(3)/6) * (M[0][0] + M[1][1] - 2*M[2][2])
-    return [c0, c1, c2, c3, c4, c5, c6, c7, c8]
+    c1 = M[0,0]
+    c2 = M[1,1]
+    c3 = M[2,2]
+    c4 = (1/2) * (M[0][1] + M[1][0])
+    c5 = (1j/2) * (M[0][1] - M[1][0])
+    c6 = (1/2) * (M[0][2] + M[2][0])
+    c7 = (1j/2) * (M[0][2] - M[2][0])
+    c8 = (1/2) * (M[1][2] + M[2][1])
+    c9 = (1j/2) * (M[1][2] - M[2][1])
+    return [c1, c2, c3, c4, c5, c6, c7, c8, c9]
 
 
 """
@@ -424,15 +423,13 @@ def compute_linearised_coefficients(Fmat, M_mat, chi_mat, Dm2_mat):
                                        [0]*21 + [0]*21 + [0]*21], dtype=np.complex128).reshape(21,21))
     
 
-    #We are writing the equations in terms of rn-1, therefore, there is an additional matrix, which is simply L, and needs to be multiplied by fact only
+
     L_gm_rN  = [GellMann_coefficients(l) + [0]*9  + [0]*3 for l in L]
     L_gm_rNb = [[0]*9 + GellMann_coefficients(l)  + [0]*3 for l in L]
-    
     A_L  = np.transpose(np.array(L_gm_rN[0]+L_gm_rN[1]+L_gm_rN[2]+L_gm_rN[3]+L_gm_rN[4]+L_gm_rN[5]+L_gm_rN[6]+L_gm_rN[7]+L_gm_rN[8] +
                                   L_gm_rNb[0]+L_gm_rNb[1]+L_gm_rNb[2]+L_gm_rNb[3]+L_gm_rNb[4]+L_gm_rNb[5]+L_gm_rNb[6]+L_gm_rNb[7]+L_gm_rNb[8] +
                                   [0]*21 + [0]*21 + [0]*21, dtype=np.complex128).reshape(21,21))
     
-
     """
     #Non-linear terms
     """
@@ -849,14 +846,13 @@ def set_rates(z, Mav, T,set_rates_kn2):
 
 @njit
 def lin_RHS(x, y, M1, Tew, M0, Lambda,
-            A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L, Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21):
+            A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
+            C_col_precomp,
+            Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21):
 
     
     #If the splitting is small, Mav \simeq M1
     Mav = M1
-    # print(Bvec_G2[1].dtype,Bvec_S2[1].dtype,Bvec_G2_fact2[1].dtype,Bvec_S2_fact2[1].dtype,y.dtype,A.dtype,R.dtype,C_col.dtype )
-
-    # lambda x: Bvec_G2_fact2[x]=Bvec_G2_fact2[x].astype(np.complex128) for x in range(len(Bvec_G2_fact2))
 
 
     # Calculate T
@@ -866,31 +862,24 @@ def lin_RHS(x, y, M1, Tew, M0, Lambda,
 
     h0, hLNC, hLNV, G0, G1, S0, S1, G2, S2 = set_rates(z, Mav, T,kn2)
 
-    # This is expensive so cache it
-    #fdyneq = f_DYNeq(M2, x, Tew, gss)
-    #fyneq = f_YNeq(M2, x, Tew, gss)
+
     temp_z = Mav*x/Tew
     zz  = temp_z.real
-    if kn2 == 0:
-        fact    = (Mav/Tew)  * 8*zz/(15+8*zz)
-        fact2   = 9*1.20205/(2*np.pi**2) * (zz**2 * kn2/2)
-    else:
-        fact    = (Mav/Tew)   * (kn1/kn2)
-        fact2   = (9*1.20205/(2*np.pi**2)) * (zz**2 * kn2/2)
+    fact    = .5*zz**2 * (Mav/Tew)   * kn1
+    fact2   = (9*1.20205/(2*np.pi**2))
+    Neq_N0  = (zz**2 * kn2/2)
 
 
-    # Define matrix of the linearised equations 
-    A = fact*A_L +  (M0/Tew) *(h0 * A_ham_0 * x*x/(Tew*Tew) + hLNC * A_ham_LNC + hLNV * A_ham_LNV +
+    # Define matrix of the linearised equations
+    A = fact*A_L*0 +  (M0/Tew) *(h0 * A_ham_0 * x*x/(Tew*Tew) + hLNC * A_ham_LNC + hLNV * A_ham_LNV +
                                A_G0 * G0 + A_S0 * S0 +
-                               A_G0_fact2 * G0*fact2 + A_S0_fact2 * S0*fact2 + A_G1*G1 + A_S1*S1 + A_G1_fact2*G1*fact2 + A_S1_fact2*S1*fact2) 
-    #The factors of 2 in front of A_G0_fact2 and A_S0_fact2 and the factors of 0.5 in front of A_G1 and A_S1 are inserted by hand
-    #to match with the equations given in arxiv:2407.10560
-    
+                               A_G0_fact2 * G0*fact2 + A_S0_fact2 * S0*fact2 +
+                               A_G1*G1 * Neq_N0 + A_S1*S1*Neq_N0 +
+                               A_G1_fact2*G1*fact2*Neq_N0 + A_S1_fact2*S1*fact2*Neq_N0)
 
-    #Constant term in the linearised equations
-    C_col = np.array(GellMann_coefficients(np.identity(3)) +  GellMann_coefficients(np.identity(3)) + [0,0,0], dtype=np.complex128)
 
-    
+    C_col = C_col_precomp
+
     #Non-linear terms, add them as 0.5*NL@y in the eqtns
     n = Bvec_G2.shape[0]
     m = y.shape[0]
@@ -915,19 +904,17 @@ def lin_RHS(x, y, M1, Tew, M0, Lambda,
     #Regulator
     R = np.linalg.inv(-A*x/ Lambda + I21)
     A_regulated = A @ R
-    
-    # print(Bvec_G2[1].dtype,Bvec_S2[1].dtype,Bvec_G2_fact2[1].dtype,Bvec_S2_fact2[1].dtype,y.dtype,A.dtype,R.dtype,C_col.dtype )
-
-    # print(y.shape, Bvec_G2_fact2.shape)
 
     #Equations are written for RN-1 and RNb-1
-    eqtns = (A_regulated@y + R@C_col*fact)# + 0.5*NL@y)
+    eqtns = (A_regulated@y + R@C_col*fact)
 
     return np.real(eqtns)
 
 @njit
 def Jac(x, M1, Tew, M0, Lambda,
-            A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,kn1,kn2,I21):
+            A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
+            C_col_precomp,
+            kn1,kn2,I21):
 
     #If the splitting is small, Mav \simeq M1
     Mav = M1
@@ -940,34 +927,25 @@ def Jac(x, M1, Tew, M0, Lambda,
     h0, hLNC, hLNV, G0, G1, S0, S1, G2, S2 = set_rates(z, Mav, T,kn2)
 
 
-    # This is expensive so cache it
-    #fdyneq = f_DYNeq(M2, x, Tew, gss)
-    #fyneq = f_YNeq(M2, x, Tew, gss)
     temp_z = Mav*x/Tew
     zz  = temp_z.real
-    if kn2 == 0:
-        fact    = (Mav/Tew)  * 8*zz/(15+8*zz)
-        fact2   = 9*1.20205/(2*np.pi**2) * (zz**2 * kn2/2)
-    else:
-        fact    = (Mav/Tew)   * (kn1/kn2)
-        fact2   = (9*1.20205/(2*np.pi**2)) * (zz**2 * kn2/2)
+    fact    = .5*zz**2 * (Mav/Tew)   * kn1
+    fact2   = (9*1.20205/(2*np.pi**2))
+    Neq_N0  = (zz**2 * kn2/2)
 
 
-    # Define matrix of the linearised equations 
-    A = fact*A_L +  (M0/Tew) *(h0 * A_ham_0 * x*x/(Tew*Tew) + hLNC * A_ham_LNC + hLNV * A_ham_LNV +
+    # Define matrix of the linearised equations
+    A = fact*A_L*0 +  (M0/Tew) *(h0 * A_ham_0 * x*x/(Tew*Tew) + hLNC * A_ham_LNC + hLNV * A_ham_LNV +
                                A_G0 * G0 + A_S0 * S0 +
-                               A_G0_fact2 * G0*fact2 + A_S0_fact2 * S0*fact2 + A_G1*G1 + A_S1*S1 + A_G1_fact2*G1*fact2 + A_S1_fact2*S1*fact2) 
-    #The factors of 2 in front of A_G0_fact2 and A_S0_fact2 and the factors of 0.5 in front of A_G1 and A_S1 are inserted by hand
-    #to match with the equations given in arxiv:2407.10560
-    
+                               A_G0_fact2 * G0*fact2 + A_S0_fact2 * S0*fact2 +
+                               A_G1*G1 * Neq_N0 + A_S1*S1*Neq_N0 +
+                               A_G1_fact2*G1*fact2*Neq_N0 + A_S1_fact2*S1*fact2*Neq_N0)
 
-    #Constant term in the linearised equations
-    C_col = np.array(GellMann_coefficients(np.identity(3)) +  GellMann_coefficients(np.identity(3)) + [0,0,0], dtype=np.complex128)
-    
+    C_col = C_col_precomp
+
     #Regulator
     R = np.linalg.inv(-A*x/ Lambda + I21)
     A_regulated = A @ R
-
 
     return  np.real(A_regulated), np.real(R@C_col*fact)
 
@@ -976,49 +954,37 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
 
     def shortname(self): return "BEARS_3RHN"
 
-    def flavourindices(self): return [1,2,3,4,5,6,7,8,9]
+    def flavourindices(self): return [7,8,9]
 
-    def flavourlabels(self): return [r"$N_{N_1}$", r"$N_{N_2}$", r"$N_{N_3}$",r"$|N_{N_1}-N_{\overline{N}_1}|$", r"$|N_{N_2}-N_{\overline{N}_2}|$", r"$|N_{N_3}-N_{\overline{N}_3}|$",r"$\mu_{\Delta_e}$",  r"$\mu_{\Delta_\mu}$", r"$\mu_{\Delta_\tau}$"]
+    def flavourlabels(self): return [r"$\mu_{\Delta_e}$",  r"$\mu_{\Delta_\mu}$", r"$\mu_{\Delta_\tau}$"]
+
+    def extendedindices(self): return [1,2,3,4,5,6]
+
+    def extendedlabels(self): return [r"$N_{N_1}$", r"$N_{N_2}$", r"$N_{N_3}$",r"$|N_{N_1}-N_{\overline{N}_1}|$", r"$|N_{N_2}-N_{\overline{N}_2}|$", r"$|N_{N_3}-N_{\overline{N}_3}|$"]    
     
 
     def RHS(self, x, y, M1, Tew, M0, Lambda,
-            A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L, Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21):
+            A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
+            C_col_precomp,
+            Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21):
 
         return lin_RHS(x, y, M1, Tew, M0, Lambda,
-                       A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L, Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21)
+                       A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
+                       C_col_precomp,
+                       Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21)
     
 
-    def Jac_for_RHS(self, x,kn1,kn2,I21,A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L, Lambda = 1e3):
+    def Jac_for_RHS(self, x,kn1,kn2,I21,A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
+                    C_col_precomp, Lambda = 1e3):
         # Global constants (masses in GeV)
         Tew         = 131.7
         gss         = 106.75
         M0          = 7.112582895088419e+17
 
-        # Model parameters
-        Fmat        = self.h
-        dMval_21    = self.M2 - self.M1
-        dMval_31    = self.M3 - self.M1
-
-        # Mass matrices and differences
-        M_mat       = np.diag([self.M1, self.M1 + dMval_21, self.M1 + dMval_31])
-        deltaM2_21  = 2 * self.M1 * dMval_21 + dMval_21**2
-        deltaM2_31  = 2 * self.M1 * dMval_31 + dMval_31**2
-        Dm2_mat     = np.diag([0, deltaM2_21, deltaM2_31])
-
-        # Chi matrix
-        chi_mat     = 1./711. * np.array([[257., 20., 20.], [20., 257., 20.], [20., 20., 257.]], dtype=np.complex128)
-
-        #Compute here just once the coefficients of the linearised equations
-        # A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L, Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2 = compute_linearised_coefficients(Fmat, M_mat, chi_mat, Dm2_mat)
-
-        # Vectors for calculations
-        Lvec        = np.zeros((24, 3), dtype=np.complex128)
-        Rvec        = np.zeros((24, 3), dtype=np.complex128)
-        acr         = np.zeros((24, 3), dtype=np.complex128)
-
-
         return Jac(x, self.M1, Tew, M0, Lambda,
-                       A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,kn1,kn2,I21)
+                       A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
+                       C_col_precomp,
+                       kn1,kn2,I21)
     
     @property
     def EtaB(self):
@@ -1037,8 +1003,10 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         ToYb        = 45 * zeta3 / (gstaro * np.pi**4)
         ToOmegab    = mp * ngamma / rhoc
         self.Lambda = 1e3 if self.Lambda is None else self.Lambda
-        self.plot = False
-        self.save_plot = False
+        #for ARS
+        self.xmin = 1e-6 if self.xmin is None else self.xmin
+        self.xmax = np.min([1, 20*131.7/self.M1]) if self.xmax is None else self.xmax
+
         self.evolname = r"$T_{\rm{ew}}/T$"
 
         # Model parameters
@@ -1046,13 +1014,18 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         dMval_21    = self.M2 - self.M1
         dMval_31    = self.M3 - self.M1
 
-        #initial conditions for the Gell-Mann coefficients for RN-1 and RNb-1 and the chemical potentials
-        y0          = np.array([self.initial_abundance-1.] + [0.] * 8 + [self.initial_abundance-1.] + [0.]*8 + [0, 0, 0], dtype=np.complex128)
+
+        #initial conditions for the Gell-Mann coefficients for (rhoN-Neq)/Neq0 and (rhoNbar-Neq)/Neq0 and the chemical potentials
+        y0          = np.array([(self.initial_abundance-1.)]*3 + [0] * 6 +
+                               [(self.initial_abundance-1.)]*3 + [0] * 6 +
+                               [0, 0, 0], dtype=np.complex128)
+
 
         # Mass matrices and differences
         M_mat       = np.diag([self.M1, self.M1 + dMval_21, self.M1 + dMval_31])
         deltaM2_21  = 2 * self.M1 * dMval_21 + dMval_21**2
         deltaM2_31  = 2 * self.M1 * dMval_31 + dMval_31**2
+
         Dm2_mat     = np.diag([0, deltaM2_21, deltaM2_31])
 
         # Chi matrix
@@ -1060,6 +1033,9 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
 
         #Compute here just once the coefficients of the linearised equations
         A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L, Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2 = compute_linearised_coefficients(Fmat, M_mat, chi_mat, Dm2_mat)
+
+
+        C_col_precomp = np.array(GellMann_coefficients(np.identity(3)) + GellMann_coefficients(np.identity(3)) + [0.,0.,0.], dtype=np.complex128)
 
         # Vectors for calculations
         Lvec        = np.zeros((24, 3), dtype=np.complex128)
@@ -1073,18 +1049,14 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         I21 = np.identity(21)
 
         ys          = solve_ivp(lambda x, q: self.RHS(x, q, self.M1, Tew, M0, self.Lambda,
-                                                       A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L, Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn(1,self.M1*x/Tew),kn(2,self.M1*x/Tew),I21),
-                                                       [1e-6, 1], y0, method='BDF', jac = lambda x, q: self.Jac_for_RHS(x,kn(1,self.M1*x/Tew),kn(2,self.M1*x/Tew),I21, A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,Lambda = self.Lambda)[0], atol=1e-13, rtol = 1e-6, max_step = 0.1)
-        
-        #ys          = odeint(lambda x, t: self.RHS(t, x, self.M1, Tew, M0, self.Lambda,
-        #                                               A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L, Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2),
-        #                                               y0, np.logspace(-6, 0, 100), #, Dfun = lambda t, x: self.Jac_for_RHS(t, Lambda = self.Lambda)[0],
-        #                                               atol=1e-13, rtol = 1e-6, mxstep = 10**6, full_output=True)[0]
-        
+                                                       A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
+                                                       C_col_precomp,
+                                                       Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn(1,self.M1*x/Tew),kn(2,self.M1*x/Tew),I21),
+                                                       [self.xmin, self.xmax], y0, method='BDF', jac = lambda x, q: self.Jac_for_RHS(x,kn(1,self.M1*x/Tew),kn(2,self.M1*x/Tew),I21, A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
+                                                                                                         C_col_precomp, Lambda = self.Lambda)[0], atol=1e-13, rtol = 1e-6, max_step = 0.1)
+
         t, muD1, muD2, muD3             = [ys.t, ys.y[18], ys.y[19], ys.y[20]]
         self.zs = t
-        #t = np.logspace(-6, 0, 100)
-        #muD1, muD2, muD3 = [ys[:, 18], ys[:, 19], ys[:, 20]]
         
         # Calculate YB solutions for e, mu, and tau components
         YB_sol_e, YB_sol_mu, YB_sol_tau = map(lambda x: np.real(x[-1]), [muD1, muD2, muD3])
@@ -1108,21 +1080,10 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         rN2_minus_id = np.sum([ys.y[j]*l[1,1] for j, l in enumerate(L)], axis = 0)
         rN3_minus_id = np.sum([ys.y[j]*l[2,2] for j, l in enumerate(L)], axis = 0)
 
-        rN12         = np.sum([ys.y[j]*l[0,1] for j, l in enumerate(L)], axis = 0)
-        rN13         = np.sum([ys.y[j]*l[0,2] for j, l in enumerate(L)], axis = 0)
-        rN23         = np.sum([ys.y[j]*l[1,2] for j, l in enumerate(L)], axis = 0)
-
         rNbar1_minus_id = np.sum([ys.y[j+9]*l[0,0] for j, l in enumerate(L)], axis = 0)
         rNbar2_minus_id = np.sum([ys.y[j+9]*l[1,1] for j, l in enumerate(L)], axis = 0)
         rNbar3_minus_id = np.sum([ys.y[j+9]*l[2,2] for j, l in enumerate(L)], axis = 0)
 
-        rNbar12         = np.sum([ys.y[j+9]*l[0,1] for j, l in enumerate(L)], axis = 0)
-        rNbar13         = np.sum([ys.y[j+9]*l[0,2] for j, l in enumerate(L)], axis = 0)
-        rNbar23         = np.sum([ys.y[j+9]*l[1,2] for j, l in enumerate(L)], axis = 0)
-
-        #rN1_minus_id = np.sum([ys[:, j]*l[0,0] for j, l in enumerate(L)], axis = 0)
-        #rN2_minus_id = np.sum([ys[:, j]*l[1,1] for j, l in enumerate(L)], axis = 0)
-        #rN3_minus_id = np.sum([ys[:, j]*l[2,2] for j, l in enumerate(L)], axis = 0)
 
         #Plot haestetics     
         lw              = 0.9
@@ -1140,15 +1101,13 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
                 ax.axvline(self._zcut, color='grey', linewidth=0.6, linestyle='-.')
 
             # Plotting various components
-            ax.plot(t, np.abs((rN1_minus_id + 1) * Neq), label=r"$N_{N_1}$", linewidth=lw, color = colors[4], ls = '-')
-            ax.plot(t, np.abs((rN2_minus_id + 1) * Neq), label=r"$N_{N_2}$", linewidth=lw, color = colors[5], ls = '-.')
-            ax.plot(t, np.abs((rN3_minus_id + 1) * Neq), label=r"$N_{N_3}$", linewidth=lw, color = colors[6], ls = ':')
-            ax.plot(t, np.real(rN1_minus_id - rNbar1_minus_id) * Neq, label=r"$|N_{N_1}-N_{\overline{N}_1}|$", linewidth=lw, color = 'k', ls = '-')
-            ax.plot(t, np.real(rN2_minus_id - rNbar2_minus_id) * Neq, label=r"$|N_{N_2}-N_{\overline{N}_2}|$", linewidth=lw, color = 'k', ls = '-.')
-            ax.plot(t, np.real(rN3_minus_id - rNbar3_minus_id) * Neq, label=r"$|N_{N_3}-N_{\overline{N}_3}|$", linewidth=lw, color = 'k', ls = ':')
-            #ax.plot(t, np.real(rN13) * Neq, label=r"Re($N_{N_1N_3}$)", linewidth=lw, color = 'gold', ls = '-')
-            #ax.plot(t, np.real(rN23) * Neq, label=r"Re($N_{N_2N_3}$)", linewidth=lw, color = 'gold', ls = '-.')
-            #ax.plot(t, np.real(rN13-rN23) * Neq, label=r"Re($N_{N_1N_3}-N_{N_2 N_3}$)", linewidth=lw, color = 'gold', ls = '-')
+            ax.plot(t, np.abs((rN1_minus_id*3/8+Neq)), label=r"$N_{N_1}$", linewidth=lw, color = colors[4], ls = '-')
+            ax.plot(t, np.abs((rN2_minus_id*3/8+Neq)), label=r"$N_{N_2}$", linewidth=lw, color = colors[5], ls = '-.')
+            ax.plot(t, np.abs((rN3_minus_id*3/8+Neq)), label=r"$N_{N_3}$", linewidth=lw, color = colors[6], ls = ':')
+            ax.plot(t, np.real(rN1_minus_id - rNbar1_minus_id) * 3/8, label=r"$|N_{N_1}-N_{\overline{N}_1}|$", linewidth=lw, color = 'k', ls = '-')
+            ax.plot(t, np.real(rN2_minus_id - rNbar2_minus_id) * 3/8, label=r"$|N_{N_2}-N_{\overline{N}_2}|$", linewidth=lw, color = 'k', ls = '-.')
+            ax.plot(t, np.real(rN3_minus_id - rNbar3_minus_id) * 3/8, label=r"$|N_{N_3}-N_{\overline{N}_3}|$", linewidth=lw, color = 'k', ls = ':')
+
 
             ax.plot(t, np.real(muD1), label=r"$\mu_{\Delta_e}$", linewidth=lw, color = colors[0])
             ax.plot(t, np.real(muD2), label=r"$\mu_{\Delta_\mu}$", linewidth=lw, color = colors[1])
@@ -1161,9 +1120,9 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
             ax.plot(t, -np.real(muD2), linestyle='--', color=colors[1], linewidth=lw)
             ax.plot(t, -np.real(muD3), linestyle='--', color=colors[2], linewidth=lw)
             ax.plot(t, -cf * np.real(muD1 + muD2 + muD3), linestyle='--', linewidth=lw, color=colors[3])
-            ax.plot(t, -np.real(rN1_minus_id - rNbar1_minus_id) * Neq, linewidth=lw, color = 'k', linestyle='-')
-            ax.plot(t, -np.real(rN2_minus_id - rNbar2_minus_id) * Neq, linewidth=lw, color = 'k', linestyle='-.')
-            ax.plot(t, -np.real(rN3_minus_id - rNbar3_minus_id) * Neq, linewidth=lw, color = 'k', linestyle=':')
+            ax.plot(t, -np.real(rN1_minus_id - rNbar1_minus_id) * 3/8, linewidth=lw, color = 'k', linestyle='-')
+            ax.plot(t, -np.real(rN2_minus_id - rNbar2_minus_id) * 3/8, linewidth=lw, color = 'k', linestyle='-.')
+            ax.plot(t, -np.real(rN3_minus_id - rNbar3_minus_id) * 3/8, linewidth=lw, color = 'k', linestyle=':')
 
             # Setting scales, ticks, and labels
             ax.set_xscale('log')
@@ -1176,11 +1135,13 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
             ax.xaxis.set_ticks_position('both')
             ax.yaxis.set_ticks_position('both')
             ax.tick_params(direction='in', which='both', labelsize=13, width=0.6)
-            ax.set_xlabel(r"$T_{\rm{ew}}/T$", fontsize=13)
+            ax.set_xlabel(r"$T_{\rm{sph}}/T$", fontsize=13)
             ax.set_ylabel(r"$|\eta_B|, \, |\mu_{\Delta_\alpha}|,\, |N_{N_j}-N_{\overline{N}_j}|,\,N_{N_j}$", fontsize=13)
             ax.legend(loc='lower left', shadow=True, ncol=1, prop={'size': 12})
 
             ax.text(1.5e-6, 8.5e-1, r'$N_N^{\rm{eq}}$', fontsize=11, color='k')
+
+            ax.set_title(r'$\texttt{etabARS_3RHN.py}$', loc = 'right', fontsize=13)
 
             ax.grid(which='both', linestyle='-', linewidth='0.6', color='grey', alpha=0.2)
 
@@ -1191,7 +1152,7 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
 
             
             # Show plot
-            # plt.show()
+            plt.show()
             plt.close()
 
         evol_joint = np.array([t,np.abs((rN1_minus_id + 1) * Neq),np.abs((rN2_minus_id + 1) * Neq), np.abs((rN3_minus_id + 1) * Neq), np.real(rN1_minus_id - rNbar1_minus_id) * Neq, 
