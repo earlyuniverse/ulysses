@@ -46,15 +46,15 @@ dependencies = [
     "python-dateutil>=2.8",
     "termcolor>=1.1",
     "tqdm>=4.60",
-    "numba>=0.56",          
+    "numba>=0.56",
     "mpmath>=1.2",
     "mpltern>=0.4",
     "multiprocess>=0.70.12",
-    "ipykernel",
 ]
 
 [project.optional-dependencies]
-nest = ["pymultinest>=2.11"]  # optional: not available on Windows
+nest    = ["pymultinest>=2.11"]  # optional: not available on Windows
+jupyter = ["ipykernel"]
 
 [project.urls]
 Homepage   = "https://github.com/earlyuniverse/ulysses"
