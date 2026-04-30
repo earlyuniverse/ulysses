@@ -829,7 +829,7 @@ def set_rates(z, Mav, T, set_rates_kn2):
 
     # Relativistic values (unused but kept for reference)
     G0_rel = 0.013296432287963416
-    G1_rel = 0.006737226958120181e-2
+    G1_rel = 0.006737226958120181e
     S0_rel = 0.0432819999972177 / T**2
     S1_rel = 2.5e-2 / T**2
 
