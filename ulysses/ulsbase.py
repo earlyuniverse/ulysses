@@ -77,7 +77,8 @@ class ULSBase(object):
         self.msplit2_athm_invert = kwargs.get("m2atminv", 2.500e-3 * 1e-18)
 
         # Flags
-        self.debug = kwargs.get("debug", False)
+        self.debug     = kwargs.get("debug", False)
+        self.use_hind  = kwargs.get("use_hind", False)
 
         # Parameters of the z-solver (standard leptogenesis)
         self._zmin = kwargs.get("zmin", 0.001)

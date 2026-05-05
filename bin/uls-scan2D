@@ -74,6 +74,7 @@ if __name__=="__main__":
     op.add_option("--zcut",            dest="ZCUT",        default="1.0",  help="Set cut value for stitching in ARS model")
     op.add_option("--extended",        dest="EXTENDED",    default=False, action="store_true", help="Allow model-specific parameters beyond the standard pnames (default: %default)")
     op.add_option("--initial",         dest="INITIAL",     default=0.0,   type=float,          help="Initial RHN abundance: 0 = vanishing, 1 = thermal (default: %default)")
+    op.add_option("--ars-indirect",    dest="ARS_INDIRECT", default=False, action="store_true", help="Add indirect contributions for the 3RHN ARS scenario (default: %default)")
     opts, args = op.parse_args()
 
 
@@ -122,6 +123,7 @@ if __name__=="__main__":
             zcut=float(opts.ZCUT),
             extended_mode=opts.EXTENDED,
             initial_abundance=opts.INITIAL,
+            use_hind=opts.ARS_INDIRECT,
             **gdict
             )
 

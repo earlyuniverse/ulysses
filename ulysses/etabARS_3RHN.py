@@ -817,7 +817,7 @@ import time
 _M_tab_max = 50000.0  # GeV
 
 @njit
-def set_rates(z, Mav, T, set_rates_kn2):
+def set_rates(z, Mav, T, set_rates_kn2, use_hind):
 
     Tew = 131.7
     x   = Tew / T
@@ -827,9 +827,9 @@ def set_rates(z, Mav, T, set_rates_kn2):
     # M dependence moved to the interaction Hamiltonian definition
     hLNV = interp_hm(z) / (Mav**2)
 
-    # Relativistic values (unused but kept for reference)
+    # Relativistic values (kept for reference)
     G0_rel = 0.013296432287963416
-    G1_rel = 0.006737226958120181e
+    G1_rel = 0.006737226958120181e-2
     S0_rel = 0.0432819999972177 / T**2
     S1_rel = 2.5e-2 / T**2
 
@@ -845,10 +845,17 @@ def set_rates(z, Mav, T, set_rates_kn2):
         m_scale = 1.0
 
     G0 = m_scale * G0_M_fun(M_ref, x_eff)
-    G1 = m_scale * G1_M_fun(M_ref, x_eff) * 2 / (z**2 * set_rates_kn2)
+    G1 = m_scale * G1_M_fun(M_ref, x_eff)
     # M dependence moved to the DME coefficients; 1/Mav**2 uses the physical mass
     S0 = m_scale * S0_M_fun(M_ref, x_eff) / (Mav**2)
-    S1 = m_scale * S1_M_fun(M_ref, x_eff) * 2 / (z**2 * set_rates_kn2) / (Mav**2)
+    S1 = m_scale * S1_M_fun(M_ref, x_eff) / (Mav**2)
+
+    # hind_p/hind_m: mass-dependent interaction Hamiltonian corrections (optional)
+    if use_hind:
+        hind_p = hind_p_M_fun(M_ref, x_eff)
+        hind_m = hind_m_M_fun(M_ref, x_eff)
+        hLNC = hLNC + hind_p
+        hLNV = hLNV + hind_m
 
     # Non-linear terms (no non-relativistic corrections)
     G2 = -2.19e-3
@@ -860,9 +867,9 @@ def set_rates(z, Mav, T, set_rates_kn2):
 def lin_RHS(x, y, M1, Tew, M0, Lambda,
             A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
             C_col_precomp,
-            Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21):
+            Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21,use_hind):
 
-    
+
     #If the splitting is small, Mav \simeq M1
     Mav = M1
 
@@ -872,7 +879,7 @@ def lin_RHS(x, y, M1, Tew, M0, Lambda,
 
     z       = Mav*x/Tew
 
-    h0, hLNC, hLNV, G0, G1, S0, S1, G2, S2 = set_rates(z, Mav, T,kn2)
+    h0, hLNC, hLNV, G0, G1, S0, S1, G2, S2 = set_rates(z, Mav, T, kn2, use_hind)
 
 
     temp_z = Mav*x/Tew
@@ -926,7 +933,7 @@ def lin_RHS(x, y, M1, Tew, M0, Lambda,
 def Jac(x, M1, Tew, M0, Lambda,
             A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
             C_col_precomp,
-            kn1,kn2,I21):
+            kn1,kn2,I21,use_hind):
 
     #If the splitting is small, Mav \simeq M1
     Mav = M1
@@ -936,7 +943,7 @@ def Jac(x, M1, Tew, M0, Lambda,
 
     z       = Mav*x/Tew
 
-    h0, hLNC, hLNV, G0, G1, S0, S1, G2, S2 = set_rates(z, Mav, T,kn2)
+    h0, hLNC, hLNV, G0, G1, S0, S1, G2, S2 = set_rates(z, Mav, T, kn2, use_hind)
 
 
     temp_z = Mav*x/Tew
@@ -978,16 +985,16 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
     def RHS(self, x, y, M1, Tew, M0, Lambda,
             A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
             C_col_precomp,
-            Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21):
+            Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21,use_hind):
 
         return lin_RHS(x, y, M1, Tew, M0, Lambda,
                        A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
                        C_col_precomp,
-                       Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21)
-    
+                       Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn1,kn2,I21,use_hind)
+
 
     def Jac_for_RHS(self, x,kn1,kn2,I21,A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
-                    C_col_precomp, Lambda = 1e3):
+                    C_col_precomp, Lambda = 1e3, use_hind = False):
         # Global constants (masses in GeV)
         Tew         = 131.7
         gss         = 106.75
@@ -996,7 +1003,7 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         return Jac(x, self.M1, Tew, M0, Lambda,
                        A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
                        C_col_precomp,
-                       kn1,kn2,I21)
+                       kn1,kn2,I21,use_hind)
     
     @property
     def EtaB(self):
@@ -1093,13 +1100,14 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
         Bvec_S2_fact2 = np.array(Bvec_S2_fact2, dtype=np.complex128)
         I21 = np.identity(21)
 
+        use_hind    = self.use_hind
         t_eval      = np.geomspace(x_start, x_end, self._xsteps)
         ys          = solve_ivp(lambda x, q: self.RHS(x, q, self.M1, Tew, M0, self.Lambda,
                                                        A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
                                                        C_col_precomp,
-                                                       Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn(1,self.M1*x/Tew),kn(2,self.M1*x/Tew),I21),
+                                                       Bvec_G2, Bvec_S2, Bvec_G2_fact2, Bvec_S2_fact2,kn(1,self.M1*x/Tew),kn(2,self.M1*x/Tew),I21,use_hind),
                                                        [x_start, x_end], y0, method='BDF', t_eval=t_eval, jac = lambda x, q: self.Jac_for_RHS(x,kn(1,self.M1*x/Tew),kn(2,self.M1*x/Tew),I21, A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
-                                                                                                         C_col_precomp, Lambda = self.Lambda)[0], atol=1e-13, rtol = 1e-6, max_step = 0.1)
+                                                                                                         C_col_precomp, Lambda = self.Lambda, use_hind=use_hind)[0], atol=1e-13, rtol = 1e-6, max_step = 0.1)
 
         t, muD1, muD2, muD3             = [ys.t, ys.y[18], ys.y[19], ys.y[20]]
         self.zs = t
@@ -1216,70 +1224,34 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
 #---------------------------------------------#
 
 import os
-import pandas as pd
-from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
-import re
-
-
-# Function to extract mass values from file names
-def extract_mass(file_name):
-    # Find all sequences of digits in the file name
-    num = float(re.findall(r'\d+\.?\d*', file_name)[0])
-    # Adjust numbers based on the presence of "TeV" or "MeV"
-    if "TeV" in file_name:
-        num = num * 1e3
-    elif "MeV" in file_name:
-        num = num * 1e-3
-    return num
-
-
 data_dir = os.path.dirname(ulysses.__file__)
-    
-PATHrates_nonrel = os.path.join(data_dir, './data/ARS_rates_nonrel/')
 
-# List all files in the directory
-file_names = [f for f in os.listdir(PATHrates_nonrel) if os.path.isfile(os.path.join(PATHrates_nonrel, f))]
-# List to store DataFrames
-df_list = []
+_PATH_ARS_rates = os.path.join(data_dir, 'data', 'ARS_rates')
 
-# Process each file
-for file_name in file_names:
-    # Extract mass value from the file name
-    M = extract_mass(file_name)
-    
-    # Read the data from the file into a DataFrame
-    df = pd.read_csv(PATHrates_nonrel + file_name, sep=',', header=None)
-    df.columns = ['T', 'gamma1_p', 'gamma1_m', 'gamma_p', 'gamma_m', 'hp', 'hm', 'av_inv_k0', 'dYdzeta']
-    
-    # Add new columns and perform calculations
-    df['M'] = M
+def _load_ars_file(fname):
+    data = np.loadtxt(os.path.join(_PATH_ARS_rates, fname), skiprows=1)
+    M_col = data[:, 0]
+    x_col = 131.7 / data[:, 1]   # convert T → x = Tew/T
+    v_col = data[:, 2]            # already divided by T in the files
+    return M_col, x_col, v_col
 
-    df['z'] = df['M'] / df['T']
-    df['x'] = 131.7 / df['T']
-    # print(df['x'])
-    for c in ['gamma1_p', 'gamma1_m', 'gamma_p', 'gamma_m', 'hp', 'hm']:
-        df[c] = df[c] / df['T']
-    df['av_inv_y0'] = df['av_inv_k0'] * df['T']
-    
-    # Reorder columns
-    df = df[['M', 'x', 'T', 'z', 'gamma1_p', 'gamma1_m', 'gamma_p', 'gamma_m', 'hp', 'hm', 'av_inv_y0', 'dYdzeta']]
-        
-    # Append the DataFrame to the list
-    df_list.append(df)
+def _build_rate_table(fname):
+    M_col, x_col, v_col = _load_ars_file(fname)
+    unique_Ms = np.sort(np.unique(M_col))
+    Xs, Vs = [], []
+    for M in unique_Ms:
+        mask = M_col == M
+        idx = np.argsort(x_col[mask])
+        Xs.append(x_col[mask][idx])
+        Vs.append(v_col[mask][idx])
+    return unique_Ms, Xs, Vs
 
-# Concatenate all DataFrames into a single DataFrame
-combined_df = pd.concat(df_list, ignore_index=True)
-combined_df = combined_df.sort_values(by=['M', 'x']).reset_index(drop=True)
-
-#Interpolate Juraj's rates
-# Ms = np.log10(combined_df['M'].values)
-# Xs = np.log10(combined_df['x'].values)
-# G0tab = combined_df['gamma_p'].values
-# G1tab = combined_df['gamma1_p'].values
-# S0tab = combined_df['gamma_m'].values
-# S1tab = combined_df['gamma1_m'].values
-# # print(len(Ms))
-
+_Ms_ars, _Xs_ars, _G0tab  = _build_rate_table('rates_averaged_G0.txt')
+_,        _,       _G1tab  = _build_rate_table('rates_averaged_G1.txt')
+_,        _,       _S0tab  = _build_rate_table('rates_averaged_S0.txt')
+_,        _,       _S1tab  = _build_rate_table('rates_averaged_S1.txt')
+_,        _,       _hindp  = _build_rate_table('rates_averaged_hind_p.txt')
+_,        _,       _hindm  = _build_rate_table('rates_averaged_hind_m.txt')
 
 #Faster interpolation
 
@@ -1417,77 +1389,37 @@ def make_interpolator(unique_M, x_arrays, value_arrays):
 
 
 
-Ms = np.sort(combined_df['M'].unique())
-
-Xs = []
-G0tab = []
-G1tab = []
-S0tab = []
-S1tab = []
-
-for M in Ms:
-    sub = combined_df[combined_df['M'] == M]
-    Xs.append(sub['x'].values)
-    G0tab.append(sub['gamma_p'].values)
-    G1tab.append(sub['gamma1_p'].values)
-    S0tab.append(sub['gamma_m'].values)
-    S1tab.append(sub['gamma1_m'].values)
+G0_logM,   G0_xflat,   G0_vflat,   G0_offsets,   G0_lengths   = make_interpolator(_Ms_ars, _Xs_ars, _G0tab)
+G1_logM,   G1_xflat,   G1_vflat,   G1_offsets,   G1_lengths   = make_interpolator(_Ms_ars, _Xs_ars, _G1tab)
+S0_logM,   S0_xflat,   S0_vflat,   S0_offsets,   S0_lengths   = make_interpolator(_Ms_ars, _Xs_ars, _S0tab)
+S1_logM,   S1_xflat,   S1_vflat,   S1_offsets,   S1_lengths   = make_interpolator(_Ms_ars, _Xs_ars, _S1tab)
+hindp_logM, hindp_xflat, hindp_vflat, hindp_offsets, hindp_lengths = make_interpolator(_Ms_ars, _Xs_ars, _hindp)
+hindm_logM, hindm_xflat, hindm_vflat, hindm_offsets, hindm_lengths = make_interpolator(_Ms_ars, _Xs_ars, _hindm)
 
 
-
-# Create the interpolation function
-
-
-# points = np.column_stack((Ms, Xs))
-# G0_interpolator = LinearNDInterpolator(points, G0tab)
-# G0_extrapolator = NearestNDInterpolator(points, G0tab)
-# G1_interpolator = LinearNDInterpolator(points, G1tab)
-# G1_extrapolator = NearestNDInterpolator(points, G1tab)
-# S0_interpolator = LinearNDInterpolator(points, S0tab)
-# S0_extrapolator = NearestNDInterpolator(points, S0tab)
-# S1_interpolator = LinearNDInterpolator(points, S1tab)
-# S1_extrapolator = NearestNDInterpolator(points, S1tab)
-
-G0_logM, G0_xflat, G0_vflat, G0_offsets, G0_lengths = make_interpolator(Ms, Xs, G0tab)
-G1_logM, G1_xflat, G1_vflat, G1_offsets, G1_lengths = make_interpolator(Ms, Xs, G1tab)
-S0_logM, S0_xflat, S0_vflat, S0_offsets, S0_lengths = make_interpolator(Ms, Xs, S0tab)
-S1_logM, S1_xflat, S1_vflat, S1_offsets, S1_lengths = make_interpolator(Ms, Xs, S1tab)
-
-
-
-# Define the function to return interpolated G0
 @njit
 def G0_M_fun(M, x):
-    log_M = np.log10(M)
-    log_x = np.log10(x)
-
-    interpolated_value = _interp_core(log_M,log_x,G0_logM, G0_xflat, G0_vflat, G0_offsets, G0_lengths)
-
-    return interpolated_value
+    return _interp_core(np.log10(M), np.log10(x), G0_logM, G0_xflat, G0_vflat, G0_offsets, G0_lengths)
 
 @njit
 def G1_M_fun(M, x):
-    log_M = np.log10(M)
-    log_x = np.log10(x)
-    interpolated_value = _interp_core(log_M,log_x,G1_logM, G1_xflat, G1_vflat, G1_offsets, G1_lengths)
-
-    return interpolated_value
+    return _interp_core(np.log10(M), np.log10(x), G1_logM, G1_xflat, G1_vflat, G1_offsets, G1_lengths)
 
 @njit
 def S0_M_fun(M, x):
-    log_M = np.log10(M)
-    log_x = np.log10(x)
-    interpolated_value = _interp_core(log_M,log_x, S0_logM, S0_xflat, S0_vflat, S0_offsets, S0_lengths)
-
-    return interpolated_value
+    return _interp_core(np.log10(M), np.log10(x), S0_logM, S0_xflat, S0_vflat, S0_offsets, S0_lengths)
 
 @njit
 def S1_M_fun(M, x):
-    log_M = np.log10(M)
-    log_x = np.log10(x)
-    interpolated_value = _interp_core(log_M,log_x,S1_logM, S1_xflat, S1_vflat, S1_offsets, S1_lengths)
+    return _interp_core(np.log10(M), np.log10(x), S1_logM, S1_xflat, S1_vflat, S1_offsets, S1_lengths)
 
-    return interpolated_value
+@njit
+def hind_p_M_fun(M, x):
+    return _interp_core(np.log10(M), np.log10(x), hindp_logM, hindp_xflat, hindp_vflat, hindp_offsets, hindp_lengths)
+
+@njit
+def hind_m_M_fun(M, x):
+    return _interp_core(np.log10(M), np.log10(x), hindm_logM, hindm_xflat, hindm_vflat, hindm_offsets, hindm_lengths)
 
 
     """

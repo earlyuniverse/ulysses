@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+import warnings
+from functools import lru_cache
 import numpy as np
 from scipy.integrate import quad
 from mpmath import polylog
@@ -7,8 +9,11 @@ from scipy import interpolate
 from scipy.special import expit
 from scipy.special import kn
 from scipy.special import zeta
-from numba import jit, njit
-
+from numba import njit
+import numba as nb
+import math
+from NumbaQuadpack import quadpack_sig, dqags
+from concurrent.futures import ThreadPoolExecutor
 
 # Get the directory of the current Python file
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -31,7 +36,7 @@ ht  = 0.993
 lam = 0.129
 gw  = 2
 Tew = 160 #GeV
-v   = 246# GeV
+v   = 246 #GeV
 
 
 #vev as in PhysRevLett.117.091801
@@ -79,6 +84,29 @@ def y0_onshell(y, z):
     else:
         return y
     
+@njit
+def _log_abs_ratio_nb(num, den):
+    eps = 1e-14
+    return math.log(math.fabs(num) + eps) - math.log(math.fabs(den) + eps)
+
+@njit
+def _f_F_nb(x):
+    return 1.0 / (1.0 + math.exp(x))
+
+@njit
+def _f_B_nb(x):
+    if x > 40.0:
+        return math.exp(-x)
+    if x < 1e-10:
+        return 1e10
+    return 1.0 / (math.exp(x) - 1.0)
+
+
+"""
+HELICITY PROJECTORS
+"""
+
+
 def yp(y, z):
     y0 = y0_onshell(y, z)
     return y0 + y
@@ -554,6 +582,282 @@ def gamma_indirect_p(y, M, T):
     gamma_nu = g2**2 * T /(2*np.pi)
     return (vev(T)**2/(2*T)) * (yp(y, M/T)/y0) * (gamma_nu/2) /((T*yp(y, M/T) - bnu)**2 + (gamma_nu/2)**2)
 
+
+@nb.cfunc(quadpack_sig)
+def _A_integrand(w, data_):
+    data = nb.carray(data_, (6,))
+    y0 = data[0]; y = data[1]; D1 = data[2]; D2 = data[3]; z1 = data[4]; z2 = data[5]
+    o1 = math.sqrt(w*w + z1*z1)
+    o2 = math.sqrt(w*w + z2*z2)
+    L1p = (_log_abs_ratio_nb(D1 - 2*o1*y0 - 2*y*w, D1 - 2*o1*y0 + 2*y*w)
+         + _log_abs_ratio_nb(D1 + 2*o1*y0 - 2*y*w, D1 + 2*o1*y0 + 2*y*w))
+    L1m = (_log_abs_ratio_nb(D1 - 2*o1*y0 - 2*y*w, D1 - 2*o1*y0 + 2*y*w)
+         - _log_abs_ratio_nb(D1 + 2*o1*y0 - 2*y*w, D1 + 2*o1*y0 + 2*y*w))
+    L2p = (_log_abs_ratio_nb(D2 + 2*o2*y0 + 2*y*w, D2 + 2*o2*y0 - 2*y*w)
+         + _log_abs_ratio_nb(D2 - 2*o2*y0 + 2*y*w, D2 - 2*o2*y0 - 2*y*w))
+    L2m = (_log_abs_ratio_nb(D2 + 2*o2*y0 + 2*y*w, D2 + 2*o2*y0 - 2*y*w)
+         - _log_abs_ratio_nb(D2 - 2*o2*y0 + 2*y*w, D2 - 2*o2*y0 - 2*y*w))
+    term_B = (-(D2 + 2.0*y*y) / (2.0*y) * w/o2 * L2p
+              - y0*w/y * L2m
+              + 4.0*w*w/o2) * _f_B_nb(o2)
+    term_F = (D1 / (2.0*y) * w/o1 * L1p
+              - y0*w/y * L1m
+              + 4.0*w*w/o1) * _f_F_nb(o1)
+    return (term_B + term_F) / (8.0 * math.pi * math.pi)
+
+@nb.cfunc(quadpack_sig)
+def _B_integrand(w, data_):
+    data = nb.carray(data_, (6,))
+    y0 = data[0]; y = data[1]; D1 = data[2]; D2 = data[3]; z1 = data[4]; z2 = data[5]
+    zN2 = y0*y0 - y*y
+    o1 = math.sqrt(w*w + z1*z1)
+    o2 = math.sqrt(w*w + z2*z2)
+    L1p = (_log_abs_ratio_nb(D1 - 2*o1*y0 - 2*y*w, D1 - 2*o1*y0 + 2*y*w)
+         + _log_abs_ratio_nb(D1 + 2*o1*y0 - 2*y*w, D1 + 2*o1*y0 + 2*y*w))
+    L1m = (_log_abs_ratio_nb(D1 - 2*o1*y0 - 2*y*w, D1 - 2*o1*y0 + 2*y*w)
+         - _log_abs_ratio_nb(D1 + 2*o1*y0 - 2*y*w, D1 + 2*o1*y0 + 2*y*w))
+    L2p = (_log_abs_ratio_nb(D2 + 2*o2*y0 + 2*y*w, D2 + 2*o2*y0 - 2*y*w)
+         + _log_abs_ratio_nb(D2 - 2*o2*y0 + 2*y*w, D2 - 2*o2*y0 - 2*y*w))
+    L2m = (_log_abs_ratio_nb(D2 + 2*o2*y0 + 2*y*w, D2 + 2*o2*y0 - 2*y*w)
+         - _log_abs_ratio_nb(D2 - 2*o2*y0 + 2*y*w, D2 - 2*o2*y0 - 2*y*w))
+    term_B = (zN2/y * w * L2m
+             + D2/2.0 * y0/y * w/o2 * L2p
+             - 4.0*y0*w*w/o2) * _f_B_nb(o2)
+    term_F = (zN2/y * w * L1m
+             - D1/2.0 * y0/y * w/o1 * L1p
+             - 4.0*y0*w*w/o1) * _f_F_nb(o1)
+    return (term_B + term_F) / (8.0 * math.pi * math.pi)
+
+# .address gives the raw integer pointer — dqags passes it to the underlying
+# C function as void*, which Numba handles correctly for integer arguments.
+_A_addr = _A_integrand.address
+_B_addr = _B_integrand.address
+
+@njit
+def _dqags_A(y0, y, D1, D2, z1, z2):
+    data = np.empty(6)
+    data[0] = y0; data[1] = y; data[2] = D1
+    data[3] = D2; data[4] = z1; data[5] = z2
+    result, _, _ = dqags(_A_addr, 1e-6, 80.0, data=data)
+    return result
+
+@njit
+def _dqags_B(y0, y, D1, D2, z1, z2):
+    data = np.empty(6)
+    data[0] = y0; data[1] = y; data[2] = D1
+    data[3] = D2; data[4] = z1; data[5] = z2
+    result, _, _ = dqags(_B_addr, 1e-6, 80.0, data=data)
+    return result
+
+
+def A(y, z, z1, z2):
+    y0 = y0_onshell(y, z)
+    delta = z2**2 - z1**2
+    D1 = y0**2 - y**2 - delta
+    D2 = y0**2 - y**2 + delta
+    return _dqags_A(y0, y, D1, D2, float(z1), float(z2)) / y**2
+
+def B(y, z, z1, z2):
+    y0 = y0_onshell(y, z)
+    delta = z2**2 - z1**2
+    D1 = y0**2 - y**2 - delta
+    D2 = y0**2 - y**2 + delta
+    return _dqags_B(y0, y, D1, D2, float(z1), float(z2)) / y**2
+
+def anu_approx(y, M, T):
+    yell = np.sqrt(g1**2 + 3*g2**2)/4
+    y0   = y0_onshell(y, M/T)
+    return (yell**2/y**2) * (1 - y0/(2*y) * np.log((y0+y)/(y0-y))) 
+
+def bnu_approx(y, M, T):
+    yell = np.sqrt(g1**2 + 3*g2**2)/4
+    y0   = y0_onshell(y, M/T)
+    return (yell**2/y**2) * (-y0 + (y0**2-y**2)/(2*y) * np.log((y0+y)/(y0-y))) 
+
+_quad_pool = ThreadPoolExecutor(max_workers=4)
+
+@lru_cache(maxsize=32768)
+def _anu_full_cached(y, M, T):
+    z = M / T
+    zZ, zW = mZ(T) / T, mW(T) / T
+    fZ = _quad_pool.submit(A, y, z, 0.0, zZ)
+    fW = _quad_pool.submit(A, y, z, 0.0, zW)
+    return (g1**2 + g2**2) / 4 * fZ.result() + g2**2 / 4 * fW.result()
+
+@lru_cache(maxsize=32768)
+def _bnu_full_cached(y, M, T):
+    z = M / T
+    zZ, zW = mZ(T) / T, mW(T) / T
+    fZ = _quad_pool.submit(B, y, z, 0.0, zZ)
+    fW = _quad_pool.submit(B, y, z, 0.0, zW)
+    return (g1**2 + g2**2) / 4 * fZ.result() + g2**2 / 4 * fW.result()
+
+
+def anu_full(y, M, T):
+    return _anu_full_cached(float(y), float(M), float(T))
+
+
+def bnu_full(y, M, T):
+    return _bnu_full_cached(float(y), float(M), float(T))
+
+# ---------- Thermal helpers (dimensionless, normalized by T) ----------
+
+def _safe_pos(x, eps=1e-14):
+    return x if x > eps else eps
+
+def _log_ratio_1plus4y2_over_m2(y, m2_num, m2_den, eps=1e-14):
+    # computes log[(1 + 4 y^2/m2_num)/(1 + 4 y^2/m2_den)]
+    a = 1.0 + 4.0 * y**2 / _safe_pos(m2_num, eps)
+    b = 1.0 + 4.0 * y**2 / _safe_pos(m2_den, eps)
+    return np.log(a / b)
+
+def _mix_angles_and_masses_tilde_bar(zW2, zZ2, g1, g2, nS=1.0, nG=3.0):
+    # Debye masses divided by T^2
+    e1 = (nS/6.0 + 5.0*nG/9.0) * g1**2
+    e2 = (2.0/3.0 + nS/6.0 + nG/3.0) * g2**2
+
+    # vacuum weak mixing
+    s2t = 2.0 * g1 * g2 / (g1**2 + g2**2)
+    c2t = (g2**2 - g1**2) / (g1**2 + g2**2)
+
+    # tilde sector
+    disc_t = np.sqrt(s2t**2 * zZ2**2 + (c2t * zZ2 + e2 - e1)**2)
+    s2tt = s2t * zZ2 / _safe_pos(disc_t)
+    c2tt = (c2t * zZ2 + e2 - e1) / _safe_pos(disc_t)
+
+    # cos^2(theta-tilde), sin^2(theta-tilde) from double-angle data only
+    c_d_t = 0.5 * (1.0 + c2t * c2tt + s2t * s2tt)
+    s_d_t = 1.0 - c_d_t
+
+    zt_plus2  = 0.5 * (zZ2 + e1 + e2 + disc_t)
+    zt_minus2 = 0.5 * (zZ2 + e1 + e2 - disc_t)
+
+    ztW2 = zW2 + e2
+    ztZ2 = zt_plus2
+    ztQ2 = zt_minus2
+
+    # bar sector
+    disc_b = np.sqrt(s2t**2 * zZ2**2 + (c2t * zZ2 + 0.5*(e2 - e1))**2)
+    s2tb = s2t * zZ2 / _safe_pos(disc_b)
+    c2tb = (c2t * zZ2 + 0.5*(e2 - e1)) / _safe_pos(disc_b)
+
+    c_d_b = 0.5 * (1.0 + c2t * c2tb + s2t * s2tb)
+    s_d_b = 1.0 - c_d_b
+
+    zb_plus2  = 0.5 * (zZ2 + 0.5*(e1 + e2) + disc_b)
+    zb_minus2 = 0.5 * (zZ2 + 0.5*(e1 + e2) - disc_b)
+
+    zbW2 = zW2 + 0.5*e2
+    zbZ2 = zb_plus2
+    zbQ2 = zb_minus2
+
+    return {
+        "c_d_t": c_d_t, "s_d_t": s_d_t, "ztW2": ztW2, "ztZ2": ztZ2, "ztQ2": ztQ2,
+        "c_d_b": c_d_b, "s_d_b": s_d_b, "zbW2": zbW2, "zbZ2": zbZ2, "zbQ2": zbQ2,
+    }
+
+# ---------- HTL pieces: hat means divided by T ----------
+
+def Gamma_u_HTL_hat(y, T, nS=1.0, nG=3.0):
+    zW2 = (mW(T)/T)**2
+    zZ2 = (mZ(T)/T)**2
+    th = _mix_angles_and_masses_tilde_bar(zW2, zZ2, g1, g2, nS=nS, nG=nG)
+
+    su2 = 2.0 * g2**2 * _log_ratio_1plus4y2_over_m2(y, zW2, th["ztW2"])
+    neutral = (g1**2 + g2**2) * (
+        th["c_d_t"] * _log_ratio_1plus4y2_over_m2(y, zZ2, th["ztZ2"]) +
+        th["s_d_t"] * _log_ratio_1plus4y2_over_m2(y, zZ2, th["ztQ2"])
+    )
+    return (su2 + neutral) / (16.0 * np.pi)
+
+
+def Gamma_up2kK_HTL_hat(y, T, nS=1.0, nG=3.0):
+    zW2 = (mW(T)/T)**2
+    zZ2 = (mZ(T)/T)**2
+    th = _mix_angles_and_masses_tilde_bar(zW2, zZ2, g1, g2, nS=nS, nG=nG)
+
+    su2 = 2.0 * g2**2 * _log_ratio_1plus4y2_over_m2(y, zW2, th["zbW2"])
+    neutral = (g1**2 + g2**2) * (
+        th["c_d_b"] * _log_ratio_1plus4y2_over_m2(y, zZ2, th["zbZ2"]) +
+        th["s_d_b"] * _log_ratio_1plus4y2_over_m2(y, zZ2, th["zbQ2"])
+    )
+    return (su2 + neutral) / (8.0 * np.pi)
+
+# ---------- Born pieces (dimensionless chemical potentials mu/T) ----------
+
+def l1b(x):
+    # ln(1 - e^{-x})
+    return np.log1p(-np.exp(-_safe_pos(x)))
+
+def l1f(x):
+    # ln(1 + e^{-x})
+    return np.log1p(np.exp(-x))
+
+def l2b(x):
+    # Li_2(+e^{-x})
+    return float(polylog(2, np.exp(-x)))
+
+def l2f(x):
+    # Li_2(-e^{-x})
+    return float(polylog(2, -np.exp(-x)))
+
+
+def Gamma_tilde_u_Born_hat(y, zM, mu1_hat=0.0, mu2_hat=0.0):
+    # \tilde\Gamma_u / T
+    a = zM**2 / (4.0*y)
+    return (zM**2 / (32.0*np.pi*y**2)) * (
+        l1f(a + mu1_hat) - l1b(y + a - mu2_hat)
+    )
+
+
+def Gamma_tilde_up2kK_Born_hat(y, zM, mu1_hat=0.0, mu2_hat=0.0):
+    # (\tilde\Gamma_u + 2k\tilde\Gamma_K) / T
+    a = zM**2 / (4.0*y)
+    return (1.0 / (8.0*np.pi*y)) * (
+        l2b(y + a - mu2_hat) - l2f(a + mu1_hat)
+    )
+
+
+def Gamma_u_Born_hat(y, T, mu_a_hat=0.0, mu_Q_hat=0.0):
+    zZ = mZ(T)/T
+    zW = mW(T)/T
+    return ((g1**2 + g2**2) * Gamma_tilde_u_Born_hat(y, zZ, mu_a_hat, 0.0) +
+            2.0*g2**2 * Gamma_tilde_u_Born_hat(y, zW, mu_a_hat - mu_Q_hat, mu_Q_hat))
+
+
+def Gamma_up2kK_Born_hat(y, T, mu_a_hat=0.0, mu_Q_hat=0.0):
+    zZ = mZ(T)/T
+    zW = mW(T)/T
+    return ((g1**2 + g2**2) * Gamma_tilde_up2kK_Born_hat(y, zZ, mu_a_hat, 0.0) +
+            2.0*g2**2 * Gamma_tilde_up2kK_Born_hat(y, zW, mu_a_hat - mu_Q_hat, mu_Q_hat))
+
+# ---------- Total Gu, Gk (dimensionless, i.e. divided by T) ----------
+
+def Gu_Gk_hat(y, T, mu_a_hat=0.0, mu_Q_hat=0.0, nS=1.0, nG=3.0):
+    Gu = Gamma_u_HTL_hat(y, T, nS=nS, nG=nG) + Gamma_u_Born_hat(y, T, mu_a_hat, mu_Q_hat)
+    GupK = Gamma_up2kK_HTL_hat(y, T, nS=nS, nG=nG) + Gamma_up2kK_Born_hat(y, T, mu_a_hat, mu_Q_hat)
+
+    # since (Gamma_u + 2k Gamma_K)/T = Gu + 2y Gk
+    Gk = (GupK - Gu) / (2.0*y)
+    return Gu, Gk, GupK
+
+def gamma_indirect_m_full(y, M, T):
+    Gu, Gk, GupK = Gu_Gk_hat(y, T)
+    y0 = y0_onshell(y, M/T)
+    anu = anu_full(y, M, T)
+    bnu = bnu_full(y, M, T)
+    #here v = 246 GeV, are we sure?
+    return (vev(T)**2/(4*T**2)) * (ym(y, M/T)/y0) * (Gu + Gk * ym(y, M/T)) /((bnu + (1+anu) * ym(y, M/T))**2 + (Gu +Gk * ym(y, M/T))**2/4)
+
+
+def gamma_indirect_p_full(y, M, T):
+    Gu, Gk, GupK = Gu_Gk_hat(y, T)
+    y0 = y0_onshell(y, M/T)
+    anu = anu_full(y, M, T)
+    bnu = bnu_full(y, M, T)
+    #here v = 246 GeV, are we sure?
+    return (vev(T)**2/(4*T**2)) * (yp(y, M/T)/y0) * (Gu + Gk * yp(y, M/T)) /((bnu + (1+anu) * yp(y, M/T))**2 + (Gu +Gk * yp(y, M/T))**2/4)
+
 def Sigma_indirect_m(y, M, T):
     y0 = y0_onshell(y, M/T)
     bnu = -m_ell(T)**2 /(2*y0*T)
@@ -562,6 +866,23 @@ def Sigma_indirect_m(y, M, T):
 
 def Sigma_indirect_p(y, M, T):
     return (vev(T)**2/(2*T)) * SigmaA_m(y, M, T) /(SigmaA_m(y, M, T)**2 + (T*ym(y, M/T) - SigmaH_m(y, M, T))**2)
+
+def Sigma_indirect_m_full(y, M, T):
+    Gu, Gk, GupK = Gu_Gk_hat(y, T)
+    y0 = y0_onshell(y, M/T)
+    anu = anu_full(y, M, T)
+    bnu = bnu_full(y, M, T)
+    #here v = 246 GeV, are we sure?
+    return (vev(T)**2/(4*T**2)) * (Gu + Gk * ym(y, M/T)) /((bnu + (1+anu) * ym(y, M/T))**2 + (Gu +Gk * ym(y, M/T))**2/4)
+
+
+def Sigma_indirect_p_full(y, M, T):
+    Gu, Gk, GupK = Gu_Gk_hat(y, T)
+    y0 = y0_onshell(y, M/T)
+    anu = anu_full(y, M, T)
+    bnu = bnu_full(y, M, T)
+    #here v = 246 GeV, are we sure?
+    return (vev(T)**2/(4*T**2)) * (Gu + Gk * yp(y, M/T)) /((bnu + (1+anu) * yp(y, M/T))**2 + (Gu +Gk * yp(y, M/T))**2/4)
 
 """
 Relativistic contribution extrapolated from PhysRevD.104.055010
@@ -680,13 +1001,13 @@ Full Contribution
 
 def Sigma_m(y, M, T):
     z = M/T
-    if T >= 160:
+    if T >= Tew:
         if 1-np.sqrt(xphi(z)) >= 0:
             Symmetric = np.heaviside(1-np.sqrt(xphi(z)),0.5) * (Sigma_sNm(y, z) + Sigma_sHm(y, z))
             return Sigma_m_rel(y, T) + Symmetric
         else:
             return Sigma_m_rel(y,T)
-    if T < 160:
+    if T < Tew:
         if 1-mW(T)/M >= 0:
             Broken = Sigma_indirect_m(y, M, T) + np.heaviside(1-mW(T)/M,0.5) * Sigma_bDm(y, M, T)
             return Sigma_m_rel(y, T) + Broken
@@ -695,11 +1016,11 @@ def Sigma_m(y, M, T):
 
 def Sigma_p(y, M, T):
     z = M/T
-    if T >= 160:
+    if T >= Tew:
         if 1-np.sqrt(xphi(z)) >= 0:
             Symmetric = np.heaviside(1-np.sqrt(xphi(z)),0.5) * (Sigma_sNp(y, z) + Sigma_sHp(y, z))
             return Sigma_p_rel(y, T) + Symmetric
-    if T < 160:
+    if T < Tew:
         if 1-mW(T)/M>= 0:
             Broken = Sigma_indirect_p(y, M, T) + np.heaviside(1-mW(T)/M,0.5) * Sigma_bDp(y, M, T)
             return Sigma_p_rel(y, T) + Broken
@@ -708,33 +1029,33 @@ def Sigma_p(y, M, T):
     
 def gamma_m(y, M, T):
     z = M/T
-    if T >= 160:
+    if T >= Tew:
         if 1-np.sqrt(xphi(z))>= 0:
             Symmetric = np.heaviside(1-np.sqrt(xphi(z)),0.5) * (gamma_sNm(y, z) + gamma_sHm(y, z))
             return gamma_m_rel(y, M, T) + Symmetric
         else:
             return gamma_m_rel(y, M, T)
-    if T < 160:
+    if T < Tew:
         if 1-mW(T)/M>= 0:
-            Broken = gamma_indirect_m(y, M, T) + np.heaviside(1-mW(T)/M,0.5) * gamma_bDm(y, M, T)
-            return gamma_m_rel(y, M, T) + Broken
+            Broken = np.heaviside(1-mW(T)/M,0.5) * gamma_bDm(y, M, T) + gamma_indirect_m_full(y, M, T)
+            return Broken# + gamma_m_rel(y, M, T) 
         else:
-            return gamma_m_rel(y, M, T)
+            return gamma_indirect_m_full(y, M, T) + gamma_m_rel(y, M, T)
 
 def gamma_p(y, M, T):
     z = M/T
-    if T >= 160:
+    if T >= Tew:
         if 1-np.sqrt(xphi(z))>=0:
             Symmetric = np.heaviside(1-np.sqrt(xphi(z)),0.5) * (gamma_sNp(y, z) + gamma_sHp(y, z))
             return gamma_p_rel(y, M, T) + Symmetric
         else:
             return gamma_p_rel(y, M, T)
-    if T < 160:
+    if T < Tew:
         if 1-mW(T)/M >= 0:
-            Broken = gamma_indirect_p(y, M, T) + np.heaviside(1-mW(T)/M,0.5) * gamma_bDp(y, M, T)
-            return gamma_p_rel(y, M, T) + Broken
+            Broken = np.heaviside(1-mW(T)/M,0.5) * gamma_bDp(y, M, T) + gamma_indirect_p_full(y, M, T) 
+            return Broken + gamma_p_rel(y, M, T)
         else:
-            return gamma_p_rel(y, M, T)
+            return gamma_indirect_p_full(y, M, T) + gamma_p_rel(y, M, T)
     
 def ImPi(y, M, T):
     z = M/T

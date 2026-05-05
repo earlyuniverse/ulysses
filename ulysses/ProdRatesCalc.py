@@ -2,38 +2,68 @@ r"""
 This script can be used to compute the tables of the rates that enter the denisty matrix equations 
 relevant for low-scale leptogenesis via oscillations. 
 
-The columns of the table correspond to the following quantities:
-T       <\gamma_LNC^(0)>/T      <S_LNV^(0)>/T      <\gamma_LNC^(1)>/T      <S_LNV^(2)>/T
+Each output table has three columns:
+M_GeV   T_GeV   rate
 
-The results are stored in a different file named rt_#M#units.txt, where #M is the averaged mass of the heavy neutrinos written with three digits while #units are either MeV, GeV or TeV.
-E.g. the rates for M = 1GeV are stored in the file rt_001GeV.txt.
+One file is produced per rate quantity:
+rates_averaged_G0.txt
+rates_averaged_S0.txt
+rates_averaged_G1.txt
+rates_averaged_S1.txt
+rates_averaged_hind_p.txt
+rates_averaged_hind_m.txt
 """
 
 
 import os
+import multiprocessing as mp
 import numpy as np
-import ProdRates as PD
+import ProdRates_alt as PD
 
 
-HEADER = 'T_GeV <gamma_LNC^(0)>/T <S_LNV^(0)>/T <gamma_LNC^(1)>/T <S_LNV^(2)>/T'
+def rate_averaged_G0(mass_gev, temperature_gev):
+    return PD.averaged_gamma_p(mass_gev, temperature_gev)
+
+def rate_averaged_S0(mass_gev, temperature_gev):
+    return PD.averaged_gamma_m(mass_gev, temperature_gev)
+
+def rate_averaged_G1(mass_gev, temperature_gev):
+    return PD.averaged_gamma1_p(mass_gev, temperature_gev, b = 0)
+
+def rate_averaged_S1(mass_gev, temperature_gev):
+    return PD.averaged_gamma1_m(mass_gev, temperature_gev, b = 0)
+
+def rate_averaged_h_ind_p(mass_gev, temperature_gev):
+    return PD.averaged_h_indirect_p(mass_gev, temperature_gev)
+
+def rate_averaged_h_ind_m(mass_gev, temperature_gev):
+    return PD.averaged_h_indirect_m(mass_gev, temperature_gev)
 
 
-def format_rate_filename(mass_gev):
-    if mass_gev < 1:
-        mass_value = mass_gev * 1e3
-        unit = 'MeV'
-    elif mass_gev < 1e3:
-        mass_value = mass_gev
-        unit = 'GeV'
-    else:
-        mass_value = mass_gev / 1e3
-        unit = 'TeV'
+RATE_FUNCTIONS = {
+    'G0': rate_averaged_G0,
+    'S0': rate_averaged_S0,
+    'G1': rate_averaged_G1,
+    'S1': rate_averaged_S1,
+    'hindp': rate_averaged_h_ind_p,
+    'hindm': rate_averaged_h_ind_m,
+}
 
-    rounded_mass_value = round(mass_value)
-    if not np.isclose(mass_value, rounded_mass_value):
-        raise ValueError('Mtest must correspond to an integer number of MeV, GeV, or TeV.')
 
-    return f'rt_{rounded_mass_value:03d}{unit}.txt'
+TABLE_SPECS = {
+    'G0': ('rates_averaged_G0.txt', 'M_GeV T_GeV <g0>/T'),
+    'S0': ('rates_averaged_S0.txt', 'M_GeV T_GeV <S0>/T'),
+    'G1': ('rates_averaged_G1.txt', 'M_GeV T_GeV <g1>/T'),
+    'S1': ('rates_averaged_S1.txt', 'M_GeV T_GeV <S1>/T'),
+    'hindp': ('rates_averaged_hind_p.txt', 'M_GeV T_GeV <hindp>/T'),
+    'hindm': ('rates_averaged_hind_m.txt', 'M_GeV T_GeV <hindm>/T'),
+}
+
+
+def _compute_rate_row(task):
+    rate_key, mass_gev, temperature_gev = task
+    value = RATE_FUNCTIONS[rate_key](mass_gev, temperature_gev)
+    return rate_key, mass_gev, temperature_gev, value
 
 
 def build_mass_list():
@@ -55,30 +85,32 @@ def build_mass_list():
     return sorted(set(masses_gev))
 
 
-def compute_rate_table(mass_gev, temperatures_gev):
-    gam_lnc0 = np.array([PD.averaged_gamma_p(mass_gev, temperature) for temperature in temperatures_gev])
-    s_lnv0   = np.array([PD.averaged_gamma_m(mass_gev, temperature) * temperature**2 / mass_gev**2 for temperature in temperatures_gev])
-    gam_lnc1 = np.array([PD.averaged_gamma1_p(mass_gev, temperature, b = 0) for temperature in temperatures_gev])
-    s_lnv2   = np.array([PD.averaged_gamma1_m(mass_gev, temperature, b = 0) * temperature**2 / mass_gev**2 for temperature in temperatures_gev])
+def save_rate_tables(path, masses_gev, temperatures_gev, n_processes = None, chunksize = 20):
+    os.makedirs(path, exist_ok = True)
 
-    return np.column_stack((temperatures_gev, gam_lnc0, s_lnv0, gam_lnc1, s_lnv2))
+    if n_processes is None:
+        n_processes = max(1, (os.cpu_count() or 1) - 1)#use all but one CPU cores to avoid overloading the system
 
+    tasks = [(rate_key, mass_gev, temperature_gev) for rate_key in TABLE_SPECS  for mass_gev in masses_gev   for temperature_gev in temperatures_gev]
 
-def save_rate_table(path, mass_gev, temperatures_gev):
-    filename   = format_rate_filename(mass_gev)
-    rate_table = compute_rate_table(mass_gev, temperatures_gev)
-    
-    np.savetxt(os.path.join(path, filename), rate_table, header = HEADER, comments = '')
+    rows_by_rate = {rate_key: [] for rate_key in TABLE_SPECS}
+
+    with mp.Pool(processes = n_processes) as pool:
+        for rate_key, mass_gev, temperature_gev, value in pool.imap_unordered(_compute_rate_row, tasks, chunksize = chunksize):
+            rows_by_rate[rate_key].append((mass_gev, temperature_gev, value))
+
+    for rate_key, (filename, header) in TABLE_SPECS.items():
+        rows_by_rate[rate_key].sort(key = lambda row: (row[0], row[1]))
+        rate_table = np.array(rows_by_rate[rate_key], dtype = float)
+        np.savetxt(os.path.join(path, filename), rate_table, header = header, comments = '')
 
 
 #CHANGE THIS ACCORDINGLY
 PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'ARS_rates_ULYSSES')
 
-
-Npoints = 50
-Ts    = np.logspace(7, 2, Npoints)#GeV
+Npoints = 100
+Ts      = np.append(np.logspace(7, 3, Npoints), np.logspace(3, 2, Npoints)) #GeV, more points close to the electroweak phase transition (Tc \sim 160 GeV) where the rates change rapidly
 MASSES = build_mass_list()
 
 if __name__ == '__main__':
-    for mass in [1]:#MASSES:
-        save_rate_table(PATH, mass, Ts)
+    save_rate_tables(PATH, MASSES, Ts)
