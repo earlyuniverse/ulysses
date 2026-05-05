@@ -22,6 +22,7 @@ The package features:
 It is documented across two key publications:
 - [Version 1 – arXiv:2007.09150](https://arxiv.org/abs/2007.09150)
 - [Version 2 – arXiv:2301.05722](https://arxiv.org/abs/2301.05722)
+- Version 3 – paper forthcoming
 
 ---
 
@@ -57,21 +58,27 @@ with temperature parameter $z = M_1 / T$.
 - Preconfigured 2D scans for parameter space exploration
 
 ### Version 3 (v3) – This release
-- **Case S2**: Full phase-space Boltzmann equations including $\Delta L = 1$ scattering ($s$- and $t$-channel, $Nl \to qt$) via precomputed AB grids (arXiv:0907.0205)
-- **ARS with 3 RHNs** (`BEARS_3RHN`): extension of the ARS mechanism to the three right-handed neutrino case
-- **Extended model interface** (`--extended` flag): allows models to declare extra parameters beyond the standard PMNS+CI set, opening the solver to coupled multi-sector scenarios; `1BE1F_DM_FreezeIn` serve as worked toy-model examples demonstrating freeze-in and RHN dark matter production
+- **ARS with 3 RHNs** (`BEARS_3RHN`): extension of the ARS mechanism to the three right-handed neutrino case, with optional mass-dependent indirect rate corrections (`--ars-indirect`)
+- **Case S2**: Full phase-space Boltzmann equations including $\Delta L = 1$ scattering ($s$- and $t$-channel, $Nl \to qt$) without assuming kinetic equilibrium nor Maxwell-Boltzmann statistics
+- **Extended model interface** (`--extended` flag): allows models to declare extra parameters beyond the standard PMNS+CI set, opening the solver to coupled multi-sector scenarios; `1BE1F_DM_FreezeIn` serves as a worked toy-model example demonstrating freeze-in and RHN dark matter production
+- **Three Yukawa parameterisations**: Casas–Ibarra with Euler angles (default), single-imaginary CI (arXiv:2106.16226), and direct matrix entry — auto-detected from the parameter file
 ---
 
 ## Installation
 
 ### PyPI (Recommended)
+
 ```bash
-pip install ulysses --user
+pip install ulysses
 ```
+
+Pre-built binary wheels are provided for Linux (x86\_64 and aarch64), macOS (Intel and Apple Silicon), and Windows, covering Python 3.9–3.13. **No C compiler is required** when a wheel is available for your platform.
+
+A C compiler is only needed if pip falls back to building from source (i.e. on an unsupported platform or when installing directly from the repository). On Linux/macOS this means `gcc` or `clang`; on Windows, MSVC (Visual Studio Build Tools).
 
 ### From Source (for developers)
 
-If you intend to modify the source code or contribute to the project, install from a local clone of the GitHub repository:
+If you intend to modify the source code or contribute to the project, install from a local clone:
 
 1. Clone the repository:
 ```bash
@@ -83,27 +90,10 @@ cd ulysses
 ```
 3. Install in editable mode:
 ```bash
-pip install -e . --user
+pip install -e .
 ```
 
-### macOS notes
-
-ULYSSES builds a small C library (`NumbaQuadpack`) at install time using CMake. On macOS you need:
-
-1. **Xcode Command Line Tools** (provides the C compiler and linker):
-   ```bash
-   xcode-select --install
-   ```
-2. **CMake** — installed automatically by pip from `pyproject.toml`, but you can also install it via Homebrew:
-   ```bash
-   brew install cmake
-   ```
-
-Apple Silicon (M1/M2/M3) is fully supported. If you see an `ImportError: Could not find libcquadpack.dylib` after a successful build, it usually means an older version of ULYSSES was installed that compiled the library with a wrong suffix — a clean reinstall fixes it:
-```bash
-pip uninstall ulysses -y
-pip install .
-```
+This will compile the `NumbaQuadpack` C extension using your system compiler (`gcc`/`clang` on Linux/macOS, MSVC on Windows).
 
 ### Environment Setup (optional)
 
@@ -119,7 +109,9 @@ export PATH=$PATH:$ULYSSES/bin
 
 ## Quick Start
 
-### Step 1: Create a parameter file (or use one of the example parameter files in examples/)
+### Step 1: Create a parameter file
+
+The parameter file is a plain-text card with one `key value` pair per line. Lines starting with `#` are comments.
 
 ```ini
 # Lightest neutrino mass (log10, eV)
@@ -138,11 +130,13 @@ x3     180
 y1    -120
 y2       0
 y3    -120
-# PMNS angles — NuFit 6.1 best fit, NO
+# PMNS angles (deg) — optional, default to NuFit 6.1 best fit (NO)
 t12    33.76
 t13     8.62
 t23    43.27
 ```
+
+`t12`, `t13`, `t23` are optional. If omitted, ULYSSES uses the NuFit 6.1 best-fit values for the chosen mass ordering (normal ordering by default).
 
 ### Step 2: Run a simulation
 
@@ -150,7 +144,7 @@ t23    43.27
 uls-calc -m 1BE1F examples/1N1F.dat -o evolution.pdf
 ```
 
-The terminal will display the ULYSSES banner, the model name, all input parameters, and the computed $\eta_B$, $Y_B$, and $\Omega_b h^2$, and an output file (evolution.pdf) will be created. One could stroe the output as a .txt, a .dat or a .csv file. 
+The terminal displays the ULYSSES banner, model name, all input parameters, and the computed $\eta_B$, $Y_B$, and $\Omega_b h^2$. The output file can be `.pdf`, `.txt`, `.dat`, or `.csv`.
 
 ---
 
@@ -166,12 +160,117 @@ ULYSSES includes a suite of command-line tools in `bin/`:
 | `uls-nest`    | Nested sampling scan for Bayesian inference or model selection.             |
 | `uls-models`  | List all available pre-defined physics models.                              |
 
+### CLI flags
+
+All tools share a common set of flags. The most commonly used ones for `uls-calc` are:
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-m MODEL` | `1DME` | Physics model to run (see model table below) |
+| `-o FILE` | — | Output file for evolution plots or data (`.pdf`, `.txt`, `.dat`, `.csv`) |
+| `--inv` | off | Use inverted neutrino mass ordering |
+| `--loop` | off | Use loop-corrected Yukawa couplings |
+| `--initial ` | `0` | Initial RHN abundance: `0` = vanishing, `1` = thermal |
+| `--extended` | off | Allow model-specific parameters beyond the standard PMNS+CI set |
+| `--lambda ` | `1e3` | ARS quasi-static cutoff scale $\Lambda$ (GeV) for `BEARS_3RHN` |
+| `--ars-indirect` | off | Enable mass-dependent hindrance rate corrections in `BEARS_3RHN` |
+| `--zrange Z0,Z1,N` | `0.1,30,500` | Start, end, and number of steps for the $z$ evolution variable |
+| `--xrange X0,X1,N` | `1e-6,min([1, 20*131.7/M1]),500` | Start, end, and steps for the 3RHN ARS $x = T_\text{ew}/T$ variable |
+| `--zcut` | `1.0` | Stitch cut value used in 2RHN ARS models |
+| `-v` | off | Enable debug output |
+
 ### Extended mode (model-specific parameters)
 
 Models that require parameters beyond the standard PMNS+CI set (e.g. dark matter modules) use the `--extended` flag:
 
 ```bash
 uls-calc -m 1BE1F_DM_FreezeIn --extended examples/1N1F_dm.dat -o dm_evolution.pdf
+```
+
+The `--extended` flag tells the solver to pass unrecognised keys in the parameter file through to the model rather than rejecting them as errors. For `1BE1F_DM_FreezeIn`, the two extra keys are:
+
+```ini
+# --- standard PMNS+CI block (same as 1BE1F) ---
+m      -100
+M1     12
+M2     15
+M3     16
+x1    180
+y1      1.4
+x2    180
+y2     11.2
+x3    180
+y3     11
+delta  270
+a21      0
+a31      0
+
+# --- model-specific extensions (require --extended) ---
+lam    1e-7    # feeble dark coupling λ
+m_dm   1e6    # dark matter mass (GeV)
+```
+
+---
+
+## Yukawa Parameterisations
+
+ULYSSES supports three ways to specify the Yukawa coupling matrix. The parameterisation is **auto-detected** from the keys present in the parameter file — no explicit flag is needed.
+
+### 1. Casas–Ibarra with Euler angles (default)
+
+Standard parameterisation. Use when the parameter file contains `x1`, `y1`, `x2`, …
+
+```ini
+x1   90
+y1  -120
+x2   87
+y2    0
+x3  180
+y3  -120
+```
+
+### 2. Single-imaginary Casas–Ibarra (arXiv:2106.16226)
+
+Activated when the parameter file contains `xN1`. Used for ARS models with 3 RHNs.
+
+```ini
+xN1   2
+xN2   3
+xnu1  4
+xnu2  5
+x     1
+y   103.13
+```
+
+### 3. Manual Yukawa matrix
+
+Activated when the parameter file contains `Y11_mag`. Each entry is specified as a magnitude and a phase (radians).
+
+```ini
+Y11_mag  8.149e-05
+Y11_phs -1.819
+Y12_mag  8.149e-05
+Y12_phs -0.248
+# ... (all 9 entries required)
+```
+
+---
+
+## Neutrino Mass Splittings
+
+The default mass squared splittings come from **NuFit 6.1** (2025):
+
+| Parameter | Default value | Description |
+|-----------|---------------|-------------|
+| `m2solar` | $7.537 \times 10^{-5}$ eV² | Solar splitting $\Delta m^2_{21}$ |
+| `m2atm`   | $2.521 \times 10^{-3}$ eV² | Atmospheric splitting, normal ordering |
+| `m2atminv`| $2.500 \times 10^{-3}$ eV² | Atmospheric splitting, inverted ordering |
+
+To override, add the key(s) to your parameter file (values in eV²):
+
+```ini
+m2solar   7.53e-5
+m2atm     2.52e-3
 ```
 
 ---
@@ -218,11 +317,11 @@ uls-calc -m 1BE1F_DM_FreezeIn --extended examples/1N1F_dm.dat -o dm_evolution.pd
 
 ### ARS (low-scale) leptogenesis
 
-| Model           | Example file          | Description                                   |
-|-----------------|-----------------------|-----------------------------------------------|
-| `BEARS`         | `2RHNosc.dat`         | Temperature-independent ARS, 2 RHNs           |
-| `BEARS_INTERP`  | `2RHNosc.dat`         | Temperature-dependent ARS, 2 RHNs             |
-| `BEARS_3RHN`    | `Bears_3RHN_alt.dat`  | ARS with 3 RHNs                               |
+| Model           | Example file          | Description                                                      |
+|-----------------|-----------------------|------------------------------------------------------------------|
+| `BEARS`         | `2RHNosc.dat`         | Temperature-independent ARS, 2 RHNs                             |
+| `BEARS_INTERP`  | `2RHNosc.dat`         | Temperature-dependent ARS, 2 RHNs                               |
+| `BEARS_3RHN`    | `Bears_3RHN_alt.dat`  | ARS with 3 RHNs; supports `--ars-indirect` and `--lambda` flags  |
 
 ### Primordial black holes
 
@@ -230,7 +329,7 @@ uls-calc -m 1BE1F_DM_FreezeIn --extended examples/1N1F_dm.dat -o dm_evolution.pd
 |--------------|--------------|--------------------------------------------------|
 | `1BE1F_PBH`  | `PBH.dat`    | Leptogenesis from PBH evaporation                |
 
-### Dark matter (Toy model for extended flag interface)
+### Dark matter (toy model for extended flag interface)
 
 | Model                  | Example file   | Description                                              |
 |------------------------|----------------|----------------------------------------------------------|
@@ -275,6 +374,9 @@ Please cite the relevant paper(s) for the features you use:
     year = "2023"
 }
 ```
+
+### ULYSSES v3
+Paper forthcoming. In the meantime, please cite both v1 and v2 above when using v3 features.
 
 ---
 

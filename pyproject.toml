@@ -12,7 +12,7 @@ build-backend = "setuptools.build_meta"
 
 # ---------------------------------------------------------------------------
 # Project metadata — takes precedence over setup.py kwargs in setuptools>=77.
-# The CMake extension, custom build_ext, and bin/ scripts are still declared
+# The C extension, custom build_ext, and bin/ scripts are still declared
 # in setup.py because pyproject.toml has no equivalent for non-entry-point
 # scripts or custom build commands.
 # ---------------------------------------------------------------------------
