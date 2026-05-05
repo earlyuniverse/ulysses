@@ -42,7 +42,7 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
           # Smoke-test the installed wheel: verifies the C extension loads correctly
-          CIBW_TEST_COMMAND: python -c "import ulysses; print('wheel OK')"
+          CIBW_TEST_COMMAND: python -c "from NumbaQuadpack import dqags; import ulysses; print('wheel OK')"
 
       - uses: actions/upload-artifact@v4
         with:
