@@ -19,7 +19,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name            = "ulysses"
-version         = "2.0.2"
+version         = "3.0.0a1"
 description     = "ULYSSES: Universal LeptogeneSiS Equation Solver"
 readme          = "README.md"
 license         = "MIT"
