@@ -628,8 +628,7 @@ def _B_integrand(w, data_):
              - 4.0*y0*w*w/o1) * _f_F_nb(o1)
     return (term_B + term_F) / (8.0 * math.pi * math.pi)
 
-# .address gives the raw integer pointer — dqags passes it to the underlying
-# C function as void*, which Numba handles correctly for integer arguments.
+
 _A_addr = _A_integrand.address
 _B_addr = _B_integrand.address
 

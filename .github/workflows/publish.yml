@@ -5,6 +5,9 @@ on:
     tags: ["v*"]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build_wheels:
     name: Wheels — ${{ matrix.os }}
@@ -12,8 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # macos-13 = Intel x86_64, macos-14 = Apple Silicon arm64
-        os: [ubuntu-latest, macos-13, macos-14, windows-latest]
+        os: [ubuntu-latest, macos-14, windows-latest]
 
     steps:
       - uses: actions/checkout@v4
@@ -34,13 +36,14 @@ jobs:
           CIBW_SKIP: "pp* *-musllinux*"
           # Linux: native x86_64 + cross-compiled aarch64 via QEMU
           CIBW_ARCHS_LINUX: x86_64 aarch64
-          # macOS: use the runner's native arch (x86_64 on macos-13, arm64 on macos-14)
-          CIBW_ARCHS_MACOS: auto
+          # macOS: cross-compile both Intel x86_64 and Apple Silicon arm64 from the macos-14 runner
+          CIBW_ARCHS_MACOS: x86_64 arm64
           # Windows: 64-bit only (numba has no 32-bit wheels)
           CIBW_ARCHS_WINDOWS: AMD64
-          # manylinux2014 = glibc >= 2.17 (RHEL 7 / Ubuntu 14.04+), maximum Linux compatibility
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
+          # manylinux_2_28 = glibc >= 2.28 (RHEL 8 / Ubuntu 20.04+); required because numpy/scipy
+          # no longer publish manylinux2014 wheels, causing source-build failures in old containers
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
           # Smoke-test the installed wheel: verifies the C extension loads correctly
           CIBW_TEST_COMMAND: python -c "from NumbaQuadpack import dqags; import ulysses; print('wheel OK')"
 
