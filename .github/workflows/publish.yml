@@ -44,6 +44,9 @@ jobs:
           # no longer publish manylinux2014 wheels, causing source-build failures in old containers
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
+          # Skip testing cross-compiled x86_64 wheels on the arm64 runner — numba/llvmlite
+          # have no pre-built x86_64 wheels under Rosetta and building from source needs LLVM
+          CIBW_TEST_SKIP: "*-macosx_x86_64"
           # Smoke-test the installed wheel: verifies the C extension loads correctly
           CIBW_TEST_COMMAND: python -c "from NumbaQuadpack import dqags; import ulysses; print('wheel OK')"
 
