@@ -706,7 +706,7 @@ class EtaB_ARS(ulysses.ULSBase):
         gstaro   = 43/11              #entropic effective degrees of freedom at present
         ToYb     = 45 * zeta3 /(gstaro * np.pi**4)
         ToOmegab = mp * ngamma/rhoc
-        self.plot = False
+        self.plot = False if self.plot is None else self.plot
         self.save_plot = False
 
         self.m  = 0.
@@ -918,12 +918,12 @@ class EtaB_ARS_INTERP(EtaB_ARS):
 
         M2_f  = os.path.join(data_dir, "./data/Log_M.txt")
         z2_f  = os.path.join(data_dir, "./data/Log_z.txt")
-        G0M_f = os.path.join(data_dir, "./data/G0log_massdep.txt")
-        G1M_f = os.path.join(data_dir, "./data/G1log_massdep.txt")
-        G2M_f = os.path.join(data_dir, "./data/G2log_massdep.txt")
-        S0M_f = os.path.join(data_dir, "./data/S0log_massdep.txt")
-        S1M_f = os.path.join(data_dir, "./data/S1log_massdep.txt")
-        S2M_f = os.path.join(data_dir, "./data/S2log_massdep.txt")
+        G0M_f = os.path.join(data_dir, "./data/g0log_massdep.txt")
+        G1M_f = os.path.join(data_dir, "./data/g1log_massdep.txt")
+        G2M_f = os.path.join(data_dir, "./data/g2log_massdep.txt")
+        S0M_f = os.path.join(data_dir, "./data/s0log_massdep.txt")
+        S1M_f = os.path.join(data_dir, "./data/s1log_massdep.txt")
+        S2M_f = os.path.join(data_dir, "./data/s2log_massdep.txt")
         
         #S0M_f = os.path.join(data_dir, "./data/s0log_massdep.txt")
         #S1M_f = os.path.join(data_dir, "./data/s1log_massdep.txt")
