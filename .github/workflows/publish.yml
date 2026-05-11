@@ -30,8 +30,8 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22
         env:
-          # Python versions matching python_requires = ">=3.9,<3.14"
-          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
+          # Python versions matching python_requires = ">=3.9,<3.15"
+          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
           # Skip PyPy (numba doesn't support it) and musl/Alpine Linux
           CIBW_SKIP: "pp* *-musllinux*"
           # Linux: native x86_64 + cross-compiled aarch64 via QEMU

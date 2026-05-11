@@ -24,7 +24,7 @@ description     = "ULYSSES: Universal LeptogeneSiS Equation Solver"
 readme          = "README.md"
 license         = "MIT"
 license-files   = ["LICENSE"]
-requires-python = ">=3.9,<3.14"
+requires-python = ">=3.9,<3.15"
 authors = [
     {name = "Alessandro Granelli"},
     {name = "Christopher Leslie"},
