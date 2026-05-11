@@ -18,7 +18,7 @@ rates_averaged_hind_m.txt
 import os
 import multiprocessing as mp
 import numpy as np
-import ProdRates_alt as PD
+import ProdRates as PD
 
 
 def rate_averaged_G0(mass_gev, temperature_gev):
