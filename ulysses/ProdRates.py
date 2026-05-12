@@ -36,10 +36,24 @@ ht  = 0.993
 lam = 0.129
 gw  = 2
 Tew = 160 #GeV
-v   = 246 #GeV
+v   = 174 #GeV
 
+# Load Juraj's vev table.  Sort ascending in T so np.searchsorted works.
+# Outside the table range vev returns 0.
+_vev_table = np.loadtxt(os.path.join(data_dir, 'vev_T.txt'), comments='#')
+_sort_idx   = np.argsort(_vev_table[:, 0])
+_vev_T_arr  = np.ascontiguousarray(_vev_table[_sort_idx, 0])  # ascending T
+_vev_v_arr  = np.ascontiguousarray(_vev_table[_sort_idx, 1])
 
-#vev as in PhysRevLett.117.091801
+@njit
+def vev_interp(T):
+    """Linear interpolation of vev(T) from table."""
+    if T <= _vev_T_arr[0] or T >= _vev_T_arr[-1]:
+        return 0.0
+    i = np.searchsorted(_vev_T_arr, T) - 1
+    t = (T - _vev_T_arr[i]) / (_vev_T_arr[i + 1] - _vev_T_arr[i])
+    return _vev_v_arr[i] + t * (_vev_v_arr[i + 1] - _vev_v_arr[i])
+
 def vev(T):
     return np.sqrt((1 - T**2/Tew**2)*np.heaviside(Tew-T, 0.5)*v**2)
 
@@ -47,10 +61,10 @@ def mH(T):
     return np.sqrt(2*lam*vev(T)**2)
 
 def mW(T):
-    return vev(T)*g2/2
+    return vev(T)*g2/np.sqrt(2)
 
 def mZ(T):
-    return vev(T)*np.sqrt(g1**2 + g2**2)/2
+    return vev(T)*np.sqrt(g1**2 + g2**2)/np.sqrt(2)
 
 def m_ell(T):
     return (T/4) * np.sqrt(g1**2 + 3*g2**2)
@@ -572,15 +586,21 @@ def SigmaH_m(y, M, T):
 
 
 #See 2103.16545, 1703.06085 and 1605.07720
-def gamma_indirect_m(y, M, T):
+def gamma_indirect_m_(y, M, T):
     y0 = y0_onshell(y, M/T)
-    return (vev(T)**2/(2*T)) * (ym(y, M/T)/y0) * SigmaA_m(y, M, T) /(SigmaA_m(y, M, T)**2 + (T*ym(y, M/T) - SigmaH_m(y, M, T))**2)
+    return (vev(T)**2/(T)) * (ym(y, M/T)/y0) * SigmaA_m(y, M, T) /(SigmaA_m(y, M, T)**2 + (T*ym(y, M/T) - SigmaH_m(y, M, T))**2)
 
 def gamma_indirect_p(y, M, T):
     y0 = y0_onshell(y, M/T)
     bnu = -m_ell(T)**2 /(2*y0*T)
     gamma_nu = g2**2 * T /(2*np.pi)
-    return (vev(T)**2/(2*T)) * (yp(y, M/T)/y0) * (gamma_nu/2) /((T*yp(y, M/T) - bnu)**2 + (gamma_nu/2)**2)
+    return (vev(T)**2/(T)) * (yp(y, M/T)/y0) * (gamma_nu/2) /((T*yp(y, M/T) - bnu)**2 + (gamma_nu/2)**2)
+
+def gamma_indirect_m(y, M, T):
+    y0 = y0_onshell(y, M/T)
+    bnu = -m_ell(T)**2 /(2*y0*T)
+    gamma_nu = g2**2 * T /(2*np.pi)
+    return (vev(T)**2/(T)) * (ym(y, M/T)/y0) * (gamma_nu/2) /((T*ym(y, M/T) - bnu)**2 + (gamma_nu/2)**2)
 
 
 @nb.cfunc(quadpack_sig)
@@ -628,7 +648,8 @@ def _B_integrand(w, data_):
              - 4.0*y0*w*w/o1) * _f_F_nb(o1)
     return (term_B + term_F) / (8.0 * math.pi * math.pi)
 
-
+# .address gives the raw integer pointer — dqags passes it to the underlying
+# C function as void*, which Numba handles correctly for integer arguments.
 _A_addr = _A_integrand.address
 _B_addr = _B_integrand.address
 
@@ -693,11 +714,17 @@ def _bnu_full_cached(y, M, T):
 
 
 def anu_full(y, M, T):
-    return _anu_full_cached(float(y), float(M), float(T))
+    y = float(y)
+    M = float(M)
+    T = float(T)
+    return _anu_full_cached(y, M, T)
 
 
 def bnu_full(y, M, T):
-    return _bnu_full_cached(float(y), float(M), float(T))
+    y = float(y)
+    M = float(M)
+    T = float(T)
+    return _bnu_full_cached(y, M, T)
 
 # ---------- Thermal helpers (dimensionless, normalized by T) ----------
 
@@ -848,6 +875,12 @@ def gamma_indirect_m_full(y, M, T):
     #here v = 246 GeV, are we sure?
     return (vev(T)**2/(4*T**2)) * (ym(y, M/T)/y0) * (Gu + Gk * ym(y, M/T)) /((bnu + (1+anu) * ym(y, M/T))**2 + (Gu +Gk * ym(y, M/T))**2/4)
 
+def gamma_indirect_m_rel(y, M, T):
+    Gu, Gk, GupK = Gu_Gk_hat(y, T)
+    y0 = y0_onshell(y, M/T)
+    bnu = bnu_full(y, M, T)
+    #here v = 246 GeV, are we sure?
+    return (vev(T)**2/(4*T**2)) * (ym(y, M/T)/y0) * (Gu) /((bnu )**2 + (Gu)**2/4)
 
 def gamma_indirect_p_full(y, M, T):
     Gu, Gk, GupK = Gu_Gk_hat(y, T)
@@ -857,16 +890,25 @@ def gamma_indirect_p_full(y, M, T):
     #here v = 246 GeV, are we sure?
     return (vev(T)**2/(4*T**2)) * (yp(y, M/T)/y0) * (Gu + Gk * yp(y, M/T)) /((bnu + (1+anu) * yp(y, M/T))**2 + (Gu +Gk * yp(y, M/T))**2/4)
 
+def gamma_indirect_p_rel(y, M, T):
+    Gu, Gk, GupK = Gu_Gk_hat(y, T)
+    y0 = y0_onshell(y, M/T)
+    anu = anu_full(y, M, T)
+    bnu = bnu_full(y, M, T)
+    #here v = 246 GeV, are we sure?
+    return (vev(T)**2/(4*T**2)) * (yp(y, M/T)/y0) * (Gu + Gk * 2 * y) /((bnu + (1+anu) * 2*y)**2 + (Gu +Gk * 2*y)**2/4)
+
+
 def Sigma_indirect_m(y, M, T):
     y0 = y0_onshell(y, M/T)
     bnu = -m_ell(T)**2 /(2*y0*T)
     gamma_nu = g2**2 * T /(2*np.pi)
-    return (vev(T)**2/(2*T)) * (gamma_nu/2) /((T*yp(y, M/T) - bnu)**2 + (gamma_nu/2)**2)
+    return (vev(T)**2/(T)) * (gamma_nu/2) /((T*yp(y, M/T) - bnu)**2 + (gamma_nu/2)**2)
 
 def Sigma_indirect_p(y, M, T):
-    return (vev(T)**2/(2*T)) * SigmaA_m(y, M, T) /(SigmaA_m(y, M, T)**2 + (T*ym(y, M/T) - SigmaH_m(y, M, T))**2)
+    return (vev(T)**2/(T)) * SigmaA_m(y, M, T) /(SigmaA_m(y, M, T)**2 + (T*ym(y, M/T) - SigmaH_m(y, M, T))**2)
 
-def Sigma_indirect_m_full(y, M, T):
+def Sigma_indirect_p_full(y, M, T):
     Gu, Gk, GupK = Gu_Gk_hat(y, T)
     y0 = y0_onshell(y, M/T)
     anu = anu_full(y, M, T)
@@ -875,7 +917,7 @@ def Sigma_indirect_m_full(y, M, T):
     return (vev(T)**2/(4*T**2)) * (Gu + Gk * ym(y, M/T)) /((bnu + (1+anu) * ym(y, M/T))**2 + (Gu +Gk * ym(y, M/T))**2/4)
 
 
-def Sigma_indirect_p_full(y, M, T):
+def Sigma_indirect_m_full(y, M, T):
     Gu, Gk, GupK = Gu_Gk_hat(y, T)
     y0 = y0_onshell(y, M/T)
     anu = anu_full(y, M, T)
@@ -890,58 +932,58 @@ and tables in http://www.laine.itp.unibe.ch/leptogenesis/
 
 #Take the data file and construct the arrays of data
 Axes = pd.read_csv(data_dir + r'/Axes.txt', sep = " ")
-Axes.drop('Unnamed: 0', inplace  = True, axis = 1)
+Axes.drop('Unnamed: 0', inplace=True, axis=1, errors='ignore')
 
 Qplus = pd.read_csv(data_dir + r'/Qplus.txt', sep = " ")
-Qplus.drop('Unnamed: 0', inplace  = True, axis = 1)
+Qplus.drop('Unnamed: 0', inplace=True, axis=1, errors='ignore')
 
 Qminus = pd.read_csv(data_dir + r'/Qminus.txt', sep = " ")
-Qminus.drop('Unnamed: 0', inplace  = True, axis = 1)
+Qminus.drop('Unnamed: 0', inplace=True, axis=1, errors='ignore')
 
 Rplus = pd.read_csv(data_dir + r'/Rplus.txt', sep = " ")
-Rplus.drop('Unnamed: 0', inplace  = True, axis = 1)
+Rplus.drop('Unnamed: 0', inplace=True, axis=1, errors='ignore')
 
 Rminus = pd.read_csv(data_dir + r'/Rminus.txt', sep = " ")
-Rminus.drop('Unnamed: 0', inplace  = True, axis = 1)
+Rminus.drop('Unnamed: 0', inplace=True, axis=1, errors='ignore')
 
 ks = Axes['k/T'][:249].to_numpy()
 Ts = np.array([])
 xs = np.array([])
 for i in range(300):
-    Ts = np.append(Ts, Axes['T/MeV'][249*i]*1e3) #in GeV
-    xs = np.append(xs, Axes['log(Tmax/T)'][249*i])
+    Ts = np.append(Ts, Axes['T/MeV'].iloc[249*i]*1e3) #in GeV
+    xs = np.append(xs, Axes['log(Tmax/T)'].iloc[249*i])
 
 def Qminus_interp(y, T):
     iT = find_nearest(xs, np.log(1e7/T))[0]
     ik = find_nearest(ks, y)[0]
     index = iT * len(ks) + ik
-    return Qminus['Q11'][index]
+    return Qminus['Q11'].iloc[index]
 
 def Qplus_interp(y, T):
     iT = find_nearest(xs, np.log(1e7/T))[0]
     ik = find_nearest(ks, y)[0]
     index = iT * len(ks) + ik
-    return Qplus['Q11'][index]
+    return Qplus['Q11'].iloc[index]
 
 def Rminus_interp(y, T):
     iT = find_nearest(xs, np.log(1e7/T))[0]
     ik = find_nearest(ks, y)[0]
     index = iT * len(ks) + ik
-    return Rminus['R11'][index]
+    return Rminus['R11'].iloc[index]
 
 def Rplus_interp(y, T):
     iT = find_nearest(xs, np.log(1e7/T))[0]
     ik = find_nearest(ks, y)[0]
     index = iT * len(ks) + ik
-    return Rplus['R11'][index]
+    return Rplus['R11'].iloc[index]
 
 #\Sigma_- / T
 def Sigma_p_rel(y, T):
     iT = find_nearest(xs, np.log(1e7/T))[0]
     ik = find_nearest(ks, y)[0]
     index = iT * len(ks) + ik
-    y = Axes['k/T'][index]
-    return Qminus['Q11'][index] * 2*y**2 / gw #2*y**2 / gw #-- Check a potential factor of 2
+    y = Axes['k/T'].iloc[index]
+    return Qminus['Q11'].iloc[index] * 2*y**2 / gw #2*y**2 / gw #-- Check a potential factor of 2
     #return 1.9684e-2
 
 #\Sigma_+ / T
@@ -949,7 +991,7 @@ def Sigma_m_rel(y, T):
     iT = find_nearest(xs, np.log(1e7/T))[0]
     ik = find_nearest(ks, y)[0]
     index = iT * len(ks) + ik
-    return Qplus['Q11'][index]/(2*gw)
+    return Qplus['Q11'].iloc[index]/(2*gw)
     #return 1.4612e-3
 
 #\Sigma2_- / T
@@ -957,8 +999,8 @@ def Sigma2_p_rel(y, T):
     iT = find_nearest(xs, np.log(1e7/T))[0]
     ik = find_nearest(ks, y)[0]
     index = iT * len(ks) + ik
-    y = Axes['k/T'][index]
-    return Rminus['R11'][index] * 2*y**2 / gw #2*y**2 / gw #-- Check a potential factor of 2
+    y = Axes['k/T'].iloc[index]
+    return Rminus['R11'].iloc[index] * 2*y**2 / gw #2*y**2 / gw #-- Check a potential factor of 2
     #return 1.9684e-2
 
 #\Sigma2_+ / T
@@ -966,18 +1008,32 @@ def Sigma2_m_rel(y, T):
     iT = find_nearest(xs, np.log(1e7/T))[0]
     ik = find_nearest(ks, y)[0]
     index = iT * len(ks) + ik
-    return Rplus['R11'][index]/(2*gw)
+    return Rplus['R11'].iloc[index]/(2*gw)
     #return 1.4612e-3
 
 #\gamma_- / T
 def gamma_m_rel(y, M, T):
     y0 = y0_onshell(y, M/T)
-    return Sigma_p_rel(y, T) * ym(y, M/T) * gw / y0
+    return Sigma_p_rel(y, T) * ym(y, M/T) * gw / y0 
 
 #\gamma_+ / T
 def gamma_p_rel(y, M, T):
     y0 = y0_onshell(y, M/T)
     return Sigma_m_rel(y, T) * yp(y, M/T) * gw / y0
+
+#\Sigma_- / T
+def Sigma_p_rel_broken(y, T):
+    iT = find_nearest(xs, np.log(1e7/T))[0]
+    ik = find_nearest(ks, y)[0]
+    index = iT * len(ks) + ik
+    y = Axes['k/T'].iloc[index]
+    return Qplus['Q11'].iloc[index] * 2*y**2 / gw #2*y**2 / gw #-- Check a potential factor of 2
+    #return 1.9684e-2
+
+#\gamma_- / T
+def gamma_m_rel_broken(y, M, T):
+    y0 = y0_onshell(y, M/T)
+    return Sigma_p_rel_broken(y, T) * ym(y, M/T) * gw / y0 
 
 #\gamma_- / T
 def gamma2_m_rel(y, M, T):
@@ -1008,10 +1064,10 @@ def Sigma_m(y, M, T):
             return Sigma_m_rel(y,T)
     if T < Tew:
         if 1-mW(T)/M >= 0:
-            Broken = Sigma_indirect_m(y, M, T) + np.heaviside(1-mW(T)/M,0.5) * Sigma_bDm(y, M, T)
-            return Sigma_m_rel(y, T) + Broken
+            Broken = Sigma_indirect_m_full(y, M, T) + np.heaviside(1-mW(T)/M,0.5) * Sigma_bDm(y, M, T)
+            return Broken + Sigma_m_rel(y, T)
         else:
-            return Sigma_m_rel(y, T)
+            return Sigma_indirect_m_full(y, M, T) + Sigma_m_rel(y, T)
 
 def Sigma_p(y, M, T):
     z = M/T
@@ -1019,13 +1075,15 @@ def Sigma_p(y, M, T):
         if 1-np.sqrt(xphi(z)) >= 0:
             Symmetric = np.heaviside(1-np.sqrt(xphi(z)),0.5) * (Sigma_sNp(y, z) + Sigma_sHp(y, z))
             return Sigma_p_rel(y, T) + Symmetric
-    if T < Tew:
-        if 1-mW(T)/M>= 0:
-            Broken = Sigma_indirect_p(y, M, T) + np.heaviside(1-mW(T)/M,0.5) * Sigma_bDp(y, M, T)
-            return Sigma_p_rel(y, T) + Broken
         else:
             return Sigma_p_rel(y, T)
-    
+    if T < Tew:
+        if 1-mW(T)/M>= 0:
+            Broken = Sigma_indirect_p_full(y, M, T) + np.heaviside(1-mW(T)/M,0.5) * Sigma_bDp(y, M, T)
+            return Broken# + Sigma_p_rel(y, T)
+        else:
+            return  Sigma_indirect_p_full(y, M, T)# + Sigma_p_rel(y, T)
+
 def gamma_m(y, M, T):
     z = M/T
     if T >= Tew:
@@ -1037,9 +1095,9 @@ def gamma_m(y, M, T):
     if T < Tew:
         if 1-mW(T)/M>= 0:
             Broken = np.heaviside(1-mW(T)/M,0.5) * gamma_bDm(y, M, T) + gamma_indirect_m_full(y, M, T)
-            return Broken# + gamma_m_rel(y, M, T) 
+            return Broken# + gamma_m_rel(y, M, T)
         else:
-            return gamma_indirect_m_full(y, M, T) + gamma_m_rel(y, M, T)
+            return gamma_indirect_m_full(y, M, T)# + gamma_m_rel(y, M, T)
 
 def gamma_p(y, M, T):
     z = M/T
@@ -1051,11 +1109,11 @@ def gamma_p(y, M, T):
             return gamma_p_rel(y, M, T)
     if T < Tew:
         if 1-mW(T)/M >= 0:
-            Broken = np.heaviside(1-mW(T)/M,0.5) * gamma_bDp(y, M, T) + gamma_indirect_p_full(y, M, T) 
+            Broken = np.heaviside(1-mW(T)/M,0.5) * gamma_bDp(y, M, T) + gamma_indirect_p_full(y, M, T)
             return Broken + gamma_p_rel(y, M, T)
         else:
             return gamma_indirect_p_full(y, M, T) + gamma_p_rel(y, M, T)
-    
+
 def ImPi(y, M, T):
     z = M/T
     return ImPi_rel(y,M, T) + np.heaviside(1-np.sqrt(xphi(z)),0.5) * (ImPi_sH(y,z) + ImPi_sN(y,z))
@@ -1253,7 +1311,7 @@ Contribution from Higgs'VEV evolution
 Tsph = 131.7#GeV
 
 def hEV(M, T):
-    return vev(T)**2/(2*T**2) * (Tsph/T) * av_one_over_y0(M/T)
+    return vev(T)**2/(T**2) * (Tsph/T) * av_one_over_y0(M/T)
 
 """
 LNC and LNV contributions
@@ -1376,4 +1434,73 @@ def interp_hm(z):
     elif z > zp:
         return h_non_rel(z)
 
-    
+""" INDIRECT CONTRIBUTION IN THE BROKEN PHASE"""
+
+# h^ind_+ = v^2/(2T^2) * [b_nu + (1+a_nu)(y0+y)] / {[b_nu + (1+a_nu)(y0+y)]^2 + (1/4)[Gu + Gk*(y0+y)]^2}
+def h_indirect_p(y, M, T):
+    Gu, Gk, _ = Gu_Gk_hat(y, T)
+    anu = anu_full(y, M, T)
+    bnu = bnu_full(y, M, T)
+    yp_val = yp(y, M/T)
+    num = bnu + (1 + anu) * yp_val
+    den = num**2 + 0.25 * (Gu + Gk * yp_val)**2
+    return (vev(T)**2 / (2 * T**2)) * num / den
+
+# h^ind_- = v^2/(2T^2) * [b_nu + (1+a_nu)(y0-y)] / {[b_nu + (1+a_nu)(y0-y)]^2 + (1/4)[Gu + Gk*(y0-y)]^2}
+def h_indirect_m(y, M, T):
+    Gu, Gk, _ = Gu_Gk_hat(y, T)
+    anu = anu_full(y, M, T)
+    bnu = bnu_full(y, M, T)
+    ym_val = ym(y, M/T)
+    num = bnu + (1 + anu) * ym_val
+    den = num**2 + 0.25 * (Gu + Gk * ym_val)**2
+    return (vev(T)**2 / (2 * T**2)) * num / den
+
+
+def _stable_occ_weight(y, z):
+    if not np.isfinite(y) or not np.isfinite(z):
+        return 0.0
+
+    e = np.hypot(z, y)
+    # For large z use a rescaled MB-like weight exp(-(E-z)) so normalization
+    # and numerator stay in a safe dynamic range; the common exp(-z) cancels.
+    if z > 10:
+        # Use E-z = y^2/(E+z) to avoid catastrophic cancellation at large z.
+        denom = e + z
+        if denom <= 0 or not np.isfinite(denom):
+            return 0.0
+        delta = (y * y) / denom
+        if not np.isfinite(delta):
+            return 0.0
+        return np.exp(-delta)
+    return expit(-e)
+
+def averaged_h_indirect_p(M, T):
+    I = 0
+    N = 0
+    z = M/T
+    for n in range(len(ks)-1):
+        delta_a = ks[n+1] - ks[n]
+        a = (ks[n+1] + ks[n])/2
+        w = _stable_occ_weight(a, z)
+        h = h_indirect_p(a, M, T)
+        if not np.isfinite(w) or not np.isfinite(h):
+            continue
+        I += a**2 * h * w * delta_a
+        N += a**2 * w * delta_a
+    return I / max(N, 1e-300)
+
+def averaged_h_indirect_m(M, T):
+    I = 0
+    N = 0
+    z = M/T
+    for n in range(len(ks)-1):
+        delta_a = ks[n+1] - ks[n]
+        a = (ks[n+1] + ks[n])/2
+        w = _stable_occ_weight(a, z)
+        h = h_indirect_m(a, M, T)
+        if not np.isfinite(w) or not np.isfinite(h):
+            continue
+        I += a**2 * h * w * delta_a
+        N += a**2 * w * delta_a
+    return I / max(N, 1e-300)
