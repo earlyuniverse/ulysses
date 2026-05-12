@@ -251,8 +251,8 @@ class ULSBase(object):
         ext = self.extendedindices()
         if not fi:
             return
-        self.ys = np.empty((len(self.zs), max(fi) + len(ext) + 2))
-        self.ys[:,0] = self.zs
+        self.ys = np.empty((len(ys[:,0]), max(fi) + len(ext) + 2))
+        self.ys[:,0] = ys[:,0].real
         if ext:
             self.ys[:, ext] = ys[:, ext].real
         self.ys[:, fi] = ys[:, fi].real
@@ -317,7 +317,7 @@ class ULSBase(object):
         
         # Helper function to convert log10 masses
         def log10_mass(key):
-            return 10**pdict[key]
+            return float(10**pdict[key])
         
         if self.which_param == 'euler':
             # CasasIbarra with Euler Angles parameterization
@@ -509,34 +509,7 @@ class ULSBase(object):
 
         return np.transpose(Onu13 @ Onu23 @ RC12 @ ON23 @ ON13)
     
-    #CP-conserving Casas-Ibarra matrix with 3RHNs  -- do not include in ULYSSESv3      
-    @property
-    def R_CP_cons(self):
-        """
-        Orthogonal CP-conserving Casas-Ibarra matrix
-        """
-        R1 = np.array([[ 1j * np.cos(self.xN) * np.sinh(self.y), 1j * np.sin(self.xN) * np.sinh(self.y), np.cosh(self.y)],
-                      [-np.sin(self.xN) * np.cos(self.xnu) - np.cos(self.xN) * np.sin(self.xnu) * np.cosh(self.y), np.cos(self.xN) * np.cos(self.xnu) - np.sin(self.xN) * np.sin(self.xnu) * np.cosh(self.y), 1j * np.sin(self.xnu) * np.sinh(self.y)],
-                      [np.sin(self.xN) * np.sin(self.xnu) - np.cos(self.xN) * np.cos(self.xnu) * np.cosh(self.y), -np.cos(self.xN) * np.sin(self.xnu) - np.sin(self.xN) * np.cos(self.xnu) * np.cosh(self.y), 1j * np.cos(self.xnu) * np.sinh(self.y)]],
-                      dtype=np.complex128)
-        R2 = np.array([[-np.sin(self.xN) * np.cos(self.xnu) - np.cos(self.xN) * np.sin(self.xnu) * np.cosh(self.y), np.cos(self.xN) * np.cos(self.xnu) - np.sin(self.xN) * np.sin(self.xnu) * np.cosh(self.y), 1j * np.sin(self.xnu) * np.sinh(self.y)],
-                       [ 1j * np.cos(self.xN) * np.sinh(self.y), 1j * np.sin(self.xN) * np.sinh(self.y), np.cosh(self.y)],
-                       [np.sin(self.xN) * np.sin(self.xnu) - np.cos(self.xN) * np.cos(self.xnu) * np.cosh(self.y), -np.cos(self.xN) * np.sin(self.xnu) - np.sin(self.xN) * np.cos(self.xnu) * np.cosh(self.y), 1j * np.cos(self.xnu) * np.sinh(self.y)]],
-                       dtype=np.complex128)
-        R3 = np.array([[-np.sin(self.xN) * np.cos(self.xnu) - np.cos(self.xN) * np.sin(self.xnu) * np.cosh(self.y), np.cos(self.xN) * np.cos(self.xnu) - np.sin(self.xN) * np.sin(self.xnu) * np.cosh(self.y), 1j * np.sin(self.xnu) * np.sinh(self.y)],
-                       [np.sin(self.xN) * np.sin(self.xnu) - np.cos(self.xN) * np.cos(self.xnu) * np.cosh(self.y), -np.cos(self.xN) * np.sin(self.xnu) - np.sin(self.xN) * np.cos(self.xnu) * np.cosh(self.y), 1j * np.cos(self.xnu) * np.sinh(self.y)],
-                       [ 1j * np.cos(self.xN) * np.sinh(self.y), 1j * np.sin(self.xN) * np.sinh(self.y), np.cosh(self.y)]],
-                       dtype=np.complex128)
-        
-        if self.CP_case == 1:
-            return np.transpose(R1)
-        elif self.CP_case == 2:
-            return np.transpose(R2)
-        elif self.CP_case == 3:
-            return np.transpose(R3)
-        else:
-            raise Exception("CP_case %i not implemented"%self.CP_case)
-
+    
     @property
     def R(self):
         if self.which_param == 'single_imaginary':

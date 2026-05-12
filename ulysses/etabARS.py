@@ -671,9 +671,14 @@ class EtaB_ARS(ulysses.ULSBase):
 
     def shortname(self): return "BEARS"
 
-    def flavourindices(self): return [1]
+    def flavourindices(self): return [2,3,4]
 
-    def flavourlabels(self): return ["$NBL$"]
+    def flavourlabels(self): return [r"$\mu_{\Delta_e}$",  r"$\mu_{\Delta_\mu}$", r"$\mu_{\Delta_\tau}$"]
+
+    def extendedindices(self): return [1]
+
+    def extendedlabels(self): return [r"$N_{N_1}$"]    
+    
 
     def RHS(self, z, y, Fmat, M2, deltaM, Tew, gss, M0, M_mat, Dm2_mat, chi_mat, Lvec, Rvec, acr):
 
@@ -879,6 +884,12 @@ class EtaB_ARS(ulysses.ULSBase):
                 print(f"Plot saved to {self.path}")
 
             plt.show()
+
+        evol_joint = np.array([t,np.real(rN*Neq), np.real(muD1), np.real(muD2), np.real(muD3)])
+        
+        evol_joint = np.transpose(evol_joint)
+
+        self.setEvolDataARS(evol_joint)
                 
         return etaB
 
@@ -887,9 +898,13 @@ class EtaB_ARS_INTERP(EtaB_ARS):
 
     def shortname(self): return "BEARS_INTERP"
 
-    def flavourindices(self): return [1]
+    def flavourindices(self): return [2,3,4]
 
-    def flavourlabels(self): return ["$NBL$"]
+    def flavourlabels(self): return [r"$\mu_{\Delta_e}$",  r"$\mu_{\Delta_\mu}$", r"$\mu_{\Delta_\tau}$"]
+
+    def extendedindices(self): return [1]
+
+    def extendedlabels(self): return [r"$N_{N_1}$"]    
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
