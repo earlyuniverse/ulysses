@@ -38,22 +38,6 @@ gw  = 2
 Tew = 160 #GeV
 v   = 174 #GeV
 
-# Load Juraj's vev table.  Sort ascending in T so np.searchsorted works.
-# Outside the table range vev returns 0.
-_vev_table = np.loadtxt(os.path.join(data_dir, 'vev_T.txt'), comments='#')
-_sort_idx   = np.argsort(_vev_table[:, 0])
-_vev_T_arr  = np.ascontiguousarray(_vev_table[_sort_idx, 0])  # ascending T
-_vev_v_arr  = np.ascontiguousarray(_vev_table[_sort_idx, 1])
-
-@njit
-def vev_interp(T):
-    """Linear interpolation of vev(T) from table."""
-    if T <= _vev_T_arr[0] or T >= _vev_T_arr[-1]:
-        return 0.0
-    i = np.searchsorted(_vev_T_arr, T) - 1
-    t = (T - _vev_T_arr[i]) / (_vev_T_arr[i + 1] - _vev_T_arr[i])
-    return _vev_v_arr[i] + t * (_vev_v_arr[i + 1] - _vev_v_arr[i])
-
 def vev(T):
     return np.sqrt((1 - T**2/Tew**2)*np.heaviside(Tew-T, 0.5)*v**2)
 
