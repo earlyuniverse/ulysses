@@ -78,7 +78,7 @@ class ULSBase(object):
 
         # Flags
         self.debug     = kwargs.get("debug", False)
-        self.use_hind  = kwargs.get("use_hind", False)
+        self.use_hind  = kwargs.get("use_hind", True)
 
         # Parameters of the z-solver (standard leptogenesis)
         self._zmin = kwargs.get("zmin", 0.001)

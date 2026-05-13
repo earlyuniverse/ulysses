@@ -994,7 +994,7 @@ class EtaB_ARS_3RHN(ulysses.ULSBase):
 
 
     def Jac_for_RHS(self, x,kn1,kn2,I21,A_G0, A_S0, A_G0_fact2, A_S0_fact2, A_G1, A_S1, A_G1_fact2, A_S1_fact2, A_ham_0, A_ham_LNC, A_ham_LNV, A_L,
-                    C_col_precomp, Lambda = 1e3, use_hind = False):
+                    C_col_precomp, Lambda = 1e3, use_hind = True):
         # Global constants (masses in GeV)
         Tew         = 131.7
         gss         = 106.75
