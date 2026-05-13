@@ -304,13 +304,12 @@ class ULSBase(object):
         self.pdict = pdict
         if "Lambda" in pdict:
             self.Lambda = pdict["Lambda"]
-        # Optional mass splittings in eV^2 — converted to GeV^2 internally
         if "m2solar" in pdict:
-            self.msplit2_solar = pdict["m2solar"] * 1e-18
+            self.msplit2_solar = pdict["m2solar"] 
         if "m2atm" in pdict:
-            self.msplit2_athm_normal = pdict["m2atm"] * 1e-18
+            self.msplit2_athm_normal = pdict["m2atm"] 
         if "m2atminv" in pdict:
-            self.msplit2_athm_invert = pdict["m2atminv"] * 1e-18
+            self.msplit2_athm_invert = pdict["m2atminv"] 
         # Helper function to convert degrees to radians
         def deg_to_rad(key):
             return pdict[key] / 180 * np.pi
