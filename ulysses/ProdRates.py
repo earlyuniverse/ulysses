@@ -221,19 +221,18 @@ def Jn(n, y, z):
     ym = xm_sH(y,z)
     yp = xp_sH(y,z)
     if n == 0:
+        # Fermionic part: log(1 + e^{-x})
+        Fm = np.log1p(np.exp(-ym))
+        Fp = np.log1p(np.exp(-yp))
 
-            # Fermionic part: log(1 + e^{-x})
-            Fm = np.log1p(np.exp(-ym))
-            Fp = np.log1p(np.exp(-yp))
+        # Bosonic part: log(1 - e^{-(x+y0)})
+        Bm = np.log(-np.expm1(-(ym + y0)))
+        Bp = np.log(-np.expm1(-(yp + y0)))
 
-            # Bosonic part: log(1 - e^{-(x+y0)})
-            Bm = np.log(-np.expm1(-(ym + y0)))
-            Bp = np.log(-np.expm1(-(yp + y0)))
+        fermion = Fm - Fp
+        boson   = Bp - Bm
 
-            fermion = Fm - Fp
-            boson   = Bp - Bm
-
-            return fermion + boson
+        return fermion + boson
     if n == 1:
         l1 = -yp * (np.logaddexp(0, -yp) - np.log(1 - np.exp(-yp - y0)))
         l2 = ym * (np.logaddexp(0, -ym) - np.log(1 - np.exp(-ym - y0)))
