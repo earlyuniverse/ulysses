@@ -513,8 +513,6 @@ class ULSBase(object):
     def R(self):
         if self.which_param == 'single_imaginary':
             return self.R_alt
-        elif self.which_param == 'CP_conserving':
-            return self.R_CP_cons
         else:
             return self.R_ord
 
