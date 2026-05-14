@@ -221,16 +221,19 @@ def Jn(n, y, z):
     ym = xm_sH(y,z)
     yp = xp_sH(y,z)
     if n == 0:
-        if (ym + y0) >= 500:
-            l1 = -(ym + y0)#It avoids the overflow of the exponential
-        elif (ym + y0) < 500:
-            l1 = -np.log(np.exp(ym+y0)-1)
-        if (yp + y0) >= 500:
-            l2 = yp + y0#It avoids the overflow of the exponential
-        elif (yp + y0) < 500:
-            l2 = np.log(np.exp(yp+y0)-1)
-        l3 = np.logaddexp(0, ym) - np.logaddexp(0, yp)
-        return l1 + l2 + l3
+
+            # Fermionic part: log(1 + e^{-x})
+            Fm = np.log1p(np.exp(-ym))
+            Fp = np.log1p(np.exp(-yp))
+
+            # Bosonic part: log(1 - e^{-(x+y0)})
+            Bm = np.log(-np.expm1(-(ym + y0)))
+            Bp = np.log(-np.expm1(-(yp + y0)))
+
+            fermion = Fm - Fp
+            boson   = Bp - Bm
+
+            return fermion + boson
     if n == 1:
         l1 = -yp * (np.logaddexp(0, -yp) - np.log(1 - np.exp(-yp - y0)))
         l2 = ym * (np.logaddexp(0, -ym) - np.log(1 - np.exp(-ym - y0)))
