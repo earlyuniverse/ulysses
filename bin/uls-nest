@@ -205,12 +205,15 @@ if __name__=="__main__":
         import pymultinest
     except ImportError:
         msg="""
-        Could not load the multinest module for python.
-        MultiNest requires libmultinest.so to be present in the
-        LD_LIBRARY_PATH.
-        The python package is easiest installed with pip or conda. Detailed
-        installation instructions can be found here:
-            https://johannesbuchner.github.io/PyMultiNest/ """
+        Could not load the pymultinest module for python.
+
+        pymultinest is an optional dependency of ulysses. Install it with:
+            pip install 'ulysses[nest]'
+
+        It also requires libmultinest.so to be present on LD_LIBRARY_PATH.
+        Detailed installation instructions:
+            https://johannesbuchner.github.io/PyMultiNest/
+        Note: pymultinest is not available on Windows."""
         print(msg)
         sys.exit(1)
 
