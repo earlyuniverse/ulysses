@@ -35,7 +35,7 @@ g2  = 0.65
 ht  = 0.993
 lam = 0.129
 gw  = 2
-Tew = 160 #GeV
+Tew = 164 #GeV, slightly larger than 160GeV to avoid abrupt transition at EW phase transition
 v   = 174 #GeV
 
 def vev(T):
