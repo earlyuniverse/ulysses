@@ -19,7 +19,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name            = "ulysses"
-version         = "3.0.0a3"
+version         = "3.0.0"
 description     = "ULYSSES: Universal LeptogeneSiS Equation Solver"
 readme          = "README.md"
 license         = "MIT"
@@ -46,7 +46,7 @@ dependencies = [
     "python-dateutil>=2.8",
     "termcolor>=1.1",
     "tqdm>=4.60",
-    "numba>=0.56",
+    "numba>=0.61",
     "mpmath>=1.2",
     "mpltern>=0.4",
     "multiprocess>=0.70.12",
@@ -55,6 +55,7 @@ dependencies = [
 [project.optional-dependencies]
 nest    = ["pymultinest>=2.11"]  # optional: not available on Windows
 jupyter = ["ipykernel"]
+dev     = ["build", "twine", "pytest", "nbstripout"]
 
 [project.urls]
 Homepage   = "https://github.com/earlyuniverse/ulysses"

@@ -858,14 +858,12 @@ def gamma_indirect_m_full(y, M, T):
     y0 = y0_onshell(y, M/T)
     anu = anu_full(y, M, T)
     bnu = bnu_full(y, M, T)
-    #here v = 246 GeV, are we sure?
     return (vev(T)**2/(4*T**2)) * (ym(y, M/T)/y0) * (Gu + Gk * ym(y, M/T)) /((bnu + (1+anu) * ym(y, M/T))**2 + (Gu +Gk * ym(y, M/T))**2/4)
 
 def gamma_indirect_m_rel(y, M, T):
     Gu, Gk, GupK = Gu_Gk_hat(y, T)
     y0 = y0_onshell(y, M/T)
     bnu = bnu_full(y, M, T)
-    #here v = 246 GeV, are we sure?
     return (vev(T)**2/(4*T**2)) * (ym(y, M/T)/y0) * (Gu) /((bnu )**2 + (Gu)**2/4)
 
 def gamma_indirect_p_full(y, M, T):
@@ -873,7 +871,6 @@ def gamma_indirect_p_full(y, M, T):
     y0 = y0_onshell(y, M/T)
     anu = anu_full(y, M, T)
     bnu = bnu_full(y, M, T)
-    #here v = 246 GeV, are we sure?
     return (vev(T)**2/(4*T**2)) * (yp(y, M/T)/y0) * (Gu + Gk * yp(y, M/T)) /((bnu + (1+anu) * yp(y, M/T))**2 + (Gu +Gk * yp(y, M/T))**2/4)
 
 def gamma_indirect_p_rel(y, M, T):
@@ -881,7 +878,6 @@ def gamma_indirect_p_rel(y, M, T):
     y0 = y0_onshell(y, M/T)
     anu = anu_full(y, M, T)
     bnu = bnu_full(y, M, T)
-    #here v = 246 GeV, are we sure?
     return (vev(T)**2/(4*T**2)) * (yp(y, M/T)/y0) * (Gu + Gk * 2 * y) /((bnu + (1+anu) * 2*y)**2 + (Gu +Gk * 2*y)**2/4)
 
 

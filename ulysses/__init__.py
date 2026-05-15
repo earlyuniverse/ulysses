@@ -1,4 +1,10 @@
 import warnings
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("ulysses")
+except PackageNotFoundError:
+    __version__ = "0.0.0+unknown"
 
 from ulysses.tools import *
 
@@ -21,7 +27,7 @@ from ulysses.etab2RESmix              import EtaB_2RESmix
 from ulysses.etab2RESsp               import EtaB_2RESsp
 from ulysses.etabARS                  import EtaB_ARS
 from ulysses.etabARS                  import EtaB_ARS_INTERP
-from ulysses.etabARS_3RHN             import EtaB_ARS_3RHN
+
 
 from ulysses.etabPBH                  import EtaB_PBH
 
@@ -37,7 +43,7 @@ except Exception as _numba_err:
     _NUMBA_OK = False
     warnings.warn(
         f"NumbaQuadpack/numba not available ({_numba_err}). "
-        "Some leptogenesis models (Case2,Case3,Case4,CaseS2) will be unavailable. "
+        "Some leptogenesis models (Case2,Case3,Case4,CaseS2,BEARS_3RHN) will be unavailable. "
         "Run 'pip install .' from the repo root to build the C extension."
         "If C compiler unavailable, please install one (gcc/clang)",
         ImportWarning,
@@ -46,7 +52,7 @@ except Exception as _numba_err:
 
 if _NUMBA_OK:
 
-    #shipped with version 2
+    from ulysses.etabARS_3RHN             import EtaB_ARS_3RHN
     from ulysses.etab1BE1F_Case2          import EtaB_1BE1F_Case2
     from ulysses.etab1BE1F_Case3          import EtaB_1BE1F_Case3
     from ulysses.etab1BE1F_Case4          import EtaB_1BE1F_Case4
