@@ -95,6 +95,28 @@ pip install -e .
 
 This will compile the `NumbaQuadpack` C extension using your system compiler (`gcc`/`clang` on Linux/macOS, MSVC on Windows).
 
+### Optional dependency groups
+
+ULYSSES ships several optional extras that can be installed with the `[group]` syntax:
+
+| Extra | Install command | What it enables |
+|-------|-----------------|-----------------|
+| `nest` | `pip install ulysses[nest]` | `pymultinest` backend for `uls-nest` Bayesian scans. **Not available on Windows.** |
+| `jupyter` | `pip install ulysses[jupyter]` | `ipykernel` so ULYSSES runs inside Jupyter notebooks |
+| `dev` | `pip install ulysses[dev]` | `build`, `twine`, `pytest`, `nbstripout` — needed to build, test, and publish the package |
+
+You can combine groups in a single command:
+
+```bash
+pip install ulysses[nest,jupyter]
+```
+
+### Models that require a compiled C extension
+
+Five models — `1BE1F_Case2`, `1BE1F_Case3`, `1BE1F_Case4`, `1BE1F_CaseS2`, and `BEARS_3RHN` — depend on `numba` **and** the compiled `NumbaQuadpack` C extension. When installing from PyPI, the extension is included in the binary wheel and no compiler is needed. When installing from source (`pip install -e .`), a C compiler must be present (`gcc`/`clang` on Linux/macOS, MSVC on Windows).
+
+If the extension is missing or fails to build, ULYSSES still loads and all other models remain available; an `ImportWarning` is emitted listing the unavailable models.
+
 ### Environment Setup (optional)
 
 Add to your `~/.bashrc` or `~/.zshrc`:
@@ -162,7 +184,7 @@ ULYSSES includes a suite of command-line tools in `bin/`:
 
 ### CLI flags
 
-All tools share a common set of flags. The most commonly used ones for `uls-calc` are:
+#### Common flags (all tools)
 
 | Flag | Default | Description |
 |------|---------|-------------|
@@ -173,11 +195,63 @@ All tools share a common set of flags. The most commonly used ones for `uls-calc
 | `--initial ` | `0` | Initial RHN abundance: `0` = vanishing, `1` = thermal |
 | `--extended` | off | Allow model-specific parameters beyond the standard PMNS+CI set |
 | `--lambda ` | `1e3` | ARS quasi-static cutoff scale $\Lambda$ (GeV) for `BEARS_3RHN` |
-| `--ars-indirect` | off | Enable mass-dependent hindrance rate corrections in `BEARS_3RHN` |
 | `--zrange Z0,Z1,N` | `0.1,30,500` | Start, end, and number of steps for the $z$ evolution variable |
 | `--xrange X0,X1,N` | `1e-6,min([1, 20*131.7/M1]),500` | Start, end, and steps for the 3RHN ARS $x = T_\text{ew}/T$ variable |
 | `--zcut` | `1.0` | Stitch cut value used in 2RHN ARS models |
 | `-v` | off | Enable debug output |
+
+#### `uls-scan` / `uls-scan2D` specific flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-n N`, `--n-scan N` | `30` | Number of scan points (`uls-scan`) |
+| `-x N`, `--nx-scan N` | `30` | Number of grid points along first parameter (`uls-scan2D`) |
+| `-y N`, `--ny-scan N` | `30` | Number of grid points along second parameter (`uls-scan2D`) |
+
+#### `uls-nest` specific flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--sigma N` | `1` | Inflate the likelihood error by factor N |
+| `--mn-seed N` | `-1` | MultiNest random seed (`-1` = random) |
+| `--mn-resume` | off | Resume from a previous MultiNest run |
+| `--mn-points N` | `400` | Number of live points |
+| `--mn-tol F` | `0.5` | Evidence tolerance for convergence |
+| `--mn-eff F` | `0.8` | Sampling efficiency |
+| `--mn-multimodal` | off | Enable multimodal sampling |
+| `--mn-no-importance` | off | Disable importance sampling |
+| `--mn-imax N` | `0` | Max iterations (`0` = unlimited) |
+| `--mn-update N` | `1000` | Progress update interval (iterations) |
+
+### Parameter scans
+
+`uls-scan` and `uls-scan2D` use the same parameter file format as `uls-calc`, but any parameter to be scanned is given **three whitespace-separated values** on its line: `key start end`. All other parameters keep their fixed single value.
+
+**1D scan** — mark one parameter with a range:
+
+```ini
+# fixed parameters
+m      -100
+M1     14
+# ...
+# scanned parameter: y1 swept from 0 to 45 degrees
+y1     0.  45.
+```
+
+```bash
+uls-scan -m 1BE1F -n 50 examples/1N1F_scan.dat -o scan.pdf
+```
+
+**2D scan** — mark two parameters with ranges:
+
+```ini
+x2     0   45
+y2     0   45
+```
+
+```bash
+uls-scan2D -m 1BE1F -x 40 -y 40 examples/1N1F_2Dscan.dat -o scan2d.pdf
+```
 
 ### Extended mode (model-specific parameters)
 
@@ -208,6 +282,111 @@ a31      0
 # --- model-specific extensions (require --extended) ---
 lam    1e-7    # feeble dark coupling λ
 m_dm   1e6    # dark matter mass (GeV)
+```
+
+---
+
+## Python API
+
+All models can be driven directly from Python without the CLI. Each model class takes a parameter dictionary and returns $\eta_B$.
+
+```python
+import ulysses
+
+pars = {
+    'm': -2, 'M1': 11, 'M2': 11.6, 'M3': 12,
+    'delta': 213, 'a21': 81, 'a31': 476,
+    'x1': 90, 'x2': 87, 'x3': 180,
+    'y1': -120, 'y2': 0, 'y3': -120,
+    't12': 33.76, 't13': 8.62, 't23': 43.27,
+}
+
+model = ulysses.EtaB_1BE1F()
+etaB  = model(pars)
+print(etaB)
+```
+
+Alternatively, use `selectModel` to load a model by its short name string (the same string passed to `-m` on the CLI):
+
+```python
+from ulysses.tools import selectModel
+
+model = selectModel("1DME")
+etaB  = model(pars)
+```
+
+The model instance exposes the full evolution data after a call, and its integration range can be configured before calling:
+
+```python
+model.setZMin(0.1)
+model.setZMax(50)
+model.setZSteps(1000)
+etaB = model(pars)
+```
+
+---
+
+## Custom Models (Plugins)
+
+ULYSSES supports user-defined models without modifying the package. A plugin is a plain `.py` file containing a class that subclasses `ulysses.ULSBase` and implements at minimum `shortname` and the `EtaB` property.
+
+### Minimal plugin template
+
+```python
+# mymodel.py
+import ulysses
+import numpy as np
+from odeintw import odeintw
+
+class MyModel(ulysses.ULSBase):
+    def shortname(self): return "MyModel"
+
+    def flavourindices(self): return [1]
+    def flavourlabels(self): return ["$N_{B-L}$"]
+
+    @property
+    def EtaB(self):
+        # Set up initial conditions and integrate
+        y0 = np.array([0. + 0j, 0. + 0j])
+        ys = odeintw(self.RHS, y0, self.zs, ...)
+
+        # Store evolution data so that plotting tools can access it
+        self.setEvolData(ys)
+
+        # Return the final value of the B-L asymmetry
+        return self.ys[-1][-1]
+```
+
+`setEvolData(ys)` stores the ODE solution array on the instance so the built-in plotting routines (used by `-o evolution.pdf`) can access the per-flavour trajectories. Always call it before returning from `EtaB`.
+
+### Using a plugin on the CLI
+
+Pass `path/to/file.py:ClassName` as the `-m` argument:
+
+```bash
+uls-calc -m mymodel.py:MyModel examples/1N1F.dat -o out.pdf
+```
+
+### Using a plugin from Python
+
+```python
+from ulysses.tools import selectModel
+
+model = selectModel("mymodel.py:MyModel")
+etaB  = model(pars)
+```
+
+The plugin class is loaded dynamically via `importlib` and must be a subclass of `ulysses.ULSBase`; an error is raised immediately if it is not.
+
+---
+
+## Jupyter Notebook
+
+A worked introductory notebook `ULYSSES_intro.ipynb` ships in the repository root. It walks through installation, running single-point calculations, and producing scan plots entirely from within a Jupyter session. Install the `jupyter` extra to run it:
+
+```bash
+pip install ulysses[jupyter]
+jupyter notebook ULYSSES_intro.ipynb
 ```
 
 ---
@@ -376,7 +555,17 @@ Please cite the relevant paper(s) for the features you use:
 ```
 
 ### ULYSSES v3
-Paper forthcoming. In the meantime, please cite both v1 and v2 above when using v3 features.
+```bibtex
+@article{Granelli:2026goh,
+    author = "Granelli, Alessandro and Klari{\'c}, Juraj and Pasari, Dhruv and Perez-Gonzalez, Yuber F. and Turner, Jessica",
+    title = "{ULYSSES the Third: An Odyssey Towards a Unified Python Toolkit for Leptogenesis}",
+    eprint = "2605.16540",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    month = "5",
+    year = "2026"
+}
+```
 
 ---
 
