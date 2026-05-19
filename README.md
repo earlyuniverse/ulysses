@@ -22,7 +22,7 @@ The package features:
 It is documented across two key publications:
 - [Version 1 – arXiv:2007.09150](https://arxiv.org/abs/2007.09150)
 - [Version 2 – arXiv:2301.05722](https://arxiv.org/abs/2301.05722)
-- Version 3 – paper forthcoming
+- [Version 3 – arXiv:2605.16540](https://arxiv.org/abs/2605.16540)
 
 ---
 
@@ -57,7 +57,7 @@ with temperature parameter $z = M_1 / T$.
 - **Complete BEs** with full quantum statistics (Cases 2–4)
 - Preconfigured 2D scans for parameter space exploration
 
-### Version 3 (v3) – This release
+### Version 3 (v3) – arXiv:2605.16540
 - **ARS with 3 RHNs** (`BEARS_3RHN`): extension of the ARS mechanism to the three right-handed neutrino case, with optional mass-dependent indirect rate corrections (`--ars-indirect`)
 - **Case S2**: Full phase-space Boltzmann equations including $\Delta L = 1$ scattering ($s$- and $t$-channel, $Nl \to qt$) without assuming kinetic equilibrium nor Maxwell-Boltzmann statistics
 - **Extended model interface** (`--extended` flag): allows models to declare extra parameters beyond the standard PMNS+CI set, opening the solver to coupled multi-sector scenarios; `1BE1F_DM_FreezeIn` serves as a worked toy-model example demonstrating freeze-in and RHN dark matter production
@@ -386,6 +386,7 @@ Paper forthcoming. In the meantime, please cite both v1 and v2 above when using 
 
 - **Version 1 Manual**: [arXiv:2007.09150](https://arxiv.org/abs/2007.09150)
 - **Version 2 Manual**: [arXiv:2301.05722](https://arxiv.org/abs/2301.05722)
+- **Version 3 Manual**: [arXiv:2605.16540](https://arxiv.org/abs/2605.16540)
 - **API Documentation**: [Read the Docs](https://ulysses-universal-leptogenesis-equation-solver.readthedocs.io/)
 
 ### License
@@ -409,6 +410,7 @@ For major changes, please open a discussion before proceeding.
 - **GitHub Repository**: [earlyuniverse/ulysses](https://github.com/earlyuniverse/ulysses)
 - **arXiv:2007.09150** – ULYSSES v1: [link](https://arxiv.org/abs/2007.09150)
 - **arXiv:2301.05722** – ULYSSES v2: [link](https://arxiv.org/abs/2301.05722)
+- **arXiv:2605.16540** – ULYSSES v3: [link](https://arxiv.org/abs/2605.16540)
 - **Documentation (ReadTheDocs)**: [link](https://ulysses-universal-leptogenesis-equation-solver.readthedocs.io/)
 
 ---
