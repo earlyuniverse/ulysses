@@ -3,7 +3,7 @@ import numpy as np
 from scipy import interpolate
 from scipy.integrate import odeint
 from scipy.special import zeta
-from ulysses.numba import jit
+from numba import jit
 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++#
@@ -40,8 +40,8 @@ class EtaB_1BE1Fsf(ulysses.ULSBase):
         import os
         data_dir = os.path.dirname(ulysses.__file__)
 
-        fg  = os.path.join(data_dir, "etab1BE1Fscalefactor_gstar.txt")
-        fgS = os.path.join(data_dir, "etab1BE1Fscalefactor_gstarS.txt")
+        fg  = os.path.join(data_dir, "./data/etab1BE1Fscalefactor_gstar.txt")
+        fgS = os.path.join(data_dir, "./data/etab1BE1Fscalefactor_gstarS.txt")
 
         Dg  = np.loadtxt(fg)
         DgS = np.loadtxt(fgS)
@@ -70,7 +70,7 @@ class EtaB_1BE1Fsf(ulysses.ULSBase):
         z             = self.M1/Tp
         from ulysses.ulsbase import my_kn2, my_kn1
         _d            = np.real(self.Gamma1* my_kn1(z) / my_kn2(z))
-        _w1           = _d * 0.25 * kn2 * z**2
+        _w1           = _d * 0.25 * my_kn2(z) * z**2
         rnuRda_eq     = self.N1Eq(z)
         Del           =  1. + Tp * self.ipol_dgstarSdT(Tp)/(3. * self.ipol_gstar(Tp)) # Temperature parameter
         return fast_RHS(y0, a, rRADi, log10_ain, _d, _w1,  epstt, epsmm, epsee, rnuRda_eq, Del, self.GCF)

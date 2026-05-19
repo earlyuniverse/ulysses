@@ -3,7 +3,7 @@ import ulysses
 import numpy as np
 from odeintw import odeintw
 
-from ulysses.numba import jit
+from numba import jit
 @jit
 def fast_RHS(y0,eps1tt,eps1mm,eps1ee,eps1tm,eps1te,eps1me,eps2tt,eps2mm,eps2ee,eps2tm,eps2te,eps2me,eps3tt,eps3mm,eps3ee,eps3tm,eps3te,eps3me, C, W, d1,d2,d3,w1,w2,w3,n1eq,n2eq,n3eq):
     N1, N2, N3, Ntt, Nmm, Nee, Ntm, Nte, Nme = y0
@@ -94,7 +94,7 @@ class EtaB_3DMEsct(ulysses.ULSBase):
             self._n3eq    = self.N3Eq(zzz)
             self._currz=zzz
 
-        from ulysses.numba import List
+        from numba.typed import List
         C=List()
         [C.append(c) for c in _C]
         W=List()
@@ -134,7 +134,10 @@ class EtaB_3DMEsct(ulysses.ULSBase):
         _K      = [np.real(self.k1), np.real(self.k2), np.real(self.k3)]
         _W      = [ 485e-10*self.MP/self.M1, 1.7e-10*self.MP/self.M1]
 
-        y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
+        y0      = np.array([self.initial_abundance * self.N1Eq(self.zmin) + 0j,
+                            self.initial_abundance * self.N2Eq(self.zmin) + 0j,
+                            self.initial_abundance * self.N3Eq(self.zmin) + 0j,
+                            0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         ys, _   = odeintw(self.RHS, y0, self.zs, args = tuple([_ETA, _C , _K, _W]), full_output=1)
         self.setEvolData(ys)

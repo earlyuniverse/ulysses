@@ -1,0 +1,93 @@
+name: Build and publish wheels
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build_wheels:
+    name: Wheels — ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-14, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Needed to cross-compile Linux aarch64 wheels on x86_64 runners
+      - name: Set up QEMU
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.22
+        env:
+          # Python versions matching python_requires = ">=3.9,<3.15"
+          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
+          # Skip PyPy (numba doesn't support it) and musl/Alpine Linux
+          CIBW_SKIP: "pp* *-musllinux*"
+          # Linux: native x86_64 + cross-compiled aarch64 via QEMU
+          CIBW_ARCHS_LINUX: x86_64 aarch64
+          # macOS: cross-compile both Intel x86_64 and Apple Silicon arm64 from the macos-14 runner
+          CIBW_ARCHS_MACOS: x86_64 arm64
+          # Windows: 64-bit only (numba has no 32-bit wheels)
+          CIBW_ARCHS_WINDOWS: AMD64
+          # manylinux_2_28 = glibc >= 2.28 (RHEL 8 / Ubuntu 20.04+); required because numpy/scipy
+          # no longer publish manylinux2014 wheels, causing source-build failures in old containers
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
+          # Skip testing cross-compiled x86_64 wheels on the arm64 runner — numba/llvmlite
+          # have no pre-built x86_64 wheels under Rosetta and building from source needs LLVM
+          CIBW_TEST_SKIP: "*-macosx_x86_64"
+          # Smoke-test the installed wheel: verifies the C extension loads correctly
+          CIBW_TEST_COMMAND: python -c "from NumbaQuadpack import dqags; import ulysses; print('wheel OK')"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/
+
+  build_sdist:
+    name: Source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build && python -m build --sdist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  upload_pypi:
+    name: Upload to PyPI
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    # Only upload on tag pushes, not manual workflow_dispatch runs
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    environment:
+      name: pypi
+      url: https://pypi.org/p/ulysses
+    permissions:
+      id-token: write   # required for OIDC trusted publishing (no API token needed)
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist/
+      - uses: actions/download-artifact@v4
+        with:
+          name: sdist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

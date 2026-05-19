@@ -7,28 +7,30 @@ import cmath
 
 def fast_isPerturbative(y):
     """
-    Check perturbativity of Yukawas
+    Check perturbativity of Yukawa
     """
-    #limit of perturbativity for y
-    limit = np.power(4*np.pi,0.5)
-    #check if any element of column 1, 2 or 3 is larger than limit
-    col1               = (y[0,0] < limit)*(y[1,0] < limit)*(y[2,0] < limit)
-    col2               = (y[0,1] < limit)*(y[1,1] < limit)*(y[2,1] < limit)
-    col3               = (y[0,2] < limit)*(y[1,2] < limit)*(y[2,2] < limit)
-    return col1*col2*col3
+    # Limit of perturbativity for y
+    limit = np.power(4 * np.pi, 0.5)
+    
+    # Check if any element of column 1, 2 or 3 is larger than limit
+    col1 = (y[0, 0] < limit) * (y[1, 0] < limit) * (y[2, 0] < limit)
+    col2 = (y[0, 1] < limit) * (y[1, 1] < limit) * (y[2, 1] < limit)
+    col3 = (y[0, 2] < limit) * (y[1, 2] < limit) * (y[2, 2] < limit)
+    
+    return col1 * col2 * col3
 
 def my_kn1(x):
     """
     Convenience wrapper for kn(1, x)
     """
-    return kn(1, x) if x<=600 else 1e-100#3. + 8.*x
+    return kn(1, x) if x <= 600 else 1e-100
+
 
 def my_kn2(x):
     """
     Convenience wrapper for kn(2, x)
     """
-    return kn(2, x) if x<=600 else 1e-100#15. + 8.*x
-
+    return kn(2, x) if x <= 600 else 1e-100
 
 
 # This is the base class
@@ -55,55 +57,108 @@ class ULSBase(object):
 
 
         """
-        #Higgs vev, mass and Z-mass in GeV
-        self.v =  kwargs["vev"]                        if kwargs.get("vev")      is not None else 174.
-        self.MH = kwargs["mhiggs"]                     if kwargs.get("mhiggs")   is not None else 125.35
-        self.MZ = kwargs["mz"]                         if kwargs.get("mz")       is not None else 91.1876
-        #relativistic degrees of freedom at high temperature
-        self.gstar = kwargs["gstar"]                   if kwargs.get("gstar")    is not None else 106.75
-        #Planck mass in GeV
-        self.MP    = kwargs["mplanck"]                 if kwargs.get("mplanck")  is not None else 1.22e+19
-        #neutrino cosmological mass in GeV
-        self.mstar = kwargs["mstar"]                   if kwargs.get("mstar")    is not None else 1.0e-12
-        # Mass-splittings, all in GeV^2
-        self.msplit2_solar       = kwargs["m2solar"]   if kwargs.get("m2solar")  is not None else 7.420e-5*1e-18 # 2018
-        self.msplit2_athm_normal = kwargs["m2atm"]     if kwargs.get("m2atm")    is not None else 2.515e-3*1e-18 # Values
-        self.msplit2_athm_invert = kwargs["m2atminv"]  if kwargs.get("m2atminv") is not None else 2.498e-3*1e-18 # from nu-fit 5.1 WITHOUT SK atmospheric data
+        # Higgs vev, mass and Z-mass in GeV
+        self.v = kwargs.get("vev", 174.0)
+        self.MH = kwargs.get("mhiggs", 125.35)
+        self.MZ = kwargs.get("mz", 91.1876)
+        
+        # Relativistic degrees of freedom at high temperature
+        self.gstar = kwargs.get("gstar", 106.75)
+        
+        # Planck mass in GeV
+        self.MP = kwargs.get("mplanck", 1.22e+19)
+        
+        # Neutrino cosmological mass in GeV
+        self.mstar = kwargs.get("mstar", 1.0e-12)
+        
+        # Mass-splittings, all in GeV^2 -- from NuFit 6.1 (2025), IC23 without SK atm data, best fit
+        self.msplit2_solar = kwargs.get("m2solar", 7.537e-5 * 1e-18)
+        self.msplit2_athm_normal = kwargs.get("m2atm", 2.521e-3 * 1e-18)
+        self.msplit2_athm_invert = kwargs.get("m2atminv", 2.500e-3 * 1e-18)
 
         # Flags
-        self.debug   = kwargs["debug"]                 if kwargs.get("debug")    is not None else False
+        self.debug     = kwargs.get("debug", False)
+        self.use_hind  = kwargs.get("use_hind", True)
 
-        # Parameters of the solver
-        self._zmin   = kwargs["zmin"]                  if kwargs.get("zmin")     is not None else 0.1
-        self._zmax   = kwargs["zmax"]                  if kwargs.get("zmax")     is not None else 1000
-        self._zsteps = kwargs["zsteps"]                if kwargs.get("zsteps")   is not None else 1000
-        self._currz  = self.zmin
+        # Parameters of the z-solver (standard leptogenesis)
+        self._zmin = kwargs.get("zmin", 0.001)
+        self._zmax = kwargs.get("zmax", 1000)
+        self._zsteps = kwargs.get("zsteps", 1000)
+        self._currz = self.zmin
+
+        # Parameters of the x-solver (ARS); xmax=None means auto from M1
+        self._xmin = kwargs.get("xmin", None)
+        self._xmax = kwargs.get("xmax", None)
+        self._xsteps = kwargs.get("xsteps", 500)
 
         # Model switches
-        self.ordering = kwargs["ordering"]             if kwargs.get("ordering") is not None else 0
-        self.loop     = kwargs["loop"]                 if kwargs.get("loop")     is not None else False
+        self.ordering = kwargs.get("ordering", 0)
+        self.loop = kwargs.get("loop", False)
+        self._zcut = kwargs.get("zcut", 1.0)  # zcut value for ARS model
+        self.extended_mode = kwargs.get("extended_mode", False)
 
-        self._zcut   = kwargs["zcut"]                  if kwargs.get("zcut")     is not None else 1.0 # zcut value for ARS model
+        # model output path
+        self.path = kwargs.get("path", "./")
 
-        self.zs=None
-        self.ys=None
+        self.zs = None
+        self.ys = None
         self.setZS()
-        self.normfact = kwargs["normfact"] if kwargs.get("normfact") is not None else 0.013
+        self.normfact = kwargs.get("normfact", 0.013)
+        #ARS helpers
+        self.normfact_ars = (28/79) * np.pi**2 / (27 * 6 * 1.2020569)
+        self.plot = None
 
-        self.isCasasIbarrra = True
-        self._manualh = np.zeros((3,3), dtype=np.complex128)
-        self.pnames = ['m', 'M1', 'M2', 'M3', 'delta', 'a21', 'a31', 'x1', 'x2', 'x3', 'y1', 'y2', 'y3', 't12', 't13', 't23']
-        self.evolname="z"
+        # INCLUDEd IN ULYSSESv3
+        # Choose the parameterisation of the Yukawa matrix
+
+        # Default parameterisation is CasasIbarra with Euler Angles
+        self._manualh = np.zeros((3, 3), dtype=np.complex128)
+        self._which_param = None  # must exist before the setter fires
+        self.which_param = kwargs.get("which_param", 'euler')  # setter sets pnames
+        self.evolname = "z"
+
+        #switch for the initial abundance of RHNs
+        self.initial_abundance = kwargs.get("initial_abundance", 0)  #1 for thermal initial abundance, 0 for vanishing initial abundance
+
+        #ARS parameter Lambda which controls the scale at which the fast modes in linear term are forced to enter quasi-static regime
+        self.Lambda = kwargs.get("Lambda", None)
+
+        # Storage for the full parameter dict passed to setParams (includes extended params)
+        self.pdict = {}
 
 
     def shortname(self):
         return ""
 
     @property
-    def flavourindices(self): return None
+    def which_param(self):
+        return self._which_param
 
-    @property
-    def flavourlabels(self): return None
+    @which_param.setter
+    def which_param(self, value):
+        if value not in {'euler', 'single_imaginary', 'manual'}:
+            raise ValueError("Invalid parameterisation '{}'. Choose from 'euler', 'single_imaginary', or 'manual'.".format(value))
+        self._which_param = value
+        if value == "euler":
+            self.pnames = ['m', 'M1', 'M2', 'M3', 'delta', 'a21', 'a31', 'x1', 'x2', 'x3', 'y1', 'y2', 'y3', 't12', 't13', 't23']
+        elif value == "single_imaginary":
+            self.pnames = ['m', 'M1', 'M2', 'M3', 'delta', 'a21', 'a31', 'xN1', 'xN2', 'xnu1', 'xnu2', 'x', 'y', 't12', 't13', 't23']
+        else:
+            self.pnames = ['m', 'M1', 'M2', 'M3',
+                           'Y11_mag', 'Y12_mag', 'Y13_mag',
+                           'Y21_mag', 'Y22_mag', 'Y23_mag',
+                           'Y31_mag', 'Y32_mag', 'Y33_mag',
+                           'Y11_phs', 'Y12_phs', 'Y13_phs',
+                           'Y21_phs', 'Y22_phs', 'Y23_phs',
+                           'Y31_phs', 'Y32_phs', 'Y33_phs']
+
+    def flavourindices(self): return []
+
+    def flavourlabels(self): return []
+
+    def extendedindices(self): return []
+
+    def extendedlabels(self): return []
 
     @property
     def constants(self):
@@ -169,28 +224,50 @@ class ULSBase(object):
     @property
     def zcut(self): return self._zcut
 
+    @property
+    def xmin(self): return self._xmin
+
+    @property
+    def xmax(self): return self._xmax
+
+    @property
+    def xsteps(self): return self._xsteps
+
     def setEvolData(self, ys):
-        self.ys = np.empty((len(self.zs), max(self.flavourindices()) + 2))
+        fi = self.flavourindices()
+        ext = self.extendedindices()
+        if not fi:
+            return
+        self.ys = np.empty((len(self.zs), max(fi) + len(ext) + 3))
         self.ys[:,0] = self.zs
-        self.ys[:, self.flavourindices()] = ys[:, self.flavourindices()].real
-        self.ys[:,-1] = self.normfact*np.sum(self.ys[:,self.flavourindices()], axis=1)
+        self.ys[:, fi] = ys[:, fi].real
+        if ext:
+            self.ys[:, ext] = ys[:, ext].real
+        self.ys[:,-2] = ys[:, 0].real  # second to last column: RHN abundance
+        self.ys[:,-1] = self.normfact*np.sum(self.ys[:, fi], axis=1)
 
     def setEvolDataARS(self, ys):
-        self.ys = np.empty((len(self.zs), max(self.flavourindices()) + 2))
-        self.ys[:,0] = self.zs
-        self.ys[:, self.flavourindices()] = ys[:, self.flavourindices()].real
-        self.ys[:,-1] = self.normfact*np.sum(self.ys[:,self.flavourindices()], axis=1)
+        fi = self.flavourindices()
+        ext = self.extendedindices()
+        if not fi:
+            return
+        self.ys = np.empty((len(ys[:,0]), max(fi) + len(ext) + 2))
+        self.ys[:,0] = ys[:,0].real
+        if ext:
+            self.ys[:, ext] = ys[:, ext].real
+        self.ys[:, fi] = ys[:, fi].real
+        self.ys[:,-1] = self.normfact_ars*np.sum(self.ys[:, fi], axis=1)
 
 
     def setEvolDataPBH(self, ys):
+        fi  = self.flavourindices()
+        ext = self.extendedindices()
+        if not fi:
+            return
         self.ys = ys
-        #self.ys = np.empty((len(self.zs), max(self.flavourindices()) + 2))
-        #self.ys[:,0] = self.zs
-        #self.ys[:, self.flavourindices()] = ys[:, self.flavourindices()].real
-        #self.ys[:,-1] = self.normfact*np.sum(self.ys[:,self.flavourindices()], axis=1)
 
-        
-        
+
+    #CHANGES TO BE INCLUDED in ULYSSESv3
     @property
     def evolData(self):
         r"""
@@ -202,9 +279,9 @@ class ULSBase(object):
         third to Nmumu and the last columnd to Nee
 
         """
-        if self.flavourindices is not None:
+        if self.flavourindices():
             return self.ys
-        else: # FIXME this is only for some compatibility
+        else: # fallback for compatibility
             pd = np.empty((self.zsteps, 4))
             pd[:,      0] = self.zs
             pd[:,[1,2,3]] = self.ys
@@ -212,42 +289,163 @@ class ULSBase(object):
 
     def setParams(self, pdict):
         """
-        This set the model parameters. pdict is expected to be a dictionary
+        Set the model parameters from a dictionary.
+
+        Args:
+            pdict (dict): Parameter dictionary containing model parameters.
+                In extended_mode the dict may contain extra model-specific keys
+                beyond pnames; these are stored in self.pdict for access by the
+                subclass EtaB implementation.
+
+        Note:
+            Angular parameters are expected in degrees and converted to radians.
+            Mass parameters are in specific units (see inline comments).
         """
-        if self.isCasasIbarrra:
-            self.delta    = pdict['delta']/180*np.pi
-            self.a21      = pdict['a21']/180*np.pi
-            self.a31      = pdict['a31']/180*np.pi
-            self.t12      = pdict['t12']/180*np.pi
-            self.t23      = pdict['t23']/180*np.pi
-            self.t13      = pdict['t13']/180*np.pi
-            self.x1       = pdict['x1']/180*np.pi
-            self.y1       = pdict['y1']/180*np.pi
-            self.x2       = pdict['x2']/180*np.pi
-            self.y2       = pdict['y2']/180*np.pi
-            self.x3       = pdict['x3']/180*np.pi
-            self.y3       = pdict['y3']/180*np.pi
-            self.m        = 10**pdict['m'] * 1e-9 # NOTE input is in log10(m1) in eV --- we convert here to the real value in GeV
-            self.M1       = 10**pdict['M1']
-            self.M2       = 10**pdict['M2']
-            self.M3       = 10**pdict['M3']
+        self.pdict = pdict
+        if "Lambda" in pdict:
+            self.Lambda = pdict["Lambda"]
+        if "m2solar" in pdict:
+            self.msplit2_solar = pdict["m2solar"] 
+        if "m2atm" in pdict:
+            self.msplit2_athm_normal = pdict["m2atm"] 
+        if "m2atminv" in pdict:
+            self.msplit2_athm_invert = pdict["m2atminv"] 
+        # Helper function to convert degrees to radians
+        def deg_to_rad(key):
+            return pdict[key] / 180 * np.pi
+        
+        # Helper function to convert log10 masses
+        def log10_mass(key):
+            return float(10**pdict[key])
+        
+        if self.which_param == 'euler':
+            # CasasIbarra with Euler Angles parameterization
+            self._set_common_angles(pdict, deg_to_rad)
+            self._set_casas_ibarra_angles(pdict, deg_to_rad)
+            self._set_masses(pdict, log10_mass)
+            
+        elif self.which_param == 'single_imaginary':
+            # single_imaginary Casas Ibarra parameterization
+            self._set_common_angles(pdict, deg_to_rad)
+            self._set_single_imaginary_angles(pdict, deg_to_rad)
+            self._set_masses(pdict, log10_mass)
+            
         else:
-            self.M1       = 10**pdict['M1']
-            self.M2       = 10**pdict['M2']
-            self.M3       = 10**pdict['M3']
-            # Explicit setting of yukawa matix entries
-            self._manualh[0][0] = cmath.rect(pdict["Y11_mag"], pdict["Y11_phs"])
-            self._manualh[0][1] = cmath.rect(pdict["Y12_mag"], pdict["Y12_phs"])
-            self._manualh[0][2] = cmath.rect(pdict["Y13_mag"], pdict["Y13_phs"])
-            self._manualh[1][0] = cmath.rect(pdict["Y21_mag"], pdict["Y21_phs"])
-            self._manualh[1][1] = cmath.rect(pdict["Y22_mag"], pdict["Y22_phs"])
-            self._manualh[1][2] = cmath.rect(pdict["Y23_mag"], pdict["Y23_phs"])
-            self._manualh[2][0] = cmath.rect(pdict["Y31_mag"], pdict["Y31_phs"])
-            self._manualh[2][1] = cmath.rect(pdict["Y32_mag"], pdict["Y32_phs"])
-            self._manualh[2][2] = cmath.rect(pdict["Y33_mag"], pdict["Y33_phs"])
+            # Manual Yukawa matrix entries
+            self._set_masses(pdict, log10_mass)
+            self._set_manual_yukawa_matrix(pdict)
+    
+    # NuFIT best-fit defaults for PMNS mixing angles (degrees), normal / inverted ordering
+    _DEFAULT_T12_NO = 33.76
+    _DEFAULT_T13_NO =  8.62
+    _DEFAULT_T23_NO = 43.27
+    _DEFAULT_T12_IO = 33.76
+    _DEFAULT_T13_IO =  8.65
+    _DEFAULT_T23_IO = 48.15
+
+    # Parameters recognised in param files but not required (silently defaulted)
+    _OPTIONAL_PARAMS = {'t12', 't13', 't23', 'm2solar', 'm2atm', 'm2atminv'}
+
+    def _set_common_angles(self, pdict, deg_to_rad):
+        """Set angles common to all parameterisations."""
+        self.delta = deg_to_rad('delta')
+        self.a21 = deg_to_rad('a21')
+        self.a31 = deg_to_rad('a31')
+        if self.ordering == 0:
+            self.t12 = pdict.get('t12', self._DEFAULT_T12_NO) / 180 * np.pi
+            self.t23 = pdict.get('t23', self._DEFAULT_T23_NO) / 180 * np.pi
+            self.t13 = pdict.get('t13', self._DEFAULT_T13_NO) / 180 * np.pi
+        else:
+            self.t12 = pdict.get('t12', self._DEFAULT_T12_IO) / 180 * np.pi
+            self.t23 = pdict.get('t23', self._DEFAULT_T23_IO) / 180 * np.pi
+            self.t13 = pdict.get('t13', self._DEFAULT_T13_IO) / 180 * np.pi
+    
+    def _set_casas_ibarra_angles(self, pdict, deg_to_rad):
+        """Set angles specific to standard Casas-Ibarra parameterisation."""
+        self.x1 = deg_to_rad('x1')
+        self.y1 = deg_to_rad('y1')
+        self.x2 = deg_to_rad('x2')
+        self.y2 = deg_to_rad('y2')
+        self.x3 = deg_to_rad('x3')
+        self.y3 = deg_to_rad('y3')
+    
+    def _set_single_imaginary_angles(self, pdict, deg_to_rad):
+        """Set angles specific to single_imaginary Casas-Ibarra parameterisation."""
+        self.xnu2 = deg_to_rad('xnu2')
+        self.xnu1 = deg_to_rad('xnu1')
+        self.xN2 = deg_to_rad('xN2')
+        self.xN1 = deg_to_rad('xN1')
+        self.x = deg_to_rad('x')
+        self.y = deg_to_rad('y')
+    
+    def _set_masses(self, pdict, log10_mass):
+        """Set mass parameters."""
+        # NOTE: m input is in log10(m) in eV --- we convert here to the real value in GeV
+        self.m = log10_mass('m') * 1e-9
+        self.M1 = log10_mass('M1')
+        self.M2 = log10_mass('M2')
+        self.M3 = log10_mass('M3')
+    
+    def _set_manual_yukawa_matrix(self, pdict):
+        """Set Yukawa matrix entries manually using magnitude and phase."""
+        yukawa_params = [
+            ("Y11_mag", "Y11_phs", 0, 0),
+            ("Y12_mag", "Y12_phs", 0, 1),
+            ("Y13_mag", "Y13_phs", 0, 2),
+            ("Y21_mag", "Y21_phs", 1, 0),
+            ("Y22_mag", "Y22_phs", 1, 1),
+            ("Y23_mag", "Y23_phs", 1, 2),
+            ("Y31_mag", "Y31_phs", 2, 0),
+            ("Y32_mag", "Y32_phs", 2, 1),
+            ("Y33_mag", "Y33_phs", 2, 2),
+        ]
+        
+        for mag_key, phs_key, i, j in yukawa_params:
+            self._manualh[i, j] = cmath.rect(pdict[mag_key], pdict[phs_key])
 
 
+    # ---------------------------------------------------------------------- #
+    #  DM yield utilities — available to any subclass that sets extended_mode #
+    # ---------------------------------------------------------------------- #
 
+    # Cosmological constants for DM yield / relic density calculations
+    # Entropy density today s0 [cm^-3], rho_c/h^2 [GeV cm^-3] (PDG 2020)
+    _s0    = 2891.2
+    _rho_c = 1.05371e-5
+
+    @property
+    def _ngamma_over_s(self):
+        """n_gamma / s = 45 zeta(3) / (pi^4 g*s,0),  g*s,0 = 43/11."""
+        return 45.0 * 1.20206 / (np.pi**4 * (43.0 / 11.0))
+
+    def Y_DM(self, N_DM_final):
+        """Convert final comoving DM number N_DM to yield Y_DM = n_DM/s."""
+        return self._ngamma_over_s * np.real(N_DM_final) / 27.0
+
+    def OmegaDMh2(self, Y_DM, m_dm_GeV):
+        """Compute Omega_DM h^2 = m_DM * s0 * Y_DM / (rho_c/h^2)."""
+        return m_dm_GeV * self._s0 * Y_DM / self._rho_c
+
+    @property
+    def dmYield(self):
+        """DM yield Y_DM = n_DM/s after EtaB has been evaluated."""
+        return getattr(self, "_Y_DM", None)
+
+    @property
+    def OmDMh2(self):
+        """Omega_DM h^2 after EtaB has been evaluated."""
+        return getattr(self, "_OmDMh2", None)
+
+    def extended_summary(self):
+        """Optional extra output printed by uls-calc after eta_B.
+
+        Override in a subclass to return a formatted string of any additional
+        quantities computed inside EtaB (e.g. DM yield, relic abundance).
+        Return None to suppress extra output (default).
+        """
+        return None
+
+    # ---------------------------------------------------------------------- #
 
     def printParams(self):
         """
@@ -260,26 +458,63 @@ class ULSBase(object):
             print(k,v)
 
 
-    # Some general calculators purely based on input parameters
     @property
-    def R(self):
+    def R_ord(self):
         """
         Orthogonal matrix R = R1.R2.R3
         """
 
-        R1 = np.array([[1., 0., 0.],
+        R23 = np.array([[1., 0., 0.],
                        [0.,  np.cos(self.x1+self.y1*1j), np.sin(self.x1+self.y1*1j)],
                        [0., -np.sin(self.x1+self.y1*1j), np.cos(self.x1+self.y1*1j)]], dtype=np.complex128)
 
-        R2 = np.array([[ np.cos(self.x2+self.y2*1j), 0., np.sin(self.x2+self.y2*1j)],
+        R13 = np.array([[ np.cos(self.x2+self.y2*1j), 0., np.sin(self.x2+self.y2*1j)],
                        [0., 1. , 0.],
                        [-np.sin(self.x2+self.y2*1j), 0., np.cos(self.x2+self.y2*1j)]], dtype=np.complex128)
 
-        R3 = np.array([[ np.cos(self.x3+self.y3*1j), np.sin(self.x3+self.y3*1j), 0.],
+        R12 = np.array([[ np.cos(self.x3+self.y3*1j), np.sin(self.x3+self.y3*1j), 0.],
                        [-np.sin(self.x3+self.y3*1j), np.cos(self.x3+self.y3*1j), 0.],
                        [0., 0., 1.]], dtype=np.complex128)
 
-        return R1 @ R2 @ R3
+        return R23 @ R13 @ R12
+
+    #single_imaginary R matrix parametrisation as given in arXiv:2106.16226 -- include in ULYSSESv3
+    @property
+    def R_alt(self):
+        """
+        Orthogonal matrix R = Onu13.Onu23.RC12.ON23.ON13
+        """
+
+        Onu23 = np.array([[1., 0., 0.],
+                          [0.,  np.cos(self.xnu1), np.sin(self.xnu1)],
+                          [0., -np.sin(self.xnu1), np.cos(self.xnu1)]], dtype=np.complex128)
+
+        Onu13 = np.array([[ np.cos(self.xnu2), 0., np.sin(self.xnu2)],
+                          [0., 1. , 0.],
+                          [-np.sin(self.xnu2), 0., np.cos(self.xnu2)]], dtype=np.complex128)
+        
+        ON23 = np.array([[1., 0., 0.],
+                         [0.,  np.cos(self.xN1), np.sin(self.xN1)],
+                         [0., -np.sin(self.xN1), np.cos(self.xN1)]], dtype=np.complex128)
+
+        ON13 = np.array([[ np.cos(self.xN2), 0., np.sin(self.xN2)],
+                         [0., 1. , 0.],
+                         [-np.sin(self.xN2), 0., np.cos(self.xN2)]], dtype=np.complex128)
+
+        RC12 = np.array([[ np.cos(self.x+self.y*1j), np.sin(self.x+self.y*1j), 0.],
+                         [-np.sin(self.x+self.y*1j), np.cos(self.x+self.y*1j), 0.],
+                         [0., 0., 1.]], dtype=np.complex128)
+        
+
+        return np.transpose(Onu13 @ Onu23 @ RC12 @ ON23 @ ON13)
+    
+    
+    @property
+    def R(self):
+        if self.which_param == 'single_imaginary':
+            return self.R_alt
+        else:
+            return self.R_ord
 
     @property
     def SqrtDM(self):
@@ -337,6 +572,16 @@ class ULSBase(object):
                            [-c23*s12 - c12*np.exp(self.delta*1j)*s13*s23,np.exp((self.a21*1j)/2.)*(c12*c23 - np.exp(self.delta*1j)*s12*s13*s23) , c13*np.exp((self.a31*1j)/2.)*s23],
                            [-c12*c23*np.exp(self.delta*1j)*s13 + s12*s23,np.exp((self.a21*1j)/2.)*(-c23*np.exp(self.delta*1j)*s12*s13 - c12*s23) ,c13*c23*np.exp((self.a31*1j)/2.)]], dtype=np.complex128)
 
+    @property
+    def Theta(self):
+        """
+        Mixing of the heavy Majorana neutrinos with SM charged leptons, aka mixing parameter
+        """
+        Theta_mat = np.zeros((3,3), dtype=np.complex128)
+        for a in range(3):
+            for j in range(3):
+                Theta_mat[a,j] = (self.v)*self.h[a, j]/self.DM[j,j]
+        return Theta_mat
 
     @property
     def fMR(self):
@@ -383,13 +628,15 @@ class ULSBase(object):
         """
         Tree-level mass matrix.
         """
-        return self.v**2 * self.h @ np.linalg.inv(self.DM) @ np.transpose(self.h)
+        return -1 * self.v**2 * self.h @ np.linalg.inv(self.DM) @ np.transpose(self.h)
 
     @property
     def m_loop(self):
         """
         One-loop-level mass matrix.
+        
         """
+        print(self.fMLoopHelper)
         return -1 * self.v**2 * self.h @ self.fMLoopHelper @ np.transpose(self.h)
 
     @property
@@ -397,7 +644,24 @@ class ULSBase(object):
         """
         YUKAWA matrix.
         """
-        if self.isCasasIbarrra:
+        if self.which_param in {'euler', 'single_imaginary', 'CP_conserving'}:
+            #Some test Yukawas
+            h_test = -1j*np.array([[ 3.10409870e-04-2.88390858e-06j, -3.15972857e-04+2.93988151e-06j,-4.11823008e-06-4.42936908e-04j],
+                                   [ 5.63377207e-04-1.13668872e-06j, -5.73902621e-04+1.15657100e-06j,-1.62164031e-06-8.04212584e-04j],
+                                   [-4.11904691e-07-9.81246627e-07j, -1.60266127e-07+9.98410006e-07j,-1.39988112e-06+1.74359234e-07j]])
+            #BMCI from 1810.12463, Inverted Ordering
+            h_BMCI = np.array([[-2.0e-5 - 1j*7.9e-5, 7.9e-5 - 1j*2.0e-5, 1.8e-8 - 1j*9.5e-8],
+                       [2.7e-5 - 1j*1.3e-5, 1.3e-5 + 1j*2.7e-5, 4.6e-8 - 1j*2.8e-8],
+                       [-2.9e-5 - 1j*0.4e-5, 0.4e-5 - 1j*2.9e-5, -4.0e-8 + 1j*1.0e-8]])
+            ##BMCII from 1810.12463, Normal Ordering
+            h_BMCII = np.array([[2.8e-5 - 1j*0.4e-5, 0.4e-5 + 1j*2.8e-5, 0.4e-8 - 1j*1.3e-8],
+                        [-3.0e-7 - 1j*0.8e-7, 0.8e-7 - 1j*3.0e-7, -3.9e-8 + 1j*5.7e-8],
+                        [-4.9e-5 + 1j*0.4e-5, -0.4e-5 - 1j*4.9e-5, -3.4e-8 + 1j*5.0e-8]])
+            #BMCIII from 1810.12463, Normal Ordering
+            h_BMCIII = np.array([[-3.2e-8 - 1j*4.5e-8, -1.1e-7 - 1j*1.7e-7, -2.4e-7 + 1j*1.6e-7],
+                        [1.7e-7 - 1j*5.9e-7, 0.6e-6 - 1j*2.1e-6, -2.9e-6 - 1j*0.8e-6],
+                        [4.4e-7 - 1j*3.0e-7, 1.5e-6 - 1j*1.1e-6, -1.5e-6 - 1j*2.1e-6]])
+            
             return self.h_loop if self.loop else self.h_tree
         else:
             return self._manualh
@@ -407,15 +671,38 @@ class ULSBase(object):
         """
         Yukawa matrix (LOOP + Tree).
         """
-        return (1./self.v)*(self.U @ self.SqrtDm @ np.transpose(self.R) @ self.fMR)
+        return (1j/self.v)*(self.U @ self.SqrtDm @ np.transpose(self.R) @ self.fMR)
 
     @property
     def h_tree(self):
         """
         Yukawa matrix, tree-level.
         """
-        return (1./self.v)*(self.U @ self.SqrtDm @ np.transpose(self.R) @ self.SqrtDM)
+        return (1j/self.v)*(self.U @ self.SqrtDm @ np.transpose(self.R) @ self.SqrtDM)
 
+    #Include in ULYSSESv3, the heavy Majorana neutrino mixing
+    @property
+    def RV(self):
+        """
+        Heavy Majorana neutrino mixing
+        """
+        return 1j*self.U @ self.SqrtDm @ np.transpose(self.R) @ linalg.inv(self.SqrtDM)
+    
+    
+    @property
+    def eta(self):
+        """
+        Heavy Majorana neutrino mixing
+        """
+        return -(1/2)*self.RV@np.transpose(np.conjugate(self.RV))
+    
+    @property
+    def h_non_unitary(self):
+        """
+        Yukawa matrix, tree-level.
+        """
+        return self.h_tree + (1./self.v)*(self.eta@self.U @ self.SqrtDm @ np.transpose(self.R) @ self.SqrtDM)
+    
     @property
     def meff1(self):
         """
@@ -436,6 +723,18 @@ class ULSBase(object):
         Effective mass 3 used for decay and washout.
         """
         return np.dot(np.conjugate(np.transpose(self.h)),self.h)[2,2]*(self.v**2)/self.M3
+
+    @property
+    def zosc_mat(self):
+        Tew    = 131.7
+        M0     = 7.112582895088419e+17
+        zosc_mat = np.zeros((3,3), dtype=np.complex128)
+        deltaM2_mat = np.zeros((3,3), dtype=np.complex128)
+        for i in range(3):
+            for j in range(3):
+                deltaM2_mat[i,j] = self.DM[j,j]**2 - self.DM[i,i]**2
+                zosc_mat[i,j] = np.cbrt(np.real(12.*Tew**3/(deltaM2_mat[i,j] * M0)))
+        return np.real(zosc_mat)
 
     @property
     def k1(self):
@@ -480,7 +779,7 @@ class ULSBase(object):
         """
         M         = self.DM
         t         = np.log(M[0,0]/self.MH)
-        DStemp    = 0.1*k1*(1+t*(z**2)*np.log(1+8.77298/(t*z)))
+        DStemp    = 0.11399*k1*(1+t*(z**2)*np.log(1+8.77298/(t*z)))
         return DStemp
 
     def D2(self, k,z):
@@ -649,6 +948,41 @@ class ULSBase(object):
         fourth      = 1j*(2./3.)*(1/(np.power(M[2,2]/M[0,0],2)-1.))*(l[a,0]*lcon[b,2]*lsquare[0,2]-lcon[b,0]*l[a,2]*lsquare[2,0])
         epsilon1abtemp = prefactor*(first+second+third+fourth)
         return epsilon1abtemp
+    
+    def epsilon1ab_reg(self,a,b):
+        """
+        Off-diagonal CP asymmetry parameter for decays of N1. a and b denote lepton flavour. It is regularised to
+        include the resonant effects between N1 and N2.
+        """
+        l         = self.h
+        ldag      = np.conjugate(np.transpose(l))
+        lcon      = np.conjugate(l)
+        M         = self.DM
+        lsquare   = np.dot(ldag,l)
+        
+        DeltaM21 = M[1,1]-M[0,0]
+        DeltaM31 = M[2,2]-M[0,0]
+        x21 = (M[1,1]/M[0,0])**2
+        x31 = (M[2,2]/M[0,0])**2
+        reg21 = 1/(1 + self.Gamma2**2 * (1/(DeltaM21 * (1 + x21))**2))
+        reg31 = 1/(1 + self.Gamma3**2 * (1/(DeltaM31 * (1 + x31))**2))
+        if x21<10000:
+            f21 = 2./3.* x21 *( (1.+x21) * np.log( (1.+x21) / x21 ) - 1 + reg21 * (1.)/(x21 - 1.) )
+        else:
+            f21 = 1
+        if x31<10000:
+            f31 = 2./3.* x31 *( (1.+x31) * np.log( (1.+x31) / x31 ) - 1 + reg31 * (1.)/(x31 - 1.) )
+        else:
+            f31 = 1
+
+        prefactor   = (3/(32*np.pi))*(1/(lsquare[0,0]))
+        first       = 1j*(lsquare[1,0]*l[a,0]*lcon[b,1]-lsquare[0,1]*l[a,1]*lcon[b,0])*(M[0,0]/M[1,1])*f21
+        second      = 1j*(2./3.)*(reg21/(np.power(M[1,1]/M[0,0],2)-1.))*(l[a,0]*lcon[b,1]*lsquare[0,1]-lcon[b,0]*l[a,1]*lsquare[1,0])
+
+        third       = 1j*(lsquare[2,0]*l[a,0]*lcon[b,2]-lsquare[0,2]*l[a,2]*lcon[b,0])*(M[0,0]/M[2,2])*f31
+        fourth      = 1j*(2./3.)*(reg31/(np.power(M[2,2]/M[0,0],2)-1.))*(l[a,0]*lcon[b,2]*lsquare[0,2]-lcon[b,0]*l[a,2]*lsquare[2,0])
+        epsilon1abtemp = prefactor*(first+second+third+fourth)
+        return epsilon1abtemp
 
     def epsilon2ab(self,a,b):
         """
@@ -668,6 +1002,46 @@ class ULSBase(object):
         fourth      = 1j*(2./3.)*(1/(np.power(M[2,2]/M[1,1],2)-1.))*(l[a,1]*lcon[b,2]*lsquare[1,2]-lcon[b,1]*l[a,2]*lsquare[2,1])
         epsilon2abtemp = prefactor*(first+second+third+fourth)
         return epsilon2abtemp
+    
+    
+    def epsilon2ab_reg(self,a,b):
+        """
+        Off-diagonal CP asymmetry parameter for decays of N2. a and b denote lepton flavour. It is regularised to
+        include the resonant effects between N2 and N3
+        """
+        l         = self.h
+        ldag      = np.conjugate(np.transpose(l))
+        lcon      = np.conjugate(l)
+        M         = self.DM
+        lsquare   = np.dot(ldag,l)
+        
+        DeltaM12 = M[0,0]-M[1,1]
+        DeltaM32 = M[2,2]-M[1,1]
+        x12 = (M[0,0]/M[1,1])**2
+        x32 = (M[2,2]/M[1,1])**2
+        reg12 = 1/(1 + self.Gamma1**2 * (1/(DeltaM12 * (1 + x12))**2))
+        reg32 = 1/(1 + self.Gamma3**2 * (1/(DeltaM32 * (1 + x32))**2))
+        #Bad behaviour in the limit of large xk/xj
+        if x12 < 10000:
+            f12 = 2./3.* x12 *( (1.+x12) * np.log( (1.+x12) / x12 ) - 1 + reg12 * (1.)/(x12 - 1.) )
+        else:
+            f12 = 1
+        if x32 < 10000:
+            f32 = 2./3.* x32 *( (1.+x32) * np.log( (1.+x32) / x32 ) - 1 + reg32 * (1.)/(x32 - 1.) )
+        else:
+            f32 = 1
+    
+
+        #define terms of epsilon: prefactor and first term (first), second term (second) etc.
+        prefactor   = (3/(32*np.pi))*(1/(lsquare[1,1]))
+        first       = 1j*(lsquare[0,1]*l[a,1]*lcon[b,0]-lsquare[1,0]*l[a,0]*lcon[b,1])*(M[1,1]/M[0,0])*f12
+        second      = 1j*(2./3.)*(reg12/(np.power(M[0,0]/M[1,1],2)-1.))*(l[a,1]*lcon[b,0]*lsquare[1,0]-lcon[b,1]*l[a,0]*lsquare[0,1])
+        
+        #regularised
+        third       = 1j*(lsquare[2,1]*l[a,1]*lcon[b,2]-lsquare[1,2]*l[a,2]*lcon[b,1])*(M[1,1]/M[2,2])*f32
+        fourth      = 1j*(2./3.)*(reg32/(np.power(M[2,2]/M[1,1],2)-1.))*(l[a,1]*lcon[b,2]*lsquare[1,2]-lcon[b,1]*l[a,2]*lsquare[2,1])
+        epsilon2abtemp = prefactor*(first+second+third+fourth)
+        return epsilon2abtemp
 
     def epsilon3ab(self,a,b):
         """
@@ -685,6 +1059,44 @@ class ULSBase(object):
         third       = 1j*(lsquare[1,2]*l[a,2]*lcon[b,1]-lsquare[2,1]*l[a,1]*lcon[b,2])*(M[2,2]/M[1,1])*self.f1(M[1,1]/M[2,2])
         second      = 1j*(2./3.)*(1/(np.power(M[0,0]/M[2,2],2)-1.))*(l[a,2]*lcon[b,0]*lsquare[2,0]-lcon[b,2]*l[a,0]*lsquare[0,2])
         fourth      = 1j*(2./3.)*(1/(np.power(M[1,1]/M[2,2],2)-1.))*(l[a,2]*lcon[b,1]*lsquare[2,1]-lcon[b,2]*l[a,1]*lsquare[1,2])
+        epsilon3abtemp = prefactor*(first+second+third+fourth)
+        return epsilon3abtemp
+    
+    
+    def epsilon3ab_reg(self,a,b):
+        """
+        Off-diagonal CP asymmetry parameter for decays of N3. a and b denote lepton flavour. It is regularised to
+        include the resonant effects in the case of M1 < M2 sim M3
+        """
+        l         = self.h
+        ldag      = np.conjugate(np.transpose(l))
+        lcon      = np.conjugate(l)
+        M         = self.DM
+        lsquare   = np.dot(ldag,l)
+
+        DeltaM13 = M[0,0]-M[2,2]        
+        DeltaM23 = M[1,1]-M[2,2]
+        x13 = (M[0,0]/M[2,2])**2
+        x23 = (M[1,1]/M[2,2])**2
+        reg13 = 1/(1 + self.Gamma1**2 * (1/(DeltaM13 * (1 + x13))**2))
+        reg23 = 1/(1 + self.Gamma2**2 * (1/(DeltaM23 * (1 + x23))**2))
+        if x13 < 10000:
+            f13 = 2./3.* x13 *( (1.+x13) * np.log( (1.+x13) / x13 ) - 1 + reg13 * (1.)/(x13 - 1.) )
+        else:
+            f13 = 1
+        if x23 < 10000:
+            f23 = 2./3.* x23 *( (1.+x23) * np.log( (1.+x23) / x23 ) - 1 + reg23 * (1.)/(x23 - 1.) )
+        else:
+            f23 = 1
+
+        #define terms of epsilon: prefactor and first term (first), second term (second) etc.
+        prefactor   = (3/(32*np.pi))*(1/(lsquare[2,2]))
+        first       = 1j*(lsquare[0,2]*l[a,2]*lcon[b,0]-lsquare[2,0]*l[a,0]*lcon[b,2])*(M[2,2]/M[0,0])*f13
+        second      = 1j*(2./3.)*(reg13/(np.power(M[0,0]/M[2,2],2)-1.))*(l[a,2]*lcon[b,0]*lsquare[2,0]-lcon[b,2]*l[a,0]*lsquare[0,2])
+        
+        #regularised
+        third       = 1j*(lsquare[1,2]*l[a,2]*lcon[b,1]-lsquare[2,1]*l[a,1]*lcon[b,2])*(M[2,2]/M[1,1])*f23
+        fourth      = 1j*(2./3.)*(reg23/(np.power(M[1,1]/M[2,2],2)-1.))*(l[a,2]*lcon[b,1]*lsquare[2,1]-lcon[b,2]*l[a,1]*lsquare[1,2])
         epsilon3abtemp = prefactor*(first+second+third+fourth)
         return epsilon3abtemp
 
@@ -786,7 +1198,7 @@ class ULSBase(object):
         Gamma   = (self.M1**2/self.MP)*np.sqrt(2*np.pi/3)*np.sqrt((np.pi**2)*self.gstar/30)*(1+epstot)*d/z
 
         #calculate (decay rate)/(mass splitting)
-        return Gamma/(M2-M1)
+        return Gamma/(self.M2-self.M1)
 
     @property
     def Gamma1(self):

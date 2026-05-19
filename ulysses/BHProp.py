@@ -777,8 +777,8 @@ def afin(aexp, rPBHi, rRadi, t, ail):
 import os
 data_dir = os.path.dirname(ulysses.__file__)
 
-fg  = os.path.join(data_dir, "etab1BE1Fscalefactor_gstar.txt")
-fgS = os.path.join(data_dir, "etab1BE1Fscalefactor_gstarS.txt")
+fg  = os.path.join(data_dir, "./data/etab1BE1Fscalefactor_gstar.txt")
+fgS = os.path.join(data_dir, "./data/etab1BE1Fscalefactor_gstarS.txt")
 
 gTab = np.loadtxt(fg, skiprows=0)
 

@@ -177,6 +177,10 @@ class EtaB_PBH(ulysses.ULSBase):
 
     def flavourlabels(self): return ["$N^{\\rm B-L}_{\\rm TH}$", "$N^{\\rm B-L}_{\\rm PBH}$"]
 
+    def extendedindices(self): return [3, 4]
+
+    def extendedlabels(self): return [r"$\rho_{\rm PBH}/\rho_{\rm tot}$", r"$\rho_{\rm Rad}/\rho_{\rm tot}$"]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         """
@@ -197,7 +201,7 @@ class EtaB_PBH(ulysses.ULSBase):
         import os
         data_dir = os.path.dirname(ulysses.__file__)
 
-        MEav_f   = os.path.join(data_dir, "timedil.txt")
+        MEav_f   = os.path.join(data_dir, "./data/timedil.txt")
         MEavTab  = np.loadtxt(MEav_f)
 
         self.MEav_ = interpolate.splrep(MEavTab[:,0],  MEavTab[:,1],  s=0)
@@ -326,6 +330,8 @@ class EtaB_PBH(ulysses.ULSBase):
         Mi    = 10**(self.MPBHi) # PBH initial Mass in grams
         asi   = self.aPBHi       # PBH initial rotation a_star factor
         bi    = 10**(self.bPBHi) # Reduced Initial PBH fraction, beta^prime
+
+        self.evolname = r"$a/a_0$"
 
         assert 0. <= asi and asi < 1., colored('initial spin factor a* is not in the range [0., 1.)', 'red')
         assert bi < np.sqrt(bh.gamma), colored('initial PBH density is larger than the total Universe\'s budget', 'red')
@@ -504,9 +510,7 @@ class EtaB_PBH(ulysses.ULSBase):
 
         etaB = nb[-1]
 
-        dat = np.array([10.**xBE, np.real(N1RTBE), np.real(N1RBBE), np.real(nb)])
-
-        dat = dat.T
-                        
-        self.setEvolDataPBH(dat)
+        dat = np.array([10.**xBE, np.real(N1RTBE), np.real(N1RBBE), RadBE*10**(-4*xBE)/(PBHBE*10**(-3*xBE) + RadBE*10**(-4*xBE)), PBHBE*10**(-3*xBE)/(PBHBE*10**(-3*xBE) + RadBE*10**(-4*xBE)), np.real(nb)])
+   
+        self.setEvolDataPBH(dat.T)
         return etaB
