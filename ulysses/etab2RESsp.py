@@ -2,7 +2,7 @@
 import ulysses
 import numpy as np
 from odeintw import odeintw
-from ulysses.numba import jit
+from numba import jit
 
 @jit
 def fast_RHS(y0, eps2tt,eps2mm,eps2ee,eps1tt,eps1mm,eps1ee,C,d1,d2,w1,w2,n1eq,n2eq):
@@ -67,7 +67,7 @@ class EtaB_2RESsp(ulysses.ULSBase):
             self._n2eq          = self.N2Eq(zzz)
             self._currz=zzz
 
-        from ulysses.numba import List
+        from numba.typed import List
         C=List()
         [C.append(c) for c in _C]
         return fast_RHS(y0, eps2tt, eps2mm, eps2ee, eps1tt, eps1mm, eps1ee, C,self._d1,self._d2,self._w1,self._w2,self._n1eq,self._n2eq)
@@ -85,7 +85,9 @@ class EtaB_2RESsp(ulysses.ULSBase):
             ]
 
         _K      = [np.real(self.k1), np.real(self.k2)]
-        y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
+        y0      = np.array([self.initial_abundance * self.N1Eq(self.zmin) + 0j,
+                            self.initial_abundance * self.N2Eq(self.zmin) + 0j,
+                            0+0j,0+0j,0+0j], dtype=np.complex128)
 
         _ETA = [
                 self.epsiloniaaRES(2,1,0),

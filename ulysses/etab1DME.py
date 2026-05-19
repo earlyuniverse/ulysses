@@ -3,7 +3,7 @@ import ulysses
 import numpy as np
 from odeintw import odeintw
 
-from ulysses.numba import jit
+from numba import jit
 @jit
 def fast_RHS(y0, d, w1, n1eq, epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e, widtht, widthm):
 
@@ -73,7 +73,8 @@ class EtaB_1DME(ulysses.ULSBase):
         c1e   =                 self.c1a(0)
 
         k       = np.real(self.k1)
-        y0      = np.array([0+0j,0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
+        y0      = np.array([self.initial_abundance * self.N1Eq(self.zmin) + 0j,
+                            0+0j,0+0j,0+0j,0+0j,0+0j,0+0j], dtype=np.complex128)
 
         params  = np.array([epstt,epsmm,epsee,epstm,epste,epsme,c1t,c1m,c1e,k], dtype=np.complex128)
 

@@ -1,0 +1,74 @@
+[build-system]
+# Build-time requirements.
+# Prerequisites that CANNOT be pip-installed and must be on the system PATH:
+#   - A C compiler (gcc / clang / MSVC)
+#
+# setuptools>=77 is required for SPDX-style licence declaration.
+requires = [
+    "setuptools>=77.0.0",
+    "wheel>=0.38",
+]
+build-backend = "setuptools.build_meta"
+
+# ---------------------------------------------------------------------------
+# Project metadata — takes precedence over setup.py kwargs in setuptools>=77.
+# The C extension, custom build_ext, and bin/ scripts are still declared
+# in setup.py because pyproject.toml has no equivalent for non-entry-point
+# scripts or custom build commands.
+# ---------------------------------------------------------------------------
+
+[project]
+name            = "ulysses"
+version         = "3.0.0"
+description     = "ULYSSES: Universal LeptogeneSiS Equation Solver"
+readme          = "README.md"
+license         = "MIT"
+license-files   = ["LICENSE"]
+requires-python = ">=3.9,<3.15"
+authors = [
+    {name = "Alessandro Granelli"},
+    {name = "Christopher Leslie"},
+    {name = "Yuber Perez Gonzalez"},
+    {name = "Brian Shuve"},
+    {name = "Holger Schulz"},
+    {name = "Jessica Turner", email = "jessicaturner.5390@gmail.com"},
+    {name = "Rosie Walker"},
+]
+
+# Lower bounds ensure pre-built wheels exist for all supported Python versions,
+# preventing fallback to source builds that require extra system headers.
+dependencies = [
+    "numpy>=1.22",
+    "scipy>=1.9",
+    "matplotlib>=3.5",
+    "progressbar>=2.5",
+    "pandas>=1.5",
+    "python-dateutil>=2.8",
+    "termcolor>=1.1",
+    "tqdm>=4.60",
+    "numba>=0.56; python_version<'3.10'",
+    "numba>=0.61; python_version>='3.10'",
+    "mpmath>=1.2",
+    "mpltern>=0.4",
+    "multiprocess>=0.70.12",
+]
+
+[project.optional-dependencies]
+nest    = ["pymultinest>=2.11"]  # optional: not available on Windows
+jupyter = ["ipykernel"]
+dev     = ["build", "twine", "pytest", "nbstripout"]
+
+[project.urls]
+Homepage   = "https://github.com/earlyuniverse/ulysses"
+Repository = "https://github.com/earlyuniverse/ulysses"
+
+# ---------------------------------------------------------------------------
+# Package discovery — exclude the local virtual-env and build artefacts so
+# setuptools does not accidentally bundle them.
+# ---------------------------------------------------------------------------
+
+[tool.setuptools.packages.find]
+exclude = ["ulyssesv3_env*", "build*", "dist*", "*.egg-info"]
+
+[tool.setuptools]
+include-package-data = true

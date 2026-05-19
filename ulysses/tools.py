@@ -1,5 +1,70 @@
 import cmath
 import ulysses
+import sys
+
+
+_BANNER = r"""
+
+                              ##
+                              ###
+                           ###########   #
+                             #####             ######     ##
+                            #####            ####
+                          ###  #           ###      ############
+                        ####      ##     ###     ######      #######
+                        ###             ###    ###                 ###
+                        ##             ##    ###    ############     ##
+                       ##             ##    ##    ###          ####
+                       ##     ###    ###   ##  ###  ############   ###    #
+                    #####     ###    ###  ###  ## ### #####   ####   ##   #
+                  ####         ##     ##  ###  ## ############  ###   ##
+                               ##     ##    ##  ###########  ###  ##   ##
+                                ##     ##    ###   #########  ##  ##   ##
+                         ##     ###     ###    ######### ##   ##  ##   ##
+                                   ###      #############   ##   ###   ##
+                              ##    ####        #####     ###    ##
+                              ###      ####             ###    ###
+                              #####       ###############     ###
+                              ##  ##                        ###
+                              ##   ##                    ####      ###
+                              ##    ##             ######
+                              ##      ##                    #
+                              ##     ###      #
+                              ##    ###     ####
+                              ## ####    ######
+                              #####   ####  ###
+                       ###############      ##
+                                          ###
+                             #######    ####     ############  ##########
+                        ###########################        #######      #
+                                          ##
+
+                  ##    ##  ###  ####  ### #######   ######   ######  #######
+                  ##    ##  ###   ### ###  ###      ###       ##      ###  
+                  ##    ##  ###    #####    ######   ######   ######   ######
+                  ##    ##  ###     ###        ####      ###  ##           ###
+                  ########  ####### ###    ######## ########  ####### ########
+"""
+
+
+def print_banner(model_name=None, param_file=None, params=None, extra=None):
+    """Print the ULYSSES ASCII banner with optional run info."""
+    print(_BANNER)
+    if model_name is not None:
+        print("  Model    : {}".format(model_name))
+    if param_file is not None:
+        print("  Run card : {}".format(param_file))
+    if params:
+        print("  Parameters:")
+        col_width = max(len(k) for k in params)
+        for k, v in params.items():
+            print("    {:{w}s} = {}".format(k, v, w=col_width))
+    if extra:
+        for line in extra:
+            print("  " + line)
+    print("  " + "-" * 60)
+    sys.stdout.flush()
+
 
 
 def parseArgs(args):
@@ -21,9 +86,9 @@ def parseArgs(args):
 def readConfig(fname):
     from collections import OrderedDict
 
-    isCI = True
     fixed  = OrderedDict()
     ranges = OrderedDict()
+    param = 'euler'
     with open(fname) as f:
         for line in f:
             l=line.strip()
@@ -49,9 +114,16 @@ def readConfig(fname):
             else:
                 print ("Warning, not understood instruction:", l)
                 continue
+            
+        if "xN1" in ranges or "xN1" in fixed:
+            param = "single_imaginary"
+        
+        if "x1" in ranges or "x1" in fixed:
+            param = "euler"
+
         if "Y11_mag" in ranges or "Y11_mag" in fixed:
-            isCI = False
-        return ranges, fixed, isCI
+            param = "manual"
+        return ranges, fixed, param
 
 def getBuiltInModels():
      """

@@ -1,4 +1,10 @@
-from ulysses import numba
+import warnings
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("ulysses")
+except PackageNotFoundError:
+    __version__ = "0.0.0+unknown"
 
 from ulysses.tools import *
 
@@ -19,16 +25,40 @@ from ulysses.etab1BE1Fsf              import EtaB_1BE1Fsf
 from ulysses.etab2RES                 import EtaB_2RES # Buggy
 from ulysses.etab2RESmix              import EtaB_2RESmix
 from ulysses.etab2RESsp               import EtaB_2RESsp
-
-#shipped with version 2
-from ulysses.etab1BE1F_Case2          import EtaB_1BE1F_Case2
-from ulysses.etab1BE1F_Case3          import EtaB_1BE1F_Case3
-from ulysses.etab1BE1F_Case4          import EtaB_1BE1F_Case4
-
 from ulysses.etabARS                  import EtaB_ARS
 from ulysses.etabARS                  import EtaB_ARS_INTERP
 
+
 from ulysses.etabPBH                  import EtaB_PBH
+
+from ulysses.etab1BE1F_DM_freezein    import EtaB_1BE1F_DM_FreezeIn
+
+# All physics models requiring numba and the compiled NumbaQuadpack extension will be skipped
+# and issue a single warning and skip the model imports so that tools/ulsbase
+# remain importable for diagnostics.
+try:
+    from NumbaQuadpack import quadpack_sig, dqags  # noqa: F401
+    _NUMBA_OK = True
+except Exception as _numba_err:
+    _NUMBA_OK = False
+    warnings.warn(
+        f"NumbaQuadpack/numba not available ({_numba_err}). "
+        "Some leptogenesis models (Case2,Case3,Case4,CaseS2,BEARS_3RHN) will be unavailable. "
+        "Run 'pip install .' from the repo root to build the C extension."
+        "If C compiler unavailable, please install one (gcc/clang)",
+        ImportWarning,
+        stacklevel=2,
+    )
+
+if _NUMBA_OK:
+
+    from ulysses.etabARS_3RHN             import EtaB_ARS_3RHN
+    from ulysses.etab1BE1F_Case2          import EtaB_1BE1F_Case2
+    from ulysses.etab1BE1F_Case3          import EtaB_1BE1F_Case3
+    from ulysses.etab1BE1F_Case4          import EtaB_1BE1F_Case4
+    from ulysses.etab1BE1F_CaseS2         import EtaB_1BE1F_CaseS2
+
+
 
 testpars = {
         'delta' :270,
