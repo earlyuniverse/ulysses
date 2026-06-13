@@ -19,7 +19,7 @@ The package features:
 - Flexible physics model input via plugin system
 - Full compatibility with user-defined scenarios
 
-It is documented across two key publications:
+It is documented across three key publications:
 - [Version 1 – arXiv:2007.09150](https://arxiv.org/abs/2007.09150)
 - [Version 2 – arXiv:2301.05722](https://arxiv.org/abs/2301.05722)
 - [Version 3 – arXiv:2605.16540](https://arxiv.org/abs/2605.16540)
