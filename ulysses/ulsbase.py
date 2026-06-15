@@ -4,6 +4,7 @@ from odeintw import odeintw
 import timeit
 from numpy import linalg
 import cmath
+import warnings
 
 def fast_isPerturbative(y):
     """
@@ -615,13 +616,23 @@ class ULSBase(object):
         B = prefactor*np.diag([d,e,f])
         return B
 
+    @staticmethod
+    def _logratio(r2):
+        """
+        log(r2)/(r2-1) with the removable singularity at r2 = 1 handled.
+        """
+        u = r2 - 1.
+        if np.abs(u) < 1e-6:
+            return 1. - u*(0.5 - u/3.)  
+        return np.log1p(u)/u
+
     def fMLoop(self, x):
         """
         The loop function.
         """
         rH2 = (x/self.MH)**2
         rZ2 = (x/self.MZ)**2
-        return x*(np.log(rH2)/(rH2-1) + 3*np.log(rZ2)/(rZ2-1) )
+        return x*(self._logratio(rH2) + 3*self._logratio(rZ2))
 
     @property
     def m_tree(self):
@@ -770,6 +781,15 @@ class ULSBase(object):
         M         = self.DM
         prefactor = 0.1*(1+15/(8*z))
         t         = np.log(M[0,0]/self.MH)
+        # This scattering correction is only valid for M1 > M_H; for M1 <= M_H
+        # the log argument can turn non-positive and silently return a
+        # wrong-but-finite value=.
+        if np.real(t) <= 0:
+            warnings.warn(
+                "scat() expects M1 > M_H (got M1=%g GeV, M_H=%g GeV): the "
+                "scattering correction is undefined for M1 <= M_H; the result "
+                "may be nan or unreliable." % (np.real(M[0,0]), self.MH),
+                RuntimeWarning, stacklevel=2)
         bracket   = z*t*np.log(1+(1/z)*8.77298/t)+1/z
         return prefactor*bracket
 
@@ -779,6 +799,14 @@ class ULSBase(object):
         """
         M         = self.DM
         t         = np.log(M[0,0]/self.MH)
+        # Only valid for M1 > M_H; warn loudly for M1 <= M_H instead of
+        # silently returning a wrong-but-finite value (see scat()).
+        if np.real(t) <= 0:
+            warnings.warn(
+                "DS() expects M1 > M_H (got M1=%g GeV, M_H=%g GeV): the "
+                "scattering term is undefined for M1 <= M_H; the result may "
+                "be nan or unreliable." % (np.real(M[0,0]), self.MH),
+                RuntimeWarning, stacklevel=2)
         DStemp    = 0.11399*k1*(1+t*(z**2)*np.log(1+8.77298/(t*z)))
         return DStemp
 
@@ -896,19 +924,44 @@ class ULSBase(object):
 
     def f1(self, x):
         """
-        Loop function in epsilon.
+        Loop function in epsilon.  f1(x) -> 1 as x -> infinity.
+
+        The closed form cannot be evaluated naively for large x. We therefore use an
+        asymptotic series in t = 1/x**2 for large x, and a log1p-based form
+        (accurate for small arguments) below.
         """
-        r2=np.power(x,2)
+        r2 = np.power(x, 2)
 
-        f1temp = 2./3.*r2*( (1.+r2) * np.log( (1.+r2) / r2 ) - (2.-r2)/(1.-r2) )
+        if np.abs(x) > 30.:
+            # f1 = 1 + 5/9 t + 13/18 t**2 + 19/30 t**3 + 31/45 t**4 + ...
+            t = 1./r2
+            return 1. + t*(5./9. + t*(13./18. + t*(19./30. + t*(31./45.))))
 
-        return f1temp if x<10000 else 1
+        return 2./3.*r2*((1.+r2)*np.log1p(1./r2) - (1. - 1./(r2-1.)))
 
     def f2(self, x):
         """
         Loop function in epsilon.
         """
         return (2./3.)*(1/(np.power(x,2)-1.))
+
+    def f_reg(self, x, reg):
+        """
+        Regularised loop function used in the resonant epsilon_*_reg routines.
+        Same form as f1 but with the pole term scaled by the regulator reg,
+        and with x already squared (x = (M_j/M_i)**2, i.e. x plays the role of
+        r2 in f1):
+        """
+        if np.abs(x) > 900.:
+           
+            t = 1./x
+            return ((1. + 2.*reg)/3.
+                    + (2./3.)*t*((reg - 1./6.)
+                    + t*((reg + 1./12.)
+                    + t*((reg - 1./20.)
+                    + t*(reg + 1./30.)))))
+        # log1p keeps log((1+x)/x) = log1p(1/x) accurate; identical pole at x=1.
+        return 2./3.*x*((1. + x)*np.log1p(1./x) - 1. + reg/(x - 1.))
 
     def epsilon(self, i, j, k, m):
         """
@@ -966,14 +1019,8 @@ class ULSBase(object):
         x31 = (M[2,2]/M[0,0])**2
         reg21 = 1/(1 + self.Gamma2**2 * (1/(DeltaM21 * (1 + x21))**2))
         reg31 = 1/(1 + self.Gamma3**2 * (1/(DeltaM31 * (1 + x31))**2))
-        if x21<10000:
-            f21 = 2./3.* x21 *( (1.+x21) * np.log( (1.+x21) / x21 ) - 1 + reg21 * (1.)/(x21 - 1.) )
-        else:
-            f21 = 1
-        if x31<10000:
-            f31 = 2./3.* x31 *( (1.+x31) * np.log( (1.+x31) / x31 ) - 1 + reg31 * (1.)/(x31 - 1.) )
-        else:
-            f31 = 1
+        f21 = self.f_reg(x21, reg21)
+        f31 = self.f_reg(x31, reg31)
 
         prefactor   = (3/(32*np.pi))*(1/(lsquare[0,0]))
         first       = 1j*(lsquare[1,0]*l[a,0]*lcon[b,1]-lsquare[0,1]*l[a,1]*lcon[b,0])*(M[0,0]/M[1,1])*f21
@@ -1022,14 +1069,8 @@ class ULSBase(object):
         reg12 = 1/(1 + self.Gamma1**2 * (1/(DeltaM12 * (1 + x12))**2))
         reg32 = 1/(1 + self.Gamma3**2 * (1/(DeltaM32 * (1 + x32))**2))
         #Bad behaviour in the limit of large xk/xj
-        if x12 < 10000:
-            f12 = 2./3.* x12 *( (1.+x12) * np.log( (1.+x12) / x12 ) - 1 + reg12 * (1.)/(x12 - 1.) )
-        else:
-            f12 = 1
-        if x32 < 10000:
-            f32 = 2./3.* x32 *( (1.+x32) * np.log( (1.+x32) / x32 ) - 1 + reg32 * (1.)/(x32 - 1.) )
-        else:
-            f32 = 1
+        f12 = self.f_reg(x12, reg12)
+        f32 = self.f_reg(x32, reg32)
     
 
         #define terms of epsilon: prefactor and first term (first), second term (second) etc.
@@ -1080,14 +1121,8 @@ class ULSBase(object):
         x23 = (M[1,1]/M[2,2])**2
         reg13 = 1/(1 + self.Gamma1**2 * (1/(DeltaM13 * (1 + x13))**2))
         reg23 = 1/(1 + self.Gamma2**2 * (1/(DeltaM23 * (1 + x23))**2))
-        if x13 < 10000:
-            f13 = 2./3.* x13 *( (1.+x13) * np.log( (1.+x13) / x13 ) - 1 + reg13 * (1.)/(x13 - 1.) )
-        else:
-            f13 = 1
-        if x23 < 10000:
-            f23 = 2./3.* x23 *( (1.+x23) * np.log( (1.+x23) / x23 ) - 1 + reg23 * (1.)/(x23 - 1.) )
-        else:
-            f23 = 1
+        f13 = self.f_reg(x13, reg13)
+        f23 = self.f_reg(x23, reg23)
 
         #define terms of epsilon: prefactor and first term (first), second term (second) etc.
         prefactor   = (3/(32*np.pi))*(1/(lsquare[2,2]))
