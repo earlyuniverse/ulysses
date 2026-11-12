@@ -52,6 +52,10 @@ def Nl_lstore(fn_store, zs):
     dlogz  = np.log10(zs[1]) - np.log10(zs[0])
     dlogz0 = np.log10(zs[0])
 
+    # Interpolate Nn/Neq (smooth) instead of Nn ~ exp(-z): a linear interpolant of Nn
+    # overshoots Neq between nodes and acts as a spurious CP source at strong washout.
+    fn_store = fn_store / ((3. / 8.) * zs * zs * kn(2, zs))
+
     @njit
     def logindexz(z):
         """Index in zs just below z."""
@@ -100,8 +104,7 @@ def Nl_lstore(fn_store, zs):
 
     def Nlrhs(z, Nl, eps, K):
         """Full RHS of the N_{l-l} ODE for Case 3."""
-        Neq      = 0.375 * z * z * kn(2, z)
-        Nn       = eval(z) / Neq
+        Nn       = eval(z)   # already Nn/Neq
         data     = np.array([z, Nl[0], eps, Nn], np.float64)
         integral = dqags(ynintegral_ptr, 1e-10, 300., data,
                          epsrel=1e-10, epsabs=1e-10)[0]

@@ -27,6 +27,7 @@ oscillations; gauge-boson processes and Delta L=1 CP-violation not included.
 
 import math
 import os
+import warnings
 import numpy as np
 import ulysses
 from scipy.integrate import solve_ivp
@@ -126,8 +127,10 @@ def make_AB_eval(A_grid, B_grid, z_grid, yn_vals):
     return eval_A_vec, eval_B_vec
 
 
-def solve_fN_all_modes(yn_vals, K, zs, eval_A_vec, eval_B_vec, g0=0.0):
+def solve_fN_all_modes(yn_vals, K, zs, eval_A_vec, eval_B_vec=None, g0=0.0):
     """Solve the RHN phase-space ODE for all momentum modes in one call.
+
+    Uses detailed balance B = -A fN^eq, i.e. dg/dz = K A (g-1) - g dln(fN^eq)/dz.
 
     All modes are independent, so they are stacked into a single ODE system
     of size n_yn and solved with one call to scipy.integrate.solve_ivp.
@@ -142,9 +145,11 @@ def solve_fN_all_modes(yn_vals, K, zs, eval_A_vec, eval_B_vec, g0=0.0):
         Washout parameter k1 = Gamma_1 / H(M_1).
     zs : ndarray, shape (n_z,)
         Evolution variable z = M_1 / T.
-    eval_A_vec, eval_B_vec : njit callables
-        Vectorised interpolators returning A(z, yn_vals) and B(z, yn_vals)
-        as arrays for a given scalar z.
+    eval_A_vec : njit callable
+        Vectorised interpolator returning A(z, yn_vals) as an array for a
+        given scalar z.
+    eval_B_vec : njit callable, optional
+        Unused; kept for backward compatibility.
     g0 : float
         Initial value of g = f_N / f_N^eq at zs[0].
         0.0 → vanishing IC;  1.0 → thermal IC.
@@ -167,8 +172,8 @@ def solve_fN_all_modes(yn_vals, K, zs, eval_A_vec, eval_B_vec, g0=0.0):
         fNeq    = 1.0 / (1.0 + np.exp(en))
         dlnfNeq = -(1.0 - fNeq) * (z / en)
         A_arr   = eval_A_vec(z, yn_act)
-        B_arr   = eval_B_vec(z, yn_act)
-        return K * (A_arr * g + B_arr / fNeq) - g * dlnfNeq
+        # Detailed balance B = -A fNeq imposed exactly (see docstring)
+        return K * A_arr * (g - 1.0) - g * dlnfNeq
 
     def jac(z, _):
         # Jacobian is diagonal (modes are independent); linear ODE so independent of g
@@ -197,6 +202,8 @@ def solve_fN_all_modes(yn_vals, K, zs, eval_A_vec, eval_B_vec, g0=0.0):
         fn_store[active] = sol.y * fNeq_grid
     else:
         # Fallback: fill with equilibrium distribution
+        warnings.warn(f"CaseS2: f_N solve failed ({sol.message}); falling back to "
+                      "f_N = f_N^eq for all z, which removes the asymmetry source.")
         en_grid  = np.sqrt(zs[np.newaxis, :]**2 + yn_act[:, np.newaxis]**2)
         fn_store[active] = 1.0 / (1.0 + np.exp(en_grid))
 
@@ -212,7 +219,12 @@ def Nl_lstore(fn_store,yn_vals,zs):
     nz     = len(zs)
     ny     = len(yn_vals)
     dlogz  = np.log(zs[1]) - np.log(zs[0])
-    logz0  = np.log(zs[0])  
+    logz0  = np.log(zs[0])
+
+    # Interpolate g = fN/fNeq (smooth, ~1) rather than fN ~ exp(-E_N), whose linear
+    # interpolant overshoots fNeq between nodes and acts as a spurious CP source.
+    en_store = np.minimum(np.sqrt(zs[np.newaxis, :]**2 + yn_vals[:, np.newaxis]**2), 700.)
+    g_store  = fn_store * (1.0 + np.exp(en_store))
 
     @njit
     def eval(z, yn):
@@ -237,14 +249,17 @@ def Nl_lstore(fn_store,yn_vals,zs):
         # z interpolation — correct for log spacing
         tz = (z - zs[zindex]) / (zs[zindex+1] - zs[zindex])
 
-        fn_lo = (fn_store[yindex    ][zindex  ] * (1 - tz)
-            + fn_store[yindex    ][zindex+1] * tz)
-        fn_hi = (fn_store[yindex + 1][zindex  ] * (1 - tz)
-            + fn_store[yindex + 1][zindex+1] * tz)
+        g_lo = (g_store[yindex    ][zindex  ] * (1 - tz)
+            + g_store[yindex    ][zindex+1] * tz)
+        g_hi = (g_store[yindex + 1][zindex  ] * (1 - tz)
+            + g_store[yindex + 1][zindex+1] * tz)
 
-        # yn interpolation — linear in yn (grid is log-spaced but fn varies smoothly)
+        # yn interpolation — linear in yn
         ty = (yn - yn_vals[yindex]) / (yn_vals[yindex+1] - yn_vals[yindex])
-        return fn_lo * (1 - ty) + fn_hi * ty
+        en = math.sqrt(z * z + yn * yn)
+        if en > 700.:
+            return 0.0
+        return (g_lo * (1 - ty) + g_hi * ty) / (1.0 + math.exp(en))
 
     # ── safe Bose-Einstein for Higgs ──────────────────────────────────────
     @njit
@@ -826,6 +841,9 @@ class EtaB_1BE1F_CaseS2(ulysses.ULSBase):
     Flavour off-diagonal oscillations are not included.
     """
     def __init__(self, *args, **kwargs):
+        # AB grid only covers z in [0.01, 100]; default to the uls-calc range
+        kwargs.setdefault("zmin", 0.1)
+        kwargs.setdefault("zmax", 30.)
         super().__init__(*args, **kwargs)
 
 
@@ -854,6 +872,16 @@ class EtaB_1BE1F_CaseS2(ulysses.ULSBase):
         data_dir = os.path.dirname(ulysses.__file__)
         PATH_AB_integral = os.path.join(data_dir, './data/AB_grid_CaseS2.npz')
         AB_integral = load_AB(PATH_AB_integral)
+        # Reliable z range of the table: up to the last z row before any NaN in A among the
+        # evolved modes (E_N(zmin) < 50, i.e. yn < 50, plus one node for the bilinear stencil)
+        A_g, z_g, y_g = AB_integral[0], AB_integral[2], AB_integral[3]
+        bad = np.isnan(A_g[:, :np.searchsorted(y_g, 50.) + 1]).any(axis=1)
+        z_hi = z_g[max(np.argmax(bad) - 1, 0)] if bad.any() else z_g[-1]
+        if zs[0] < z_g[0] or zs[-1] > z_hi:
+            warnings.warn(f"CaseS2: z range [{zs[0]:g}, {zs[-1]:g}] exceeds the reliable AB-grid "
+                          f"range [{z_g[0]:g}, {z_hi:g}]; results may be wrong. "
+                          "To extend the range, regenerate data/AB_grid_CaseS2.npz with "
+                          "ulysses/Rate_store_Case_S2.ipynb.")
         
         eval_A_vec, eval_B_vec = make_AB_eval(AB_integral[0],AB_integral[1],AB_integral[2],AB_integral[3])
 

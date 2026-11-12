@@ -45,6 +45,10 @@ def Nl_lstore(fn_store, yn_vals, zs):
     dlogz  = np.log10(zs[1]) - np.log10(zs[0])
     dlogz0 = np.log10(zs[0])
 
+    # Interpolate g = fN/fNeq (smooth) instead of fN ~ exp(-E): a linear interpolant of
+    # fN overshoots fNeq between nodes and acts as a spurious CP source at strong washout.
+    fn_store = fn_store * (1. + np.exp(np.minimum(np.sqrt(zs[np.newaxis, :]**2 + yn_vals[:, np.newaxis]**2), 700.)))
+
     @njit
     def logindexy(y):
         """Index in yn_vals just below y."""
@@ -75,7 +79,8 @@ def Nl_lstore(fn_store, yn_vals, zs):
         else:
             fn_z = fn_z1 = 0.0
         if yindex < len(yn_vals) - 1 and yindex >= 0:
-            return lininterp(y, yn_vals[yindex], yn_vals[yindex + 1], fn_z, fn_z1)
+            en = math.sqrt(z * z + y * y)
+            return lininterp(y, yn_vals[yindex], yn_vals[yindex + 1], fn_z, fn_z1) / (1. + math.exp(en))
         return 0.0
 
     @nb.cfunc(quadpack_sig)
